@@ -41,17 +41,136 @@ This platform brings **professional sports management tools** to the grassroots 
 
 ### Technical Stack
 
-- **Backend:** ASP.NET Core 9 + PostgreSQL
-- **Frontend:** Vue 3 + Vuetify (mobile-first, responsive)
-- **Infrastructure:** Docker containers on VPS
-- **CI/CD:** GitHub Actions with blue-green deployment
-- **Environments:** Dev → Prod (Staging planned for future)
+**Backend:**
+- Framework: ASP.NET Core 9 (Jason Taylor Clean Architecture)
+- Database: PostgreSQL 15 (or SQL Server, SQLite for dev)
+- Authentication: ASP.NET Identity + Google SSO
+- Security: JWT tokens + cookie-based sessions
+- Logging: Serilog → Loki/file outputs
+- ORM: Entity Framework Core
+
+**Frontend:**
+- Framework: Vue 3 + Vuetify (mobile-first, responsive)
+- Authentication: Google SSO + credential-based (via backend)
+- Build Tool: Vite
+- State Management: Pinia
+- HTTP Client: Axios
+- Real-time: SignalR client
+
+**Infrastructure & Deployment:**
+- VPS: Ubuntu 24.04 (2 vCPU / 4 GB RAM)
+- Containerization: Docker + Docker Compose
+- Reverse Proxy: Nginx (SSL termination, load balancing)
+- SSL/TLS: Let's Encrypt (automated with certbot)
+- Firewall: UFW (allow 80, 443, 8200)
+- Optional: Cloudflare proxy for DDoS protection
+
+**Security & Secrets:**
+- Secrets Management: HashiCorp Vault (Docker container)
+- Access Method: Environment variables / Docker secrets
+- Never stored in code or Dockerfile
+- Frontend never accesses Vault directly
+
+**Monitoring & Observability:**
+- Metrics: Prometheus (app & container metrics)
+- Visualization: Grafana (dashboards & alerts)
+- Logs: Serilog + Loki + Promtail
+- Alerts: Grafana alerts → email/webhook notifications
+
+**CI/CD:**
+- Repository: GitHub
+- Pipeline: GitHub Actions
+- Process: Test → Build → Deploy to VPS via SSH
+- Deployment: Blue-green strategy with health checks
+
+**Environments:** Dev → Prod (Staging planned for future)
 
 ### Repository Structure
 
 - **Frontend Repository:** Vue 3 application (GitHub)
 - **Backend Repository:** ASP.NET Core API + deployment configs (GitHub)
 - Separate repos enable independent deployment and version control
+
+### Coding Standards & Architecture Patterns
+
+#### Backend: Clean Architecture (Jason Taylor Template)
+
+The backend follows **Jason Taylor's Clean Architecture** pattern for ASP.NET Core, providing:
+- **Clear separation of concerns** - Domain, Application, Infrastructure, and API layers
+- **Dependency inversion** - Core business logic independent of external frameworks
+- **Testability** - Easy unit and integration testing
+- **Maintainability** - Structured for long-term growth and scalability
+- **Future-proofing** - Easy to migrate from monolith to microservices if needed
+
+**Benefits for this project:**
+- While starting as a monolith, Clean Architecture reduces pain when expanding features
+- Enables clear boundaries between scoring logic, event management, and infrastructure
+- Makes it easier to extract services (e.g., real-time scoring engine) in the future
+- Follows industry best practices for enterprise .NET development
+
+#### Frontend: Organized Vue 3 Structure
+
+The frontend follows **best-practice Vue 3 folder organization**:
+
+```
+frontend/
+├── public/                    # Static assets served as-is
+├── src/
+│   ├── api/                   # API client and service layer
+│   ├── assets/                # Images, fonts, static files
+│   │   ├── images/
+│   │   ├── fonts/
+│   │   └── icons/
+│   ├── components/            # Reusable Vue components
+│   │   ├── common/            # Generic components (Button, Card, etc.)
+│   │   ├── events/            # Event-specific components
+│   │   ├── scoring/           # Scoring UI components
+│   │   └── brackets/          # Tournament bracket components
+│   ├── composables/           # Vue 3 Composition API reusable logic
+│   ├── directives/            # Custom Vue directives
+│   ├── layouts/               # Page layout components
+│   │   ├── DefaultLayout.vue
+│   │   ├── AuthLayout.vue
+│   │   └── MobileLayout.vue
+│   ├── locales/               # i18n translation files
+│   │   ├── en.json
+│   │   ├── vi.json
+│   │   └── index.ts
+│   ├── plugins/               # Vue plugins and third-party integrations
+│   ├── router/                # Vue Router configuration
+│   │   ├── index.ts
+│   │   └── routes/
+│   ├── store/                 # Pinia state management
+│   │   ├── modules/
+│   │   │   ├── auth.ts
+│   │   │   ├── events.ts
+│   │   │   ├── scores.ts
+│   │   │   └── brackets.ts
+│   │   └── index.ts
+│   ├── styles/                # Global styles and themes
+│   │   ├── variables.scss
+│   │   ├── mixins.scss
+│   │   └── main.scss
+│   ├── types/                 # TypeScript type definitions
+│   ├── utils/                 # Helper functions and utilities
+│   ├── views/                 # Page-level components
+│   │   ├── auth/
+│   │   ├── events/
+│   │   ├── scoring/
+│   │   └── brackets/
+│   ├── App.vue
+│   └── main.ts
+├── tests/                     # Unit and integration tests
+├── vite.config.ts
+└── package.json
+```
+
+**Organizational Benefits:**
+- **Clear separation** - Easy to locate components, services, and utilities
+- **Scalability** - Structure supports growth from MVP to large application
+- **Team collaboration** - Developers can work in parallel without conflicts
+- **Maintainability** - Consistent patterns make onboarding easier
+- **i18n ready** - Multi-language support from day one
 
 ---
 

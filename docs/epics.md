@@ -1,7 +1,7 @@
 # Archery Event Management System - Epic & Story Breakdown
 
 **Author:** TruongPham  
-**Date:** November 6, 2025  
+**Date:** November 7, 2025  
 **Project Level:** Level 3 (Complex System)  
 **Target Scale:** Production-grade SaaS platform with real-time scoring
 
@@ -21,19 +21,24 @@ This document provides the complete epic and user story breakdown for the Archer
 
 | Epic | Name | Stories | Weeks | Priority |
 |------|------|---------|-------|----------|
-| 1 | Infrastructure & Security Foundation | 5 | 1-2 | P0 (Critical) |
-| 2 | User & Access Management | 4 | 3 | P0 (Critical) |
+| 1 | Infrastructure & Security Foundation | 7 | 1-2 | P0 (Critical) |
+| 2 | User & Access Management | 5 | 3 | P0 (Critical) |
 | 3 | Event & Game Configuration | 4 | 4 | P0 (Critical) |
 | 4 | Participation & Registration | 4 | 5 | P0 (Critical) |
 | 5 | Real-Time Qualification Scoring | 6 | 6-8 | P0 (Critical) |
 | 6 | Elimination Tournament System | 6 | 9-11 | P0 (Critical) |
 | 7 | Observer & Spectator Experience | 3 | 12 | P1 (Important) |
-| 8 | Observability & Monitoring | 4 | 13-14 | P1 (Important) |
+| 8 | Observability & Monitoring | 6 | 13-14 | P1 (Important) |
 | 9 | DevOps & Deployment Pipeline | 3 | 15-16 | P0 (Critical) |
 | 10 | Mobile & Responsive UI | 3 | Parallel 6-16 | P0 (Critical) |
 
-**Total Stories:** 42  
+**Total Stories:** 47  
 **Estimated Duration:** 16-20 weeks to production MVP
+
+**Coding Standards:**
+- **Backend:** Jason Taylor Clean Architecture (ASP.NET Core 9)
+- **Frontend:** Vue 3 best practices with organized folder structure
+- See PRD.md and architecture.md for detailed standards
 
 ---
 
@@ -181,6 +186,72 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
+### Story 1.6: HashiCorp Vault Secrets Management Setup
+
+**As a** DevOps engineer,  
+**I want** HashiCorp Vault deployed for centralized secrets management,  
+**So that** sensitive credentials are never hardcoded or stored in environment files.
+
+**Acceptance Criteria:**
+1. Vault container added to Docker Compose with hashicorp/vault:latest image
+2. Vault initialized with unseal keys stored securely (development mode for local)
+3. Vault UI accessible on port 8200 (localhost only)
+4. Secrets engine (kv-v2) enabled for storing application secrets
+5. Secrets created in Vault:
+   - Database connection strings (PostgreSQL credentials)
+   - JWT signing secret and refresh token secret
+   - Google OAuth client ID and client secret
+   - Email service credentials (future)
+6. Backend service configured to read secrets from Vault via environment variables or Vault API
+7. Vault access token/AppRole configured for backend authentication
+8. Vault data persisted in named volume (vault-data)
+9. Health check endpoint `/v1/sys/health` returns 200 OK
+10. Documentation added for local Vault setup and secret initialization
+
+**Technical Notes:**
+- Use Vault Docker container with volume mount for persistence
+- For production: Use Vault server mode with auto-unseal
+- For local dev: Use `-dev` mode for simplicity
+- Backend uses VaultSharp or direct HTTP API to retrieve secrets
+- Secrets loaded at application startup and cached securely
+- Alternative: Use Docker Secrets if Vault not feasible
+
+**Prerequisites:** Story 1.1 (Docker Compose setup), Story 1.5 (Database setup)
+
+---
+
+### Story 1.7: UFW Firewall Configuration for VPS Security
+
+**As a** system administrator,  
+**I want** UFW firewall configured on Ubuntu VPS,  
+**So that** only necessary ports are exposed and the system is protected from unauthorized access.
+
+**Acceptance Criteria:**
+1. UFW installed and enabled on Ubuntu 24.04 LTS VPS
+2. Default policies set: deny incoming, allow outgoing
+3. Required ports opened:
+   - Port 22 (SSH) - restricted to specific IP addresses or SSH key only
+   - Port 80 (HTTP) - allow from anywhere
+   - Port 443 (HTTPS) - allow from anywhere
+   - Port 8200 (Vault UI) - allow from localhost only (internal access)
+4. All other ports blocked by default
+5. UFW status shows active with correct rules
+6. Rate limiting enabled on SSH port (max 6 connections per 30 seconds)
+7. Logging enabled (level: low) to `/var/log/ufw.log`
+8. Docker containers can communicate through UFW (Docker iptables compatibility ensured)
+9. Configuration documented in deployment guide
+
+**Technical Notes:**
+- Commands: `ufw allow 80/tcp`, `ufw allow 443/tcp`, `ufw limit 22/tcp`
+- Ensure UFW rules apply before Docker modifies iptables
+- Test firewall rules before enabling permanently
+- Document fallback procedure if locked out via SSH
+- Consider IP whitelisting for SSH in production
+
+**Prerequisites:** Story 1.1 (Docker Compose setup)
+
+---
+
 ## Epic 2: User & Access Management
 
 **Goal:** Implement user authentication, authorization, and profile management
@@ -209,9 +280,14 @@ This document provides the complete epic and user story breakdown for the Archer
 9. Unit tests cover success and error cases
 
 **Technical Notes:**
+- **Follow Clean Architecture pattern** (see architecture.md)
+- Create `ArcheryEvent.Domain` project for User entity
+- Create `ArcheryEvent.Application` project with `RegisterUserCommand` and handler
+- Create `ArcheryEvent.Infrastructure` project for DbContext and password hashing
+- Create `ArcheryEvent.WebAPI` project with AuthController
 - Use ASP.NET Core Identity or custom implementation
 - Entity Framework Core for database access
-- FluentValidation for input validation
+- FluentValidation for input validation in Application layer
 - Return standardized error responses
 
 **Prerequisites:** Story 1.5 (Database setup)
@@ -237,10 +313,13 @@ This document provides the complete epic and user story breakdown for the Archer
 10. JWT secret loaded from environment variable
 
 **Technical Notes:**
+- **Clean Architecture:** Create `LoginCommand` in Application layer
+- Use MediatR pattern for command handling
 - Use Microsoft.AspNetCore.Authentication.JwtBearer
 - Sign tokens with HS256 algorithm
 - Store refresh tokens in database with expiration tracking
 - Implement token rotation on refresh
+- JWT configuration in WebAPI Program.cs
 
 **Prerequisites:** Story 2.1 (User registration)
 
@@ -296,6 +375,42 @@ This document provides the complete epic and user story breakdown for the Archer
 - Don't expose password hash in any response
 
 **Prerequisites:** Story 2.3 (Authorization middleware)
+
+---
+
+### Story 2.5: Google SSO Integration (OAuth 2.0)
+
+**As a** new or existing user,  
+**I want** to sign in using my Google account,  
+**So that** I can access the platform without creating a separate password.
+
+**Acceptance Criteria:**
+1. Backend: Google OAuth 2.0 authentication configured using Google.Apis.Auth NuGet package
+2. Google Cloud Console project created with OAuth 2.0 credentials (Client ID, Client Secret)
+3. Backend: POST `/api/v1/auth/google` endpoint accepts Google ID token from frontend
+4. Backend: Token verified using Google.Apis.Auth.GoogleJsonWebSignature.ValidateAsync()
+5. Backend: User created or retrieved based on Google email (sub claim used as external ID)
+6. Backend: JWT access token and refresh token generated for authenticated Google user
+7. Frontend: Google Sign-In button implemented using Google Identity Services (GSI)
+8. Frontend: Google Sign-In button triggers OAuth flow, sends ID token to backend
+9. Frontend: JWT tokens stored securely and user redirected to dashboard
+10. Google Client ID and Secret stored in HashiCorp Vault (not hardcoded)
+11. Users can link existing email/password account with Google account
+12. Error handling for invalid tokens, network failures, and consent denials
+
+**Technical Notes:**
+- **Backend:** Install Google.Apis.Auth NuGet package
+- **Backend:** Create `GoogleAuthCommand` in Application layer with handler
+- **Backend:** Validate Google token, extract email, given_name, family_name, sub
+- **Backend:** Store Google sub in Users table (GoogleId column, nullable)
+- **Frontend:** Use `<script src="https://accounts.google.com/gsi/client" async defer></script>`
+- **Frontend:** Implement `handleCredentialResponse(response)` callback
+- **Frontend:** Send response.credential (ID token) to backend `/api/v1/auth/google`
+- Load Google Client ID from Vault secret (GOOGLE_OAUTH_CLIENT_ID)
+- Redirect URI: Configure in Google Console (e.g., https://yourdomain.com/auth/google/callback)
+- Scopes: openid, email, profile
+
+**Prerequisites:** Story 2.2 (JWT login), Story 1.6 (Vault secrets management)
 
 ---
 
@@ -1101,6 +1216,85 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
+### Story 8.5: cAdvisor Container Metrics Collection
+
+**As a** DevOps engineer,  
+**I want** detailed container-level metrics collected by cAdvisor,  
+**So that** I can monitor Docker container resource usage and performance.
+
+**Acceptance Criteria:**
+1. cAdvisor container added to Docker Compose using google/cadvisor:latest image
+2. cAdvisor configured to monitor all Docker containers on the host
+3. cAdvisor metrics endpoint exposed at http://localhost:8080 (internal only)
+4. cAdvisor added as scrape target in Prometheus (prometheus.yml)
+5. Metrics collected include:
+   - Container CPU usage (per container)
+   - Container memory usage and limits
+   - Container network I/O (bytes sent/received)
+   - Container disk I/O
+   - Container filesystem usage
+6. Grafana dashboard created showing:
+   - Resource usage by container (CPU, memory, network)
+   - Container health status
+   - Resource limit violations
+7. cAdvisor has read-only access to Docker socket (/var/run/docker.sock)
+8. Metrics retained in Prometheus for 30 days
+
+**Technical Notes:**
+- Use google/cadvisor:latest Docker image
+- Mount Docker socket: `/var/run/docker.sock:/var/run/docker.sock:ro`
+- Mount root filesystem: `/:/rootfs:ro`
+- Mount /var/run: `/var/run:/var/run:rw`
+- Mount /sys: `/sys:/sys:ro`
+- Mount /var/lib/docker: `/var/lib/docker:/var/lib/docker:ro`
+- Add to prometheus.yml: `- job_name: 'cadvisor'` targeting port 8080
+- Privileged mode may be required: `privileged: true`
+
+**Prerequisites:** Story 8.1 (Prometheus setup)
+
+---
+
+### Story 8.6: Node Exporter System Metrics Collection
+
+**As a** system administrator,  
+**I want** host system metrics collected by Node Exporter,  
+**So that** I can monitor VPS hardware resources (CPU, RAM, disk, network).
+
+**Acceptance Criteria:**
+1. Node Exporter container added to Docker Compose using prom/node-exporter:latest
+2. Node Exporter configured to collect host system metrics (not just container metrics)
+3. Node Exporter metrics endpoint exposed at http://localhost:9100/metrics (internal only)
+4. Node Exporter added as scrape target in Prometheus
+5. System metrics collected include:
+   - Host CPU usage (overall and per-core)
+   - Host memory usage (total, used, available, buffers, cache)
+   - Host disk usage (per filesystem, read/write IOPS)
+   - Host network usage (per interface, bytes/packets sent/received)
+   - System load average (1m, 5m, 15m)
+   - Host uptime
+6. Grafana dashboard created showing:
+   - System overview (CPU, RAM, disk, network)
+   - Disk space alerts (< 10% free)
+   - Network bandwidth usage
+   - System load trends
+7. Node Exporter configured with recommended collectors enabled
+8. Metrics retained in Prometheus for 30 days
+
+**Technical Notes:**
+- Use prom/node-exporter:latest Docker image
+- Mount host filesystems for accurate metrics:
+  - `/proc:/host/proc:ro`
+  - `/sys:/host/sys:ro`
+  - `/:/rootfs:ro`
+- Command: `--path.procfs=/host/proc --path.sysfs=/host/sys --path.rootfs=/rootfs`
+- Network mode: host (to access host network stats)
+- Add to prometheus.yml: `- job_name: 'node-exporter'` targeting port 9100
+- Enable collectors: cpu, meminfo, diskstats, netdev, filesystem, loadavg
+
+**Prerequisites:** Story 8.1 (Prometheus setup)
+
+---
+
 ## Epic 9: DevOps & Deployment Pipeline
 
 **Goal:** Automated CI/CD with blue-green deployment strategy
@@ -1233,8 +1427,16 @@ This document provides the complete epic and user story breakdown for the Archer
 10. Mock data includes realistic event/score/bracket data
 
 **Technical Notes:**
+- **Implement organized folder structure** (see architecture.md)
+- Create folders: api/, assets/, components/, composables/, layouts/, locales/, router/, store/, styles/, types/, utils/, views/
 - Use Vite for fast dev server
 - Mock Service Worker (MSW) for API mocking
+- Vuetify theme configured to brand colors
+- Pinia stores: auth, events, scores, brackets
+- TypeScript interfaces for all DTOs
+- i18n setup for multi-language (locales/en.json, locales/vi.json)
+
+**Prerequisites:** None (can start immediately)
 - Vuetify theme configured to brand colors
 - Pinia stores: auth, events, scores, brackets
 - TypeScript interfaces for all DTOs
@@ -1295,6 +1497,11 @@ This document provides the complete epic and user story breakdown for the Archer
 6. Fast touch interactions (no delays)
 
 **Technical Notes:**
+- **Follow Vue 3 folder structure** (see architecture.md and PRD.md)
+- Create organized folders: api/, components/, composables/, store/, views/, locales/
+- Use Composition API with composables (useAuth, useWebSocket, useScoring)
+- Pinia for state management (authStore, eventsStore, scoresStore)
+- TypeScript for type safety
 - Use v-text-field with type="number"
 - SignalR client library (@microsoft/signalr)
 - Service worker for offline support
