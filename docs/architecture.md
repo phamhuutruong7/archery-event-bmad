@@ -2339,6 +2339,33 @@ Clean Architecture makes this transition significantly easier than traditional l
 
 The frontend follows **Vue 3 community best practices** with clear separation and scalability in mind.
 
+#### Responsive Design Strategy
+
+**Mobile-First Approach:**
+- Primary target: Mobile phones in portrait orientation (athletes scoring on-the-go)
+- Full-screen experience on mobile devices with no wasted space
+- Landscape mode optimized for tablets and desktops (full-width utilization)
+
+**Breakpoint Strategy:**
+
+| Device Type | Orientation | Max Width | Layout Strategy |
+|-------------|-------------|-----------|-----------------|
+| Mobile Phone | Portrait | 767px | Full screen (100vw × 100dvh), no borders, native feel |
+| Tablet | Portrait | 768px - 1023px | Constrained width (500px max), centered, subtle borders |
+| Tablet/Desktop | Landscape | Any | Full width (100vw), optimized horizontal space |
+| Desktop | Any | Any | Full width, expanded hit targets for mouse input |
+
+**Viewport Handling:**
+- Use `100dvh` (dynamic viewport height) for mobile browsers to account for URL bar hiding
+- Remove all default padding from `v-main` container (`pa-0`)
+- Scoresheet container adapts responsively without fixed dimensions
+
+**Responsive Component Guidelines:**
+- All interactive elements minimum 44×44px touch targets (WCAG AAA)
+- Score buttons use `aspect-ratio: 1` for consistent sizing across devices
+- Grid layouts use flexible units (fr, %, vw/vh) instead of fixed pixels
+- Font sizes scale appropriately: 14px (mobile) to 16px+ (desktop)
+
 #### Folder Structure
 
 ```

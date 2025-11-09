@@ -111,6 +111,34 @@ Local persistence (offline):
 
 ---
 
+## Responsive Design Strategy
+
+**Mobile-First Philosophy:**
+The scoresheet is primarily designed for **mobile athletes** entering scores in the field. The interface must feel native and use every pixel efficiently.
+
+**Viewport Behavior:**
+
+| Device | Orientation | Strategy | Rationale |
+|--------|-------------|----------|-----------|
+| Mobile (< 768px) | Portrait | **Full Screen** - No borders, 100vw × 100dvh | Athletes need maximum space for score input, native app feel |
+| Tablet (768-1023px) | Portrait | Constrained (500px max), centered | Comfortable reading width, professional appearance |
+| Tablet/Desktop | Landscape | **Full Width** - 100vw utilization | Horizontal space abundant, maximize content visibility |
+
+**Implementation Details:**
+- Use `100dvh` (dynamic viewport height) to handle mobile browser chrome hiding/showing
+- Remove default padding from v-main container: `<v-main class="pa-0">`
+- Scoresheet container has responsive CSS with media queries for each breakpoint
+- All touch targets minimum 44×44px (WCAG AAA compliance)
+- Score pad buttons scale proportionally using `aspect-ratio: 1`
+
+**Adaptive Features:**
+- Font sizes: 14px (mobile) → 16px+ (desktop)
+- Button spacing: 8px (mobile) → 12px (desktop)
+- Header padding: 12px (mobile) → 20px (desktop)
+- End row spacing adapts to available vertical space
+
+---
+
 ## Design Modularity & Adaptability
 
 **Critical requirement:** The scoresheet UI must adapt to different competition formats (Qualification, Elimination, Team, etc.).
