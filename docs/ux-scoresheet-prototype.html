@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scoresheet Prototype - Archery Event</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background: #f0f0f0; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .device-frame { width: 375px; height: 667px; background: white; border-radius: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); overflow: hidden; display: flex; flex-direction: column; position: relative; }
+        .scoresheet-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); color: white; padding: 16px; }
+        .scoresheet-header h2 { font-size: 18px; margin-bottom: 8px; font-weight: 600; }
+        .stats-row { display: flex; gap: 20px; font-size: 14px; opacity: 0.95; }
+        .ends-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px; }
+        .end-row { display: flex; align-items: center; gap: 6px; padding: 6px 0; margin-bottom: 4px; }
+        .end-row.active .arrow-cell { box-shadow: 0 0 0 2px #1565c0; }
+        .end-row.locked { opacity: 0.6; }
+        .end-number { min-width: 24px; font-size: 14px; font-weight: 600; color: #666; }
+        .arrows-container { display: flex; gap: 4px; flex: 1; align-items: center; }
+        .arrow-cell { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+        .arrow-cell.empty { background: #e0e0e0; color: #999; }
+        .action-space { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .action-btn { width: 36px; height: 36px; border-radius: 50%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: transform 0.1s; font-weight: bold; }
+        .action-btn:active { transform: scale(0.95); }
+        .btn-confirm { background: #4caf50; color: white; }
+        .btn-cancel { background: #f44336; color: white; }
+        .end-sum { min-width: 44px; height: 36px; display: flex; align-items: center; justify-content: center; font-weight: 700; color: #ff6f00; font-size: 16px; margin-left: -6px; flex-shrink: 0; }
+        .score-pad { background: linear-gradient(180deg, #fafafa 0%, #f0f0f0 100%); padding: 12px; border-top: 1px solid #e0e0e0; }
+        .live-stats { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; font-weight: 600; color: #666; }
+        .score-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .score-btn { aspect-ratio: 1; border-radius: 50%; border: none; font-weight: 700; font-size: 18px; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,0.3); transition: all 0.1s; }
+        .score-btn:active { transform: scale(0.95); box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .score-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+        .ring-yellow { background: #e8de27; color: #000; }
+        .ring-red { background: #d92d41; color: white; }
+        .ring-blue { background: #1884cc; color: white; }
+        .ring-black { background: #000000; color: white; }
+        .ring-white { background: #f5f5f5; color: #000; border: 2px solid #ccc; }
+        .ring-green { background: #0a8c0a; color: white; }
+        .btn-delete { background: #9e9e9e; color: white; font-size: 22px; }
+        .btn-empty { background: transparent; cursor: default; box-shadow: none; }
+        .lock-icon { display: inline-block; color: #4caf50; font-size: 16px; margin-left: 4px; }
+        .saving-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; z-index: 999; }
+    </style>
+</head>
+<body>
+    <div class="device-frame">
+        <div class="scoresheet-header">
+            <h2 id="competitionName">Men's 70m Qualification</h2>
+            <div class="stats-row">
+                <span id="distance">70m</span>
+                <span>Golds: <strong id="golds">0</strong></span>
+                <span>Avg: <strong id="average">0.00</strong></span>
+            </div>
+        </div>
+        <div class="ends-list" id="endsList"></div>
+        <div class="score-pad">
+            <div class="live-stats">
+                <span>Total: <strong id="totalScore">0</strong> / <strong id="maxScore">0</strong></span>
+                <span>Avg: <strong id="liveAvg">0.00</strong></span>
+            </div>
+            <div class="score-grid">
+                <button class="score-btn ring-yellow" data-score="X">X</button>
+                <button class="score-btn ring-yellow" data-score="10">10</button>
+                <button class="score-btn ring-yellow" data-score="9">9</button>
+                <button class="score-btn ring-red" data-score="8">8</button>
+                <button class="score-btn btn-delete" id="deleteBtn">←</button>
+                <button class="score-btn ring-red" data-score="7">7</button>
+                <button class="score-btn ring-blue" data-score="6">6</button>
+                <button class="score-btn ring-blue" data-score="5">5</button>
+                <button class="score-btn ring-black" data-score="4">4</button>
+                <button class="score-btn btn-empty"></button>
+                <button class="score-btn ring-black" data-score="3">3</button>
+                <button class="score-btn ring-white" data-score="2">2</button>
+                <button class="score-btn ring-white" data-score="1">1</button>
+                <button class="score-btn ring-green" data-score="M">M</button>
+                <button class="score-btn btn-empty"></button>
+            </div>
+        </div>
+        <div class="saving-overlay" id="savingOverlay" style="display: none;">Saving...</div>
+    </div>
+    <script>
+        const state = { ends: [], currentEndIndex: 0, arrowsPerEnd: 6, totalEnds: 12 }
+        function initEnds() { for (let i = 0; i < state.totalEnds; i++) { state.ends.push({ endNumber: i + 1, arrows: Array(state.arrowsPerEnd).fill(null), confirmed: false }) } render() }
+        function render() { const list = document.getElementById('endsList'); list.innerHTML = ''; state.ends.forEach((end, idx) => { const isActive = idx === state.currentEndIndex && !end.confirmed; const row = document.createElement('div'); row.className = 'end-row' + (isActive ? ' active' : '') + (end.confirmed ? ' locked' : ''); const sum = calcSum(end.arrows); const allFilled = end.arrows.every(a => a !== null); row.innerHTML = '<div class="end-number">'+end.endNumber+'.</div><div class="arrows-container">'+end.arrows.map(a => '<div class="arrow-cell'+(a ? '' : ' empty')+'" style="'+getArrowStyle(a)+'">'+(a || '-')+'</div>').join('')+(isActive && allFilled && !end.confirmed ? '<div class="action-space"><button class="action-btn btn-confirm" onclick="confirmEnd()">✓</button></div>' : '<div class="action-space"></div>')+'<div class="end-sum">'+sum+'</div></div>'; list.appendChild(row) }); updateStats(); document.getElementById('deleteBtn').disabled = !canDelete() }
+        function getArrowStyle(val) { if (!val) return ''; const colors = { X: 'background:#e8de27;color:#000', '10': 'background:#e8de27;color:#000', '9': 'background:#e8de27;color:#000', '8': 'background:#d92d41;color:white', '7': 'background:#d92d41;color:white', '6': 'background:#1884cc;color:white', '5': 'background:#1884cc;color:white', '4': 'background:#000;color:white', '3': 'background:#000;color:white', '2': 'background:#f5f5f5;color:#000;border:2px solid #ccc', '1': 'background:#f5f5f5;color:#000;border:2px solid #ccc', M: 'background:#0a8c0a;color:white' }; return colors[val] || '' }
+        function calcSum(arrows) { return arrows.reduce((s, a) => s + scoreVal(a), 0) }
+        function scoreVal(v) { if (v === 'X' || v === '10') return 10; if (v === 'M' || !v) return 0; return parseInt(v) }
+        function updateStats() { const total = state.ends.filter(e => e.confirmed).reduce((s, e) => s + calcSum(e.arrows), 0); const arrows = state.ends.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a).length, 0); const golds = state.ends.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a === 'X' || a === '10').length, 0); const avg = arrows > 0 ? (total / arrows).toFixed(2) : '0.00'; document.getElementById('totalScore').textContent = total; document.getElementById('maxScore').textContent = state.totalEnds * state.arrowsPerEnd * 10; document.getElementById('golds').textContent = golds; document.getElementById('average').textContent = avg; document.getElementById('liveAvg').textContent = avg }
+        function inputScore(score) { const end = state.ends[state.currentEndIndex]; if (end.confirmed) return; const emptyIdx = end.arrows.findIndex(a => a === null); if (emptyIdx !== -1) { end.arrows[emptyIdx] = score; render() } }
+        function canDelete() { const end = state.ends[state.currentEndIndex]; return end && !end.confirmed && end.arrows.some(a => a !== null) }
+        function deleteLast() { if (!canDelete()) return; const end = state.ends[state.currentEndIndex]; for (let i = end.arrows.length - 1; i >= 0; i--) { if (end.arrows[i] !== null) { end.arrows[i] = null; break } } render() }
+        function confirmEnd() { const end = state.ends[state.currentEndIndex]; if (end.arrows.some(a => a === null)) return; document.getElementById('savingOverlay').style.display = 'flex'; setTimeout(() => { end.confirmed = true; document.getElementById('savingOverlay').style.display = 'none'; if (state.currentEndIndex < state.totalEnds - 1) state.currentEndIndex++; render() }, 800) }
+        document.querySelectorAll('.score-btn[data-score]').forEach(btn => { btn.addEventListener('click', () => inputScore(btn.dataset.score)) }); document.getElementById('deleteBtn').addEventListener('click', deleteLast); initEnds()
+    </script>
+</body>
+</html>
