@@ -740,7 +740,63 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
-### Story 5.4: Live Leaderboard Calculation & API
+### Story 5.4: Backend API for End Submission with Idempotency
+
+**As an** athlete,  
+**I want** reliable end submission with idempotency,  
+**So that** my scores are saved correctly even with network issues.
+
+**Acceptance Criteria:**
+1. POST `/api/v1/events/{eventId}/competitions/{competitionId}/rounds/{roundId}/ends` accepts end submission
+2. Payload: `{ athleteId, endNumber, arrows: ["10","9","10","8","9","10"], timestamp }`
+3. Response 200 OK: `{ confirmed: true, lockedAt: timestamp }`
+4. Response 503: Service unavailable (network/database failure)
+5. Response 412: Conflict (host locked competition, scoring closed)
+6. Idempotency key support (use request header `Idempotency-Key`)
+7. Duplicate submissions return cached response (prevent double-save)
+8. Validates: athlete authorized, scoring open, arrow count correct, sequential end numbers
+9. Transaction-safe: score save + broadcast together
+
+**Technical Notes:**
+- Use ASP.NET Core idempotency middleware or custom implementation
+- Store idempotency keys with 24-hour TTL (Redis or in-memory cache)
+- Calculate end sum: X/10=10, M=0
+- Trigger SignalR broadcast after commit
+- Return 412 if competition status is "closed" or "finalized"
+
+**Prerequisites:** Story 5.1 (SignalR hub), Story 4.1 (Athlete registration), Story 2.2 (JWT auth)
+
+---
+
+### Story 5.5: SignalR Hub for Score Broadcast
+
+**As a** spectator or athlete,  
+**I want** real-time score updates via SignalR,  
+**So that** I see live results without polling.
+
+**Acceptance Criteria:**
+1. `ScoringHub.cs` implements SignalR hub
+2. Client event: `OnEndConfirmed(athleteId, endNumber, sum, cumulativeTotal, timestamp)`
+3. Hub groups scoped to competition (not global)
+4. Clients subscribe: `connection.on('OnEndConfirmed', callback)`
+5. All connected clients in competition group receive updates within 500ms
+6. Reconnection logic: clients auto-reconnect on disconnect
+7. Authentication required: JWT token via query string or header
+8. Graceful degradation: failed broadcasts logged but don't block API
+9. Includes current leaderboard snapshot in broadcast
+
+**Technical Notes:**
+- Use `IHubContext<ScoringHub>` injection in end submission controller
+- Group name: `competition_{competitionId}`
+- Configure in Program.cs: `app.MapHub<ScoringHub>("/hubs/scoring")`
+- Enable WebSocket support, fallback to long-polling
+- Use typed hub with `IScoreClient` interface
+
+**Prerequisites:** Story 5.4 (End submission API), Story 1.2 (Nginx WebSocket proxy), Story 2.2 (JWT auth)
+
+---
+
+### Story 5.6: Live Leaderboard Calculation & API
 
 **As a** user,  
 **I want** to view real-time ranked leaderboard,  
@@ -1473,7 +1529,176 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
-### Story 10.3: Score Input & Leaderboard Views
+### Story 10.3: Core Scoresheet Component Library
+
+**As a** frontend developer,  
+**I want** reusable scoring components with ring-authentic colors,  
+**So that** scoresheet views are consistent and maintainable.
+
+**Acceptance Criteria:**
+1. `ArrowCell.vue` component:
+   - Props: `value` (ScoreValue | null), `index` (0-5)
+   - Displays arrow score with ring-authentic color background
+   - Circular shape (border-radius: 50%, 36px diameter)
+   - Color mapping: X/10/9 → Yellow (#e8de27), 8/7 → Red (#d92d41), 6/5 → Blue (#1884cc), 4/3 → Black (#000000), 2/1 → White (#f5f5f5), M → Green (#0a8c0a)
+   - Empty state: gray background (#e0e0e0), "-" placeholder
+2. `ScoreButton.vue` component:
+   - Props: `score` (ScoreValue), `disabled` (boolean)
+   - Circular button (48dp min touch target)
+   - Emits: `@click` with score value
+   - Ring-authentic colors matching ArrowCell
+   - Touch feedback: scale animation on press
+3. `useScoreCalculation.ts` composable:
+   - Function: `scoreToNumber(value: ScoreValue): number` - X/10=10, M=0
+   - Function: `calculateEndSum(arrows: Arrow[]): number`
+   - Function: `isGold(value: ScoreValue): boolean` - X or 10
+4. TypeScript type definitions:
+   - `ScoreValue` type: 'X' | '10' | '9' | ... | '1' | 'M'
+   - `Arrow` interface: `{ value: ScoreValue | null, timestamp?: Date }`
+   - `End` interface: `{ endNumber, arrows, sum, confirmed, locked, status }`
+
+**Technical Notes:**
+- Use Vuetify for base styling
+- Components in `src/components/scoring/`
+- Composable in `src/composables/useScoreCalculation.ts`
+- Types in `src/types/scoring.ts`
+- All components use Composition API
+- Accessibility: aria-labels on buttons, proper contrast ratios
+
+**Estimated Effort:** 2-3 hours
+
+**Prerequisites:** Story 10.1 (Vue 3 setup)
+
+---
+
+### Story 10.4: Qualification Scoresheet Layout & Flow
+
+**As an** athlete on mobile,  
+**I want** intuitive sequential score input with visual feedback,  
+**So that** I can enter my scores quickly and accurately.
+
+**Acceptance Criteria:**
+1. `ScoresheetView.vue` page:
+   - Header: Competition name, Distance, Golds count, Average
+   - Scrollable ends list (8+ ends visible at once)
+   - Fixed bottom score pad
+   - Live stats: Total, Average updated immediately
+2. `EndRow.vue` component:
+   - Layout: End number + 6 ArrowCells + Confirm button + Sum (orange)
+   - Active end: highlighted border (#1565c0)
+   - Locked end: grayed out (opacity 0.6), small green check icon
+   - Saving state: spinner overlay
+   - Error state: red border, inline "Failed to save. Retry?" message
+3. `ScorePad.vue` component:
+   - Grid layout: 5 columns, 3 rows
+   - Score buttons: X, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, M
+   - Delete button (←) in top-right, gray background
+   - Empty placeholders for grid alignment
+4. Sequential input behavior:
+   - User taps score → fills next empty arrow slot left-to-right
+   - Cannot skip arrows or edit earlier arrows
+   - Delete (←) removes last entered arrow
+   - After 6 arrows, green ✓ button appears
+   - Confirm sends to backend, shows "Saving..." overlay (800ms)
+   - Success: locks end, auto-advances to next end
+   - Failure: shows retry option
+5. Statistics update:
+   - Golds count updates when X/10 entered
+   - Average recalculates after each arrow
+   - Total updates on confirm
+
+**Technical Notes:**
+- Use Pinia store: `src/stores/scoring.ts`
+- Components in `src/components/scoring/`
+- View in `src/views/ScoresheetView.vue`
+- Mobile-first: 375px base width
+- Use `useScoreCalculation` composable
+- End sum displays unconditionally, updates live
+
+**Estimated Effort:** 4-6 hours
+
+**Prerequisites:** Story 10.3 (Core components), Story 5.4 (Backend API)
+
+---
+
+### Story 10.5: Offline Queue & Resume Logic
+
+**As an** athlete with unreliable connectivity,  
+**I want** scores queued locally and synced when online,  
+**So that** I don't lose data if network drops.
+
+**Acceptance Criteria:**
+1. `useOfflineSync.ts` composable:
+   - Tracks online/offline state (`isOnline` ref)
+   - Queues failed end submissions to IndexedDB
+   - Background sync worker flushes queue when online
+   - Method: `queueEnd(end: End)` - saves to local queue
+   - Method: `syncQueue()` - attempts to send all queued ends
+2. IndexedDB schema:
+   - Store: `scoreQueue`
+   - Fields: `{ id, eventId, competitionId, roundId, endNumber, arrows, sum, status: 'queued', timestamp }`
+3. Mid-end resume:
+   - Partial end (e.g., 3 arrows entered) saved to localStorage immediately (debounced)
+   - On app reopen: restores incomplete end, focuses next arrow
+4. Offline indicators:
+   - "Queued — will sync when online" message near end row
+   - Queue count badge in header (e.g., "3 ends queued")
+   - Auto-sync on reconnect with success toast
+5. Edge cases:
+   - If backend rejects queued end (e.g., scoring closed), show error and remove from queue
+   - Handle app close/crash: resume on restart
+
+**Technical Notes:**
+- Use IndexedDB via Dexie.js or native API
+- Listen to `window.addEventListener('online/offline')`
+- Debounce localStorage writes (500ms)
+- Store in `localStorage.setItem('currentEnd', JSON.stringify(...))`
+- Service worker for background sync (optional)
+
+**Estimated Effort:** 3-4 hours
+
+**Prerequisites:** Story 10.4 (Scoresheet layout), Story 5.4 (Backend API)
+
+---
+
+### Story 10.6: Elimination Scoresheet Variant
+
+**As an** athlete in elimination rounds,  
+**I want** a scoresheet adapted for set-based scoring,  
+**So that** I can track my performance against an opponent.
+
+**Acceptance Criteria:**
+1. `EliminationLayout.vue` component:
+   - Layout: My scores (left) vs Opponent scores (right)
+   - 3 arrows per set (not 6)
+   - Set scoring: 2 points for win, 1 for tie, 0 for loss
+   - Running set points: "4-2" display
+   - Match ends when athlete reaches target sets (e.g., 6 sets)
+2. Score pad: Same as qualification (reuse ScorePad.vue)
+3. Real-time opponent updates:
+   - Subscribe to SignalR for opponent's score submissions
+   - Opponent's arrows appear as they're entered
+   - Visual indicator when opponent finishes set
+4. Responsive to `competitionType` prop:
+   - `<ScoreInput :competition-type="'elimination'" :arrows-per-end="3" />`
+   - ScoresheetView dynamically renders QualificationLayout or EliminationLayout
+5. Set winner calculation:
+   - Compare sum of 3 arrows: higher sum wins set
+   - Tie: both get 1 point
+
+**Technical Notes:**
+- Component in `src/components/scoring/EliminationLayout.vue`
+- Reuse ArrowCell, ScoreButton components
+- SignalR listener for opponent scores
+- Conditional rendering in ScoresheetView based on competitionType
+
+**Estimated Effort:** 3-4 hours
+
+**Prerequisites:** Story 10.4 (Scoresheet layout), Story 5.5 (SignalR hub)
+
+---
+
+### Story 10.7: Score Input & Leaderboard Views (Legacy)
 
 **As an** athlete on mobile,  
 **I want** easy score input and live leaderboard,  
@@ -1507,7 +1732,7 @@ This document provides the complete epic and user story breakdown for the Archer
 - Service worker for offline support
 - CSS animations for rank changes
 
-**Prerequisites:** Story 10.2 (Core UI), Story 5.3 (SignalR backend)
+**Prerequisites:** Story 10.2 (Core UI), Story 5.5 (SignalR backend)
 
 ---
 
