@@ -24,10 +24,11 @@
         .form-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; color: #212121; }
         .form-description { text-align: center; color: #666; margin-bottom: 24px; font-size: 14px; }
         .input-group { margin-bottom: 16px; position: relative; }
-        .input-field { width: 100%; padding: 14px 16px 14px 48px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; outline: none; transition: all 0.2s; background: white; }
+        .input-wrapper { display: grid; grid-template-columns: 48px 1fr; align-items: center; position: relative; }
+        .input-field { grid-column: 1 / 3; grid-row: 1; padding: 14px 16px 14px 48px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; line-height: 1.5; outline: none; transition: all 0.2s; background: white; }
         .input-field:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
         .input-field.error { border-color: #f44336; }
-        .input-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #666; font-size: 20px; pointer-events: none; }
+        .input-icon { grid-column: 1; grid-row: 1; justify-self: center; align-self: center; color: #666; font-size: 20px; line-height: 1; pointer-events: none; z-index: 1; }
         .input-field:focus + .input-icon { color: #1565c0; }
         .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; font-size: 20px; cursor: pointer; background: none; border: none; padding: 4px; }
         .toggle-password:hover { color: #1565c0; }
@@ -79,6 +80,11 @@
         @media (min-width: 1280px) { .responsive-badge::before { content: " Desktop XL"; } }
         .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         @media (max-width: 599px) { .name-row { grid-template-columns: 1fr; gap: 16px; } }
+        .phone-wrapper { display: grid; grid-template-columns: 30% 70%; gap: 8px; }
+        .country-select { padding: 14px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: white; cursor: pointer; color: #424242; font-weight: 500; }
+        .country-select:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .country-select.error { border-color: #f44336; }
+        .phone-input-wrapper { grid-column: 2; }
     </style>
 </head>
 <body>
@@ -100,15 +106,19 @@
                 </div>
                 <div class="input-group">
                     <label class="input-label">Email Address</label>
-                    <input type="email" id="loginEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
-                    <i class="mdi mdi-email input-icon"></i>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-email input-icon"></i>
+                        <input type="email" id="loginEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
+                    </div>
                     <div class="error-message" id="loginEmailError">Please enter a valid email</div>
                 </div>
                 <div class="input-group">
                     <label class="input-label">Password</label>
-                    <input type="password" id="loginPassword" class="input-field" placeholder="Enter your password" autocomplete="current-password">
-                    <i class="mdi mdi-lock input-icon"></i>
-                    <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')"><i class="mdi mdi-eye" id="loginPasswordIcon"></i></button>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock input-icon"></i>
+                        <input type="password" id="loginPassword" class="input-field" placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')"><i class="mdi mdi-eye" id="loginPasswordIcon"></i></button>
+                    </div>
                     <div class="error-message" id="loginPasswordError">Password is required</div>
                 </div>
                 <div class="forgot-password"><a href="#" onclick="return false;">Forgot Password?</a></div>
@@ -135,28 +145,58 @@
                 <div class="name-row">
                     <div class="input-group">
                         <label class="input-label">First Name</label>
-                        <input type="text" id="registerFirstName" class="input-field" placeholder="John" autocomplete="given-name">
-                        <i class="mdi mdi-account input-icon"></i>
+                        <div class="input-wrapper">
+                            <i class="mdi mdi-account input-icon"></i>
+                            <input type="text" id="registerFirstName" class="input-field" placeholder="John" autocomplete="given-name">
+                        </div>
                         <div class="error-message" id="registerFirstNameError">First name is required (min 2 characters)</div>
                     </div>
                     <div class="input-group">
                         <label class="input-label">Last Name</label>
-                        <input type="text" id="registerLastName" class="input-field" placeholder="Doe" autocomplete="family-name">
-                        <i class="mdi mdi-account input-icon"></i>
+                        <div class="input-wrapper">
+                            <i class="mdi mdi-account input-icon"></i>
+                            <input type="text" id="registerLastName" class="input-field" placeholder="Doe" autocomplete="family-name">
+                        </div>
                         <div class="error-message" id="registerLastNameError">Last name is required (min 2 characters)</div>
                     </div>
                 </div>
                 <div class="input-group">
                     <label class="input-label">Email Address</label>
-                    <input type="email" id="registerEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
-                    <i class="mdi mdi-email input-icon"></i>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-email input-icon"></i>
+                        <input type="email" id="registerEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
+                    </div>
                     <div class="error-message" id="registerEmailError">Please enter a valid email</div>
                 </div>
                 <div class="input-group">
+                    <label class="input-label">Phone Number</label>
+                    <div class="phone-wrapper">
+                        <select id="registerCountryCode" class="country-select">
+                            <option value="+1" data-country="USA">USA +1</option>
+                            <option value="+44" data-country="UK">UK +44</option>
+                            <option value="+61" data-country="Australia">Australia +61</option>
+                            <option value="+81" data-country="Japan">Japan +81</option>
+                            <option value="+82" data-country="South Korea">South Korea +82</option>
+                            <option value="+84" data-country="Vietnam" selected>Vietnam +84</option>
+                            <option value="+86" data-country="China">China +86</option>
+                            <option value="+91" data-country="India">India +91</option>
+                            <option value="+33" data-country="France">France +33</option>
+                            <option value="+49" data-country="Germany">Germany +49</option>
+                        </select>
+                        <div class="input-wrapper phone-input-wrapper">
+                            <i class="mdi mdi-phone input-icon"></i>
+                            <input type="tel" id="registerPhone" class="input-field" placeholder="123456789" autocomplete="tel">
+                        </div>
+                    </div>
+                    <div class="error-message" id="registerPhoneError">Please enter a valid phone number (digits only)</div>
+                </div>
+                <div class="input-group">
                     <label class="input-label">Password</label>
-                    <input type="password" id="registerPassword" class="input-field" placeholder="Create a strong password" autocomplete="new-password" oninput="updatePasswordStrength()">
-                    <i class="mdi mdi-lock input-icon"></i>
-                    <button type="button" class="toggle-password" onclick="togglePassword('registerPassword')"><i class="mdi mdi-eye" id="registerPasswordIcon"></i></button>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock input-icon"></i>
+                        <input type="password" id="registerPassword" class="input-field" placeholder="Create a strong password" autocomplete="new-password" oninput="updatePasswordStrength()">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerPassword')"><i class="mdi mdi-eye" id="registerPasswordIcon"></i></button>
+                    </div>
                     <div class="error-message" id="registerPasswordError">Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*)</div>
                     <div class="password-strength" id="passwordStrength">
                         <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
@@ -165,9 +205,11 @@
                 </div>
                 <div class="input-group">
                     <label class="input-label">Confirm Password</label>
-                    <input type="password" id="registerConfirmPassword" class="input-field" placeholder="Re-enter your password" autocomplete="new-password">
-                    <i class="mdi mdi-lock-check input-icon"></i>
-                    <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword')"><i class="mdi mdi-eye" id="registerConfirmPasswordIcon"></i></button>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock-check input-icon"></i>
+                        <input type="password" id="registerConfirmPassword" class="input-field" placeholder="Re-enter your password" autocomplete="new-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword')"><i class="mdi mdi-eye" id="registerConfirmPasswordIcon"></i></button>
+                    </div>
                     <div class="error-message" id="registerConfirmPasswordError">Passwords do not match</div>
                 </div>
                 <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()">
@@ -185,11 +227,12 @@
         function updatePasswordStrength() { const password = document.getElementById("registerPassword").value; const strengthDiv = document.getElementById("passwordStrength"); const fill = document.getElementById("strengthFill"); const text = document.getElementById("strengthText"); if (!password) { strengthDiv.classList.remove("show"); return; } strengthDiv.classList.add("show"); let strength = 0; if (password.length >= 8) strength += 20; if (password.length >= 12) strength += 20; if (/[A-Z]/.test(password)) strength += 20; if (/[a-z]/.test(password)) strength += 20; if (/\d/.test(password)) strength += 10; if (/[!@#$%^&*]/.test(password)) strength += 10; fill.className = "strength-fill"; text.className = "strength-text"; if (strength < 40) { fill.classList.add("weak"); text.classList.add("weak"); text.textContent = "Password strength: Weak"; } else if (strength < 70) { fill.classList.add("medium"); text.classList.add("medium"); text.textContent = "Password strength: Medium"; } else { fill.classList.add("strong"); text.classList.add("strong"); text.textContent = "Password strength: Strong"; } }
         function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
         function validatePassword(password) { if (password.length < 8) return { valid: false, message: "Password must be at least 8 characters" }; if (!/[A-Z]/.test(password)) return { valid: false, message: "Password must contain uppercase letter" }; if (!/[a-z]/.test(password)) return { valid: false, message: "Password must contain lowercase letter" }; if (!/\d/.test(password)) return { valid: false, message: "Password must contain a number" }; if (!/[!@#$%^&*]/.test(password)) return { valid: false, message: "Password must contain special character (!@#$%^&*)" }; return { valid: true }; }
+        function validatePhone(phone) { return /^\d{7,15}$/.test(phone); }
         function showFieldError(fieldId, show) { const field = document.getElementById(fieldId); const error = document.getElementById(fieldId + "Error"); if (show) { field.classList.add("error"); error.classList.add("show"); } else { field.classList.remove("error"); error.classList.remove("show"); } }
         function closeAlert(alertId) { document.getElementById(alertId).classList.remove("show"); }
-        function clearForm(type) { if (type === "login") { document.getElementById("loginEmail").value = ""; document.getElementById("loginPassword").value = ""; showFieldError("loginEmail", false); showFieldError("loginPassword", false); closeAlert("loginError"); } else { document.getElementById("registerFirstName").value = ""; document.getElementById("registerLastName").value = ""; document.getElementById("registerEmail").value = ""; document.getElementById("registerPassword").value = ""; document.getElementById("registerConfirmPassword").value = ""; showFieldError("registerFirstName", false); showFieldError("registerLastName", false); showFieldError("registerEmail", false); showFieldError("registerPassword", false); showFieldError("registerConfirmPassword", false); closeAlert("registerError"); closeAlert("registerSuccess"); document.getElementById("passwordStrength").classList.remove("show"); } }
+        function clearForm(type) { if (type === "login") { document.getElementById("loginEmail").value = ""; document.getElementById("loginPassword").value = ""; showFieldError("loginEmail", false); showFieldError("loginPassword", false); closeAlert("loginError"); } else { document.getElementById("registerFirstName").value = ""; document.getElementById("registerLastName").value = ""; document.getElementById("registerEmail").value = ""; document.getElementById("registerCountryCode").value = "+84"; document.getElementById("registerPhone").value = ""; document.getElementById("registerPassword").value = ""; document.getElementById("registerConfirmPassword").value = ""; showFieldError("registerFirstName", false); showFieldError("registerLastName", false); showFieldError("registerEmail", false); showFieldError("registerPhone", false); showFieldError("registerPassword", false); showFieldError("registerConfirmPassword", false); closeAlert("registerError"); closeAlert("registerSuccess"); document.getElementById("passwordStrength").classList.remove("show"); } }
         async function handleLogin() { const email = document.getElementById("loginEmail").value.trim(); const password = document.getElementById("loginPassword").value; let hasError = false; if (!email || !validateEmail(email)) { showFieldError("loginEmail", true); hasError = true; } else { showFieldError("loginEmail", false); } if (!password) { showFieldError("loginPassword", true); hasError = true; } else { showFieldError("loginPassword", false); } if (hasError) return; const btn = document.getElementById("loginBtn"); const btnText = document.getElementById("loginBtnText"); const spinner = document.getElementById("loginSpinner"); btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block"; setTimeout(() => { const success = Math.random() > 0.1; btn.disabled = false; btnText.style.display = "inline"; spinner.style.display = "none"; if (success) { const successDiv = document.createElement("div"); successDiv.className = "alert alert-success show"; successDiv.innerHTML = `<i class="mdi mdi-check-circle alert-icon"></i><span>Login successful! Redirecting to dashboard...</span>`; document.getElementById("loginForm").insertBefore(successDiv, document.getElementById("loginEmail").parentElement); setTimeout(() => { alert(` Login Successful!\n\nUser: ${email}\n\nIn production, you would be redirected to the events dashboard.`); successDiv.remove(); clearForm("login"); }, 1500); } else { document.getElementById("loginErrorText").textContent = "Invalid email or password"; document.getElementById("loginError").classList.add("show"); } }, 800); }
-        async function handleRegister() { const firstName = document.getElementById("registerFirstName").value.trim(); const lastName = document.getElementById("registerLastName").value.trim(); const email = document.getElementById("registerEmail").value.trim(); const password = document.getElementById("registerPassword").value; const confirmPassword = document.getElementById("registerConfirmPassword").value; let hasError = false; if (!firstName || firstName.length < 2) { showFieldError("registerFirstName", true); hasError = true; } else { showFieldError("registerFirstName", false); } if (!lastName || lastName.length < 2) { showFieldError("registerLastName", true); hasError = true; } else { showFieldError("registerLastName", false); } if (!email || !validateEmail(email)) { showFieldError("registerEmail", true); hasError = true; } else { showFieldError("registerEmail", false); } const passwordValidation = validatePassword(password); if (!passwordValidation.valid) { document.getElementById("registerPasswordError").textContent = passwordValidation.message; showFieldError("registerPassword", true); hasError = true; } else { showFieldError("registerPassword", false); } if (password !== confirmPassword) { showFieldError("registerConfirmPassword", true); hasError = true; } else { showFieldError("registerConfirmPassword", false); } if (hasError) return; const btn = document.getElementById("registerBtn"); const btnText = document.getElementById("registerBtnText"); const spinner = document.getElementById("registerSpinner"); btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block"; setTimeout(() => { const success = Math.random() > 0.2; btn.disabled = false; btnText.style.display = "inline"; spinner.style.display = "none"; if (success) { document.getElementById("registerSuccess").classList.add("show"); setTimeout(() => { alert(` Registration Successful!\n\nName: ${firstName} ${lastName}\nEmail: ${email}\n\nIn production, you would be auto-logged in and redirected to the events dashboard.`); clearForm("register"); }, 1500); } else { document.getElementById("registerErrorText").textContent = "Email address is already registered"; document.getElementById("registerError").classList.add("show"); } }, 800); }
+        async function handleRegister() { const firstName = document.getElementById("registerFirstName").value.trim(); const lastName = document.getElementById("registerLastName").value.trim(); const email = document.getElementById("registerEmail").value.trim(); const countryCode = document.getElementById("registerCountryCode").value; const phone = document.getElementById("registerPhone").value.trim(); const password = document.getElementById("registerPassword").value; const confirmPassword = document.getElementById("registerConfirmPassword").value; let hasError = false; if (!firstName || firstName.length < 2) { showFieldError("registerFirstName", true); hasError = true; } else { showFieldError("registerFirstName", false); } if (!lastName || lastName.length < 2) { showFieldError("registerLastName", true); hasError = true; } else { showFieldError("registerLastName", false); } if (!email || !validateEmail(email)) { showFieldError("registerEmail", true); hasError = true; } else { showFieldError("registerEmail", false); } if (!phone || !validatePhone(phone)) { showFieldError("registerPhone", true); hasError = true; } else { showFieldError("registerPhone", false); } const passwordValidation = validatePassword(password); if (!passwordValidation.valid) { document.getElementById("registerPasswordError").textContent = passwordValidation.message; showFieldError("registerPassword", true); hasError = true; } else { showFieldError("registerPassword", false); } if (password !== confirmPassword) { showFieldError("registerConfirmPassword", true); hasError = true; } else { showFieldError("registerConfirmPassword", false); } if (hasError) return; const btn = document.getElementById("registerBtn"); const btnText = document.getElementById("registerBtnText"); const spinner = document.getElementById("registerSpinner"); btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block"; setTimeout(() => { const success = Math.random() > 0.2; btn.disabled = false; btnText.style.display = "inline"; spinner.style.display = "none"; if (success) { document.getElementById("registerSuccess").classList.add("show"); setTimeout(() => { alert(` Registration Successful!\n\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${countryCode} ${phone}\n\nIn production, you would be auto-logged in and redirected to the events dashboard.`); clearForm("register"); }, 1500); } else { document.getElementById("registerErrorText").textContent = "Email address is already registered"; document.getElementById("registerError").classList.add("show"); } }, 800); }
         document.addEventListener("keypress", (e) => { if (e.key === "Enter") { const loginActive = document.getElementById("loginForm").classList.contains("active"); if (loginActive) { handleLogin(); } else { handleRegister(); } } });
     </script>
 </body>
