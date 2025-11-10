@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Dashboard - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/events.js"></script>
+    <script src="../mock-data/languages.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* Responsive container - similar to scoresheet */
+        .dashboard-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        @media (max-width: 599px) {
+            .dashboard-container { width: 100%; }
+        }
+        
+        @media (min-width: 600px) {
+            body { background: #e0e0e0; }
+            .dashboard-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header - 8-column grid like scoresheet */
+        .dashboard-header { display: grid; grid-template-columns: 40px 40px repeat(4, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        
+        .header-menu { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+        .header-menu:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-menu i { font-size: 24px; }
+        
+        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
+        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
+        
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+        
+        .header-content { grid-column: 2 / 7; display: flex; align-items: center; gap: 12px; }
+        .header-icon { font-size: 28px; }
+        .header-title { font-size: 20px; font-weight: 700; }
+        
+        /* Section */
+        .section { padding: 16px; }
+        .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #212121; }
+        
+        /* Search and Filter */
+        .search-container { margin-bottom: 16px; display: flex; gap: 8px; }
+        .search-wrapper { flex: 1; position: relative; display: grid; grid-template-columns: 40px 1fr; align-items: center; }
+        .search-icon { grid-column: 1; grid-row: 1; justify-self: center; align-self: center; color: #666; font-size: 20px; z-index: 1; pointer-events: none; }
+        .search-input { grid-column: 1 / 3; grid-row: 1; width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; }
+        .search-input:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .search-input:focus ~ .search-icon { color: #1565c0; }
+        .status-filter { padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: white; cursor: pointer; color: #424242; font-weight: 500; min-width: 120px; }
+        .status-filter:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 24px; padding-bottom: 16px; }
+        .pagination-btn { padding: 8px 12px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; cursor: pointer; font-size: 14px; font-weight: 600; color: #424242; transition: all 0.2s; min-width: 40px; display: flex; align-items: center; justify-content: center; }
+        .pagination-btn:hover:not(:disabled) { border-color: #1565c0; color: #1565c0; background: #e3f2fd; }
+        .pagination-btn.active { border-color: #1565c0; background: #1565c0; color: white; }
+        .pagination-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+        .pagination-info { font-size: 14px; color: #666; padding: 0 8px; }
+        
+        /* Event Cards */
+        .event-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border-left: 4px solid #1565c0; cursor: pointer; transition: all 0.2s; }
+        .event-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12); transform: translateY(-2px); }
+        .event-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; }
+        .event-title { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 4px; }
+        .event-badge { padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .event-badge.upcoming { background: #e3f2fd; color: #1565c0; }
+        .event-badge.live { background: #e8f5e9; color: #2e7d32; }
+        .event-badge.completed { background: #f5f5f5; color: #757575; }
+        .event-info { display: flex; gap: 16px; font-size: 14px; color: #666; margin-top: 8px; }
+        .event-info-item { display: flex; align-items: center; gap: 4px; }
+        .event-info-item i { font-size: 16px; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 48px 16px; }
+        .empty-state i { font-size: 64px; color: #e0e0e0; margin-bottom: 16px; }
+        .empty-state-title { font-size: 18px; font-weight: 700; color: #757575; margin-bottom: 8px; }
+        .empty-state-text { font-size: 14px; color: #9e9e9e; margin-bottom: 24px; }
+        
+        /* Button */
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
+        
+        /* Language Dropdown */
+        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
+        .language-dropdown.show { display: block; }
+        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
+        .language-item:hover { background: #f5f5f5; }
+        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .language-flag { font-size: 20px; }
+        .language-name { flex: 1; }
+        
+        /* Responsive badge */
+        .responsive-badge { position: fixed; bottom: 10px; right: 10px; padding: 6px 12px; background: rgba(0, 0, 0, 0.7); color: white; font-size: 11px; border-radius: 12px; font-weight: 600; z-index: 1000; backdrop-filter: blur(4px); }
+        .responsive-badge::before { content: " Mobile"; }
+        @media (min-width: 600px) and (max-width: 959px) { .responsive-badge::before { content: " Tablet"; } }
+        @media (min-width: 960px) and (max-width: 1279px) { .responsive-badge::before { content: " Desktop"; } }
+        @media (min-width: 1280px) { .responsive-badge::before { content: " Desktop XL"; } }
+    </style>
+</head>
+<body>
+    <div class="responsive-badge"></div>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="header-menu" onclick="alert('Menu clicked - would open navigation drawer')">
+                <i class="mdi mdi-menu"></i>
+            </div>
+            <div class="header-content">
+                <span class="header-title">Archery Events</span>
+            </div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇺🇸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked - would navigate to profile page')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- All Events -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">All Events</h2>
+                <button class="btn btn-primary" onclick="window.location.href='../events/create-event.html'">
+                    <i class="mdi mdi-plus"></i>
+                    <span>Create Event</span>
+                </button>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="search-container">
+                <div class="search-wrapper">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by event name or location..." oninput="filterEvents()">
+                </div>
+                <select id="statusFilter" class="status-filter" onchange="filterEvents()">
+                    <option value="all">All Status</option>
+                    <option value="upcoming">Upcoming</option>
+                    <option value="live">Live</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+
+            <!-- Events List -->
+            <div id="eventsList"></div>
+
+            <!-- Pagination -->
+            <div class="pagination" id="pagination"></div>
+
+
+    </div>
+
+    <script>
+        // Simulated user data - in production, this would come from login
+        const currentUser = {
+            firstName: "John",
+            lastName: "Doe",
+            email: "john@test.com",
+            role: "athlete"
+        };
+
+        // Get events from mock data
+        const allEvents = getAllEvents();
+        let filteredEvents = [...allEvents];
+        let currentPage = 1;
+        const eventsPerPage = 10;
+
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+            
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+            console.log('Language changed to:', language.nativeName);
+            // In production, this would reload the app with the new language
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Initialize language selector
+        initLanguageSelector();
+
+        // Render events
+        function renderEvents() {
+
+            const eventsList = document.getElementById('eventsList');
+            const startIndex = (currentPage - 1) * eventsPerPage;
+            const endIndex = startIndex + eventsPerPage;
+            const eventsToShow = filteredEvents.slice(startIndex, endIndex);
+
+            if (eventsToShow.length === 0) {
+                eventsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="mdi mdi-calendar-remove"></i>
+                        <div class="empty-state-title">No events found</div>
+                        <div class="empty-state-text">Try adjusting your search or filters</div>
+                    </div>
+                `;
+            } else {
+                eventsList.innerHTML = eventsToShow.map(event => `
+                    <div class="event-card" onclick="alert('Navigate to: ${event.title}')">
+                        <div class="event-header">
+                            <div>
+                                <div class="event-title">${event.title}</div>
+                            </div>
+                            <span class="event-badge ${event.status}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
+                        </div>
+                        <div class="event-info">
+                            <div class="event-info-item">
+                                <i class="mdi mdi-calendar-range"></i>
+                                <span>${event.dateDisplay}</span>
+                            </div>
+                            <div class="event-info-item">
+                                <i class="mdi mdi-map-marker"></i>
+                                <span>${event.location}</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            renderPagination();
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = `
+                <button class="pagination-btn" onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+                    <i class="mdi mdi-chevron-left"></i>
+                </button>
+            `;
+
+            // Show page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+                    paginationHTML += `
+                        <button class="pagination-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>
+                    `;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    paginationHTML += `<span class="pagination-info">...</span>`;
+                }
+            }
+
+            paginationHTML += `
+                <button class="pagination-btn" onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <i class="mdi mdi-chevron-right"></i>
+                </button>
+            `;
+
+            pagination.innerHTML = paginationHTML;
+        }
+
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredEvents.length / eventsPerPage);
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            renderEvents();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Filter events
+        function filterEvents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+
+            filteredEvents = allEvents.filter(event => {
+                // Search filter
+                const matchesSearch = event.title.toLowerCase().includes(searchTerm) || 
+                                    event.location.toLowerCase().includes(searchTerm);
+                
+                // Status filter
+                const matchesStatus = statusFilter === 'all' || event.status === statusFilter;
+                
+                return matchesSearch && matchesStatus;
+            });
+
+            currentPage = 1; // Reset to first page
+            renderEvents();
+        }
+
+        // Initial render
+        renderEvents();
+    </script>
+</body>
+</html>
