@@ -7,18 +7,19 @@ const mockEvents = [
     { id: 1, title: "2024 National Championship", status: "upcoming", startDate: "2024-12-15", endDate: "2024-12-17", dateDisplay: "Dec 15-17, 2024", location: "Tokyo, Japan" },
     { id: 2, title: "Regional Qualifier 2024", status: "live", startDate: "2024-12-01", endDate: "2024-12-03", dateDisplay: "Dec 1-3, 2024", location: "Seoul, Korea" },
     { id: 3, title: "Winter Indoor Tournament", status: "upcoming", startDate: "2024-12-22", endDate: "2024-12-23", dateDisplay: "Dec 22-23, 2024", location: "Hanoi, Vietnam" },
-    { id: 4, title: "Spring Open Championship", status: "upcoming", startDate: "2025-01-10", endDate: "2025-01-12", dateDisplay: "Jan 10-12, 2025", location: "Sydney, Australia" },
-    { id: 5, title: "International Archery Cup", status: "upcoming", startDate: "2025-01-25", endDate: "2025-01-28", dateDisplay: "Jan 25-28, 2025", location: "Paris, France" },
+    { id: 4, title: "Spring Open Championship", status: "upcoming", startDate: "2025-12-10", endDate: "2025-12-12", dateDisplay: "Dec 10-12, 2025", location: "Sydney, Australia" },
+    { id: 5, title: "International Archery Cup", status: "upcoming", startDate: "2025-12-20", endDate: "2025-12-23", dateDisplay: "Dec 20-23, 2025", location: "Paris, France" },
     { id: 6, title: "Youth Development Camp", status: "live", startDate: "2024-12-05", endDate: "2024-12-08", dateDisplay: "Dec 5-8, 2024", location: "Bangkok, Thailand" },
-    { id: 7, title: "Masters League Final", status: "upcoming", startDate: "2025-02-08", endDate: "2025-02-09", dateDisplay: "Feb 8-9, 2025", location: "London, UK" },
-    { id: 8, title: "Summer Outdoor Classic", status: "upcoming", startDate: "2025-02-20", endDate: "2025-02-23", dateDisplay: "Feb 20-23, 2025", location: "Los Angeles, USA" },
-    { id: 9, title: "Asian Games Qualifier", status: "upcoming", startDate: "2025-03-05", endDate: "2025-03-07", dateDisplay: "Mar 5-7, 2025", location: "Beijing, China" },
-    { id: 10, title: "European Championship", status: "upcoming", startDate: "2025-03-18", endDate: "2025-03-21", dateDisplay: "Mar 18-21, 2025", location: "Berlin, Germany" },
-    { id: 11, title: "World Cup Series Round 1", status: "upcoming", startDate: "2025-04-02", endDate: "2025-04-05", dateDisplay: "Apr 2-5, 2025", location: "Shanghai, China" },
-    { id: 12, title: "National Team Trials", status: "upcoming", startDate: "2025-04-15", endDate: "2025-04-16", dateDisplay: "Apr 15-16, 2025", location: "Tokyo, Japan" },
+    { id: 7, title: "Masters League Final", status: "upcoming", startDate: "2025-11-28", endDate: "2025-11-29", dateDisplay: "Nov 28-29, 2025", location: "London, UK" },
+    { id: 8, title: "Summer Outdoor Classic", status: "upcoming", startDate: "2025-11-25", endDate: "2025-11-28", dateDisplay: "Nov 25-28, 2025", location: "Los Angeles, USA" },
+    { id: 9, title: "Asian Games Qualifier", status: "upcoming", startDate: "2025-12-05", endDate: "2025-12-07", dateDisplay: "Dec 5-7, 2025", location: "Beijing, China" },
+    { id: 10, title: "European Championship", status: "upcoming", startDate: "2025-12-18", endDate: "2025-12-21", dateDisplay: "Dec 18-21, 2025", location: "Berlin, Germany" },
+    { id: 11, title: "World Cup Series Round 1", status: "upcoming", startDate: "2026-01-02", endDate: "2026-01-05", dateDisplay: "Jan 2-5, 2026", location: "Shanghai, China" },
+    { id: 12, title: "National Team Trials", status: "upcoming", startDate: "2025-11-22", endDate: "2025-11-23", dateDisplay: "Nov 22-23, 2025", location: "Tokyo, Japan" },
     { id: 13, title: "Autumn Open 2024", status: "completed", startDate: "2024-11-05", endDate: "2024-11-06", dateDisplay: "Nov 5-6, 2024", location: "Osaka, Japan" },
     { id: 14, title: "Summer Classic 2024", status: "completed", startDate: "2024-10-12", endDate: "2024-10-14", dateDisplay: "Oct 12-14, 2024", location: "Melbourne, Australia" },
-    { id: 15, title: "Indoor Championship 2024", status: "completed", startDate: "2024-09-20", endDate: "2024-09-22", dateDisplay: "Sep 20-22, 2024", location: "Singapore" }
+    { id: 15, title: "Indoor Championship 2024", status: "completed", startDate: "2024-09-20", endDate: "2024-09-22", dateDisplay: "Sep 20-22, 2024", location: "Singapore" },
+    { id: 16, title: "Winter Cup 2024", status: "cancelled", startDate: "2024-12-28", endDate: "2024-12-30", dateDisplay: "Dec 28-30, 2024", location: "Oslo, Norway" }
 ];
 
 /**
@@ -40,7 +41,7 @@ function getEventById(id) {
 
 /**
  * Get events by status
- * @param {string} status - Event status ('upcoming', 'live', 'completed')
+ * @param {string} status - Event status ('upcoming', 'live', 'completed', 'cancelled')
  * @returns {Array} Filtered array of events
  */
 function getEventsByStatus(status) {

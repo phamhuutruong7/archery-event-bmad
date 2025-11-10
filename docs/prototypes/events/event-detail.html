@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Event Detail - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/event-details.js"></script>
+    <script src="../mock-data/athletes.js"></script>
+    <script src="../mock-data/referees.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* Responsive container */
+        .event-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        @media (max-width: 599px) {
+            .event-container { width: 100%; }
+        }
+        
+        @media (min-width: 600px) {
+            body { background: #e0e0e0; }
+            .event-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header - 8-column grid */
+        .event-header { display: grid; grid-template-columns: 40px repeat(6, 1fr) 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        
+        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-back i { font-size: 24px; }
+        
+        .header-title { grid-column: 2 / 8; font-size: 18px; font-weight: 700; }
+        
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+        
+        /* Tab Navigation */
+        .tab-navigation { display: flex; border-bottom: 2px solid #e0e0e0; background: white; position: sticky; top: 60px; z-index: 99; }
+        .tab-item { flex: 1; padding: 16px; text-align: center; font-size: 14px; font-weight: 600; color: #757575; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab-item:hover { color: #1565c0; background: #f5f5f5; }
+        .tab-item.active { color: #1565c0; border-bottom-color: #1565c0; }
+        .tab-item i { display: block; font-size: 20px; margin-bottom: 4px; }
+        
+        /* Content */
+        .content { padding: 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Status Badge */
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; margin-bottom: 16px; }
+        .status-badge.upcoming { background: #e3f2fd; color: #1565c0; }
+        .status-badge.live { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.completed { background: #f5f5f5; color: #757575; }
+        .status-badge.cancelled { background: #ffebee; color: #c62828; }
+        
+        /* Event Title */
+        .event-title { font-size: 24px; font-weight: 700; color: #212121; margin-bottom: 20px; line-height: 1.3; }
+        
+        /* Info Section */
+        .info-section { margin-bottom: 24px; }
+        .info-label { font-size: 12px; font-weight: 600; color: #757575; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .info-value { font-size: 15px; color: #424242; line-height: 1.5; }
+        .info-value i { color: #1565c0; margin-right: 8px; font-size: 18px; vertical-align: middle; }
+        
+        /* Description */
+        .description { font-size: 15px; color: #424242; line-height: 1.6; }
+        
+        /* Competitions Section */
+        .competitions-section { margin-bottom: 24px; }
+        .competitions-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .competitions-title i { color: #1565c0; }
+        .competition-item { background: #f9f9f9; border-left: 4px solid #1565c0; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
+        .competition-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .competition-badge.recurve { background: #e3f2fd; color: #1565c0; }
+        .competition-badge.compound { background: #e8f5e9; color: #2e7d32; }
+        .competition-badge.barebow { background: #fff3e0; color: #f57c00; }
+        .competition-badge.traditional { background: #f3e5f5; color: #7b1fa2; }
+        .competition-badge.longbow { background: #fce4ec; color: #c2185b; }
+        .competition-division { font-size: 14px; font-weight: 600; color: #212121; }
+        .competition-custom-icon { color: #f57c00; font-size: 14px; margin-left: 4px; }
+        .competition-details { font-size: 13px; color: #666; margin-left: 28px; }
+        
+        /* Organizer Section */
+        .organizer-section { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+        .organizer-title { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .organizer-title i { color: #1565c0; }
+        .organizer-item { display: flex; align-items: start; gap: 12px; margin-bottom: 8px; font-size: 14px; color: #424242; }
+        .organizer-item:last-child { margin-bottom: 0; }
+        .organizer-item i { color: #757575; font-size: 18px; margin-top: 2px; }
+        
+        /* Registration Info */
+        .registration-info { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+        .registration-card { background: #f9f9f9; border-radius: 12px; padding: 16px; text-align: center; }
+        .registration-card-value { font-size: 28px; font-weight: 700; color: #1565c0; margin-bottom: 4px; }
+        .registration-card-label { font-size: 12px; color: #757575; font-weight: 600; text-transform: uppercase; }
+        
+        /* Results Section (for completed events) */
+        .results-section { margin-bottom: 24px; }
+        .results-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .results-title i { color: #ffc107; }
+        .result-item { background: #f9f9f9; border-radius: 8px; padding: 12px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .result-info { flex: 1; }
+        .result-name { font-size: 15px; font-weight: 600; color: #212121; margin-bottom: 2px; }
+        .result-category { font-size: 13px; color: #666; }
+        .result-score { font-size: 20px; font-weight: 700; color: #1565c0; }
+        
+        /* Cancellation Notice */
+        .cancellation-notice { background: #ffebee; border-left: 4px solid #c62828; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .cancellation-title { font-size: 16px; font-weight: 700; color: #c62828; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+        .cancellation-title i { font-size: 20px; }
+        .cancellation-text { font-size: 14px; color: #c62828; line-height: 1.5; }
+        
+        /* Action Buttons */
+        .action-buttons { position: sticky; bottom: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08); display: flex; flex-direction: column; gap: 12px; }
+        .button-row { display: flex; gap: 12px; }
+        .btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
+        .btn-secondary { background: #f5f5f5; color: #424242; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-success { background: #2e7d32; color: white; }
+        .btn-success:hover { background: #1b5e20; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn:disabled:hover { transform: none; box-shadow: none; }
+        
+        /* Divider */
+        .divider { height: 1px; background: #e0e0e0; margin: 24px 0; }
+        
+        /* Loading State */
+        .loading { text-align: center; padding: 48px 16px; }
+        .loading i { font-size: 48px; color: #1565c0; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        
+        /* Error State */
+        .error-state { text-align: center; padding: 48px 16px; }
+        .error-state i { font-size: 64px; color: #e0e0e0; margin-bottom: 16px; }
+        .error-state-title { font-size: 18px; font-weight: 700; color: #757575; margin-bottom: 8px; }
+        .error-state-text { font-size: 14px; color: #9e9e9e; margin-bottom: 24px; }
+        
+        /* Search and Sort Controls */
+        .controls { margin-bottom: 16px; display: flex; gap: 8px; flex-direction: column; }
+        .search-wrapper { position: relative; display: grid; grid-template-columns: 40px 1fr; align-items: center; }
+        .search-icon { grid-column: 1; grid-row: 1; justify-self: center; align-self: center; color: #666; font-size: 20px; z-index: 1; pointer-events: none; }
+        .search-input { grid-column: 1 / 3; grid-row: 1; width: 100%; padding: 12px 12px 12px 40px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; }
+        .search-input:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .sort-controls { display: flex; gap: 8px; }
+        .sort-btn { flex: 1; padding: 10px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; cursor: pointer; font-size: 13px; font-weight: 600; color: #424242; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .sort-btn:hover { border-color: #1565c0; color: #1565c0; background: #e3f2fd; }
+        .sort-btn.active { border-color: #1565c0; background: #1565c0; color: white; }
+        .sort-btn i { font-size: 16px; }
+        
+        /* Athlete/Referee List */
+        .list-item { background: white; border-radius: 8px; padding: 14px; margin-bottom: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); border-left: 4px solid #1565c0; }
+        .list-item-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; }
+        .list-item-name { font-size: 16px; font-weight: 600; color: #212121; }
+        .list-item-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #e3f2fd; color: #1565c0; }
+        .list-item-info { display: flex; flex-direction: column; gap: 4px; }
+        .list-item-detail { font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; }
+        .list-item-detail i { font-size: 14px; color: #1565c0; }
+        
+        /* Empty List State */
+        .empty-list { text-align: center; padding: 48px 16px; }
+        .empty-list i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
+        .empty-list-title { font-size: 16px; font-weight: 600; color: #757575; margin-bottom: 4px; }
+        .empty-list-text { font-size: 13px; color: #9e9e9e; }
+        
+        /* Table Styles */
+        .table-container { margin-top: 16px; overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead { background: #f5f5f5; }
+        .data-table th { padding: 14px 12px; text-align: left; font-size: 13px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; }
+        .data-table th.sortable { cursor: pointer; user-select: none; transition: background 0.2s; }
+        .data-table th.sortable:hover { background: #eeeeee; }
+        .data-table th.sortable .sort-icon { font-size: 14px; margin-left: 4px; color: #9e9e9e; transition: color 0.2s; }
+        .data-table th.sortable.active .sort-icon { color: #1565c0; }
+        .data-table th.sortable.desc .sort-icon { transform: rotate(180deg); }
+        .data-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.2s; }
+        .data-table tbody tr:hover { background: #fafafa; }
+        .data-table tbody tr:last-child { border-bottom: none; }
+        .data-table td { padding: 14px 12px; font-size: 14px; color: #212121; }
+        .data-table td:first-child { font-weight: 600; color: #1565c0; }
+        .table-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #e3f2fd; color: #1565c0; }
+        .table-badge.compound { background: #f3e5f5; color: #7b1fa2; }
+        .table-badge.barebow { background: #fff3e0; color: #ef6c00; }
+        .table-country { display: flex; align-items: center; gap: 6px; }
+        .table-flag { font-size: 18px; }
+        .athlete-link { color: #1565c0; text-decoration: none; font-weight: 600; transition: color 0.2s; }
+        .athlete-link:hover { color: #0d47a1; text-decoration: underline; }
+        .team-tag { display: inline-block; padding: 5px 12px; border-radius: 14px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+        
+        /* Athlete Name Cell with Profile Picture */
+        .athlete-name-cell { display: flex; align-items: center; gap: 10px; }
+        .athlete-profile-pic { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; background: #e0e0e0; flex-shrink: 0; }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .table-container { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .data-table { min-width: 600px; }
+            .data-table th, .data-table td { padding: 10px 8px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="event-container">
+        <!-- Header -->
+        <div class="event-header">
+            <div class="header-back" onclick="window.location.href='../dashboard/dashboard.html'">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">Event Details</div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <div class="tab-item active" onclick="switchTab('details')">
+                <i class="mdi mdi-information-outline"></i>
+                <span>Details</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('athletes')">
+                <i class="mdi mdi-account-multiple"></i>
+                <span>Athletes</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('referees')">
+                <i class="mdi mdi-whistle"></i>
+                <span>Referees</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Details Tab -->
+            <div id="detailsTab" class="tab-content active">
+                <div class="loading">
+                    <i class="mdi mdi-loading"></i>
+                </div>
+            </div>
+
+            <!-- Athletes Tab -->
+            <div id="athletesTab" class="tab-content">
+                <div class="search-wrapper">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="text" id="athleteSearch" class="search-input" placeholder="Search by athlete or team name..." oninput="filterAthletes()">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="athletesTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="sortAthletes('name')">
+                                    Name <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortAthletes('team')">
+                                    Team <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortAthletes('country')">
+                                    Country <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="athletesList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Referees Tab -->
+            <div id="refereesTab" class="tab-content">
+                <div class="search-wrapper">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="text" id="refereeSearch" class="search-input" placeholder="Search by referee name..." oninput="filterReferees()">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="refereesTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="sortReferees('name')">
+                                    Name <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortReferees('country')">
+                                    Country <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="refereesList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get event ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = parseInt(urlParams.get('id'));
+
+        // Mock data for athletes and referees
+        let allAthletes = [];
+        let filteredAthletes = [];
+        let currentAthleteSort = 'name';
+        
+        let allReferees = [];
+        let filteredReferees = [];
+        let currentRefereeSort = 'name';
+
+        // Registration state management (stored in localStorage)
+        function getRegistrationState(eventId) {
+            const state = localStorage.getItem(`event_${eventId}_registration`);
+            return state || null; // returns 'athlete', 'referee', or null
+        }
+
+        function setRegistrationState(eventId, type) {
+            if (type) {
+                localStorage.setItem(`event_${eventId}_registration`, type);
+            } else {
+                localStorage.removeItem(`event_${eventId}_registration`);
+            }
+        }
+
+        function handleRegistration(eventId, type) {
+            const currentState = getRegistrationState(eventId);
+            
+            if (currentState === type) {
+                // Already registered as this type, show options to change or unregister
+                showRegistrationOptions(eventId, type);
+            } else if (currentState) {
+                // Registered as different type, confirm switch
+                if (confirm(`You are currently registered as ${currentState}. Switch to ${type}?`)) {
+                    setRegistrationState(eventId, type);
+                    location.reload();
+                }
+            } else {
+                // Not registered, register now
+                setRegistrationState(eventId, type);
+                alert(`Successfully registered as ${type}!`);
+                location.reload();
+            }
+        }
+
+        function showRegistrationOptions(eventId, currentType) {
+            const otherType = currentType === 'athlete' ? 'referee' : 'athlete';
+            const action = confirm(`You are registered as ${currentType}.\n\nOK = Change to ${otherType}\nCancel = Unregister/Not participate`);
+            
+            if (action) {
+                // User wants to switch
+                setRegistrationState(eventId, otherType);
+                alert(`Changed registration to ${otherType}!`);
+            } else {
+                // User wants to unregister
+                if (confirm('Are you sure you want to unregister?')) {
+                    setRegistrationState(eventId, null);
+                    alert('Successfully unregistered.');
+                }
+            }
+            location.reload();
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab
+            event.target.closest('.tab-item').classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'athletes' && allAthletes.length === 0) {
+                loadAthletes();
+            } else if (tabName === 'referees' && allReferees.length === 0) {
+                loadReferees();
+            }
+        }
+
+        // Load event details
+        function loadEventDetail() {
+            const eventContent = document.getElementById('detailsTab');
+
+            if (!eventId) {
+                eventContent.innerHTML = `
+                    <div class="error-state">
+                        <i class="mdi mdi-calendar-alert"></i>
+                        <div class="error-state-title">Event not found</div>
+                        <div class="error-state-text">The event you're looking for doesn't exist.</div>
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const event = getEventDetail(eventId);
+
+            if (!event) {
+                eventContent.innerHTML = `
+                    <div class="error-state">
+                        <i class="mdi mdi-calendar-alert"></i>
+                        <div class="error-state-title">Event not found</div>
+                        <div class="error-state-text">The event you're looking for doesn't exist.</div>
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render event details
+            let html = `
+                <span class="status-badge ${event.status}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
+                <h1 class="event-title">${event.title}</h1>
+            `;
+
+            // Show cancellation notice if cancelled
+            if (event.status === 'cancelled' && event.cancellationReason) {
+                html += `
+                    <div class="cancellation-notice">
+                        <div class="cancellation-title">
+                            <i class="mdi mdi-alert-circle"></i>
+                            Event Cancelled
+                        </div>
+                        <div class="cancellation-text">${event.cancellationReason}</div>
+                    </div>
+                `;
+            }
+
+            // Basic Information
+            html += `
+                <div class="info-section">
+                    <div class="info-label">Date & Time</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-calendar-range"></i>
+                        ${event.dateDisplay}
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-map-marker"></i>
+                        ${event.location}
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Registration Deadline</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-clock-outline"></i>
+                        ${new Date(event.registrationDeadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
+                </div>
+            `;
+
+            // Registration Info (not for cancelled events)
+            if (event.status !== 'cancelled') {
+                html += `
+                    <div class="registration-info">
+                        <div class="registration-card">
+                            <div class="registration-card-value">${event.currentParticipants}</div>
+                            <div class="registration-card-label">Registered</div>
+                        </div>
+                        <div class="registration-card">
+                            <div class="registration-card-value">${event.maxParticipants}</div>
+                            <div class="registration-card-label">Max Capacity</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Description
+            html += `
+                <div class="info-section">
+                    <div class="info-label">About This Event</div>
+                    <div class="description">${event.description}</div>
+                </div>
+
+                <div class="divider"></div>
+            `;
+
+            // Competitions
+            html += `
+                <div class="competitions-section">
+                    <div class="competitions-title">
+                        <i class="mdi mdi-trophy"></i>
+                        Competitions (${event.competitions.length})
+                    </div>
+            `;
+
+            event.competitions.forEach(comp => {
+                const categoryClass = comp.category.toLowerCase();
+                html += `
+                    <div class="competition-item">
+                        <div class="competition-header">
+                            <span class="competition-badge ${categoryClass}">${comp.category}</span>
+                            <span class="competition-division">${comp.division}</span>
+                            ${comp.isCustom ? '<i class="mdi mdi-star competition-custom-icon" title="Custom competition"></i>' : ''}
+                        </div>
+                        <div class="competition-details">
+                            ${comp.distance} • ${comp.format}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div><div class="divider"></div>`;
+
+            // Organizer
+            html += `
+                <div class="organizer-section">
+                    <div class="organizer-title">
+                        <i class="mdi mdi-account-group"></i>
+                        Organizer
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-office-building"></i>
+                        <span>${event.organizer.name}</span>
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-email"></i>
+                        <span>${event.organizer.email}</span>
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-phone"></i>
+                        <span>${event.organizer.phone}</span>
+                    </div>
+                </div>
+            `;
+
+            // Results (for completed events)
+            if (event.status === 'completed' && event.results) {
+                html += `
+                    <div class="results-section">
+                        <div class="results-title">
+                            <i class="mdi mdi-medal"></i>
+                            Top Scorers
+                        </div>
+                `;
+
+                event.results.topScorers.forEach((scorer, index) => {
+                    html += `
+                        <div class="result-item">
+                            <div class="result-info">
+                                <div class="result-name">${index + 1}. ${scorer.name}</div>
+                                <div class="result-category">${scorer.category}</div>
+                            </div>
+                            <div class="result-score">${scorer.score}</div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            eventContent.innerHTML = html;
+
+            // Add action buttons based on status
+            renderActionButtons(event);
+        }
+
+        function renderActionButtons(event) {
+            const existingButtons = document.querySelector('.action-buttons');
+            if (existingButtons) {
+                existingButtons.remove();
+            }
+
+            const container = document.querySelector('.event-container');
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'action-buttons';
+
+            if (event.status === 'upcoming') {
+                const isRegistrationOpen = new Date() < new Date(event.registrationDeadline);
+                const isFull = event.currentParticipants >= event.maxParticipants;
+                const registrationState = getRegistrationState(event.id);
+
+                let registrationButtons = '';
+                
+                if (!isRegistrationOpen || isFull) {
+                    // Registration closed or event full
+                    registrationButtons = `
+                        <button class="btn btn-secondary" disabled>
+                            <i class="mdi mdi-close-circle"></i>
+                            ${isFull ? 'Event Full' : 'Registration Closed'}
+                        </button>
+                    `;
+                } else if (registrationState === 'athlete') {
+                    // Already registered as athlete
+                    registrationButtons = `
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'athlete')">
+                            <i class="mdi mdi-check-circle"></i>
+                            Registered as Athlete
+                        </button>
+                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
+                            <i class="mdi mdi-whistle"></i>
+                            Register as Referee
+                        </button>
+                    `;
+                } else if (registrationState === 'referee') {
+                    // Already registered as referee
+                    registrationButtons = `
+                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
+                            <i class="mdi mdi-run"></i>
+                            Register as Athlete
+                        </button>
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'referee')">
+                            <i class="mdi mdi-check-circle"></i>
+                            Registered as Referee
+                        </button>
+                    `;
+                } else {
+                    // Not registered yet
+                    registrationButtons = `
+                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
+                            <i class="mdi mdi-run"></i>
+                            Register as Athlete
+                        </button>
+                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
+                            <i class="mdi mdi-whistle"></i>
+                            Register as Referee
+                        </button>
+                    `;
+                }
+
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        ${registrationButtons}
+                    </div>
+                `;
+            } else if (event.status === 'live') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="alert('View live scores')">
+                            <i class="mdi mdi-trophy"></i>
+                            View Live Scores
+                        </button>
+                    </div>
+                `;
+            } else if (event.status === 'completed') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="alert('View full results')">
+                            <i class="mdi mdi-medal"></i>
+                            View Full Results
+                        </button>
+                    </div>
+                `;
+            } else if (event.status === 'cancelled') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'" style="flex: 1;">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+            }
+
+            container.appendChild(buttonsDiv);
+        }
+
+        // Load athletes data
+        function loadAthletes() {
+            // Get athletes for this event from mock data
+            allAthletes = getAthletesByEvent(eventId);
+            filteredAthletes = [...allAthletes];
+            currentAthleteSort = 'name';
+            sortAthletes('name');
+        }
+
+        // Filter athletes
+        function filterAthletes() {
+            const searchTerm = document.getElementById('athleteSearch').value.toLowerCase();
+            filteredAthletes = allAthletes.filter(athlete => 
+                athlete.name.toLowerCase().includes(searchTerm) || 
+                athlete.team.toLowerCase().includes(searchTerm)
+            );
+            renderAthletes();
+        }
+
+        // Sort athletes
+        function sortAthletes(sortBy) {
+            currentAthleteSort = sortBy;
+            
+            // Update header states
+            const headers = document.querySelectorAll('#athletesTable th.sortable');
+            headers.forEach(th => th.classList.remove('active'));
+            
+            if (sortBy === 'name') {
+                filteredAthletes.sort((a, b) => a.name.localeCompare(b.name));
+                headers[0].classList.add('active');
+            } else if (sortBy === 'team') {
+                filteredAthletes.sort((a, b) => a.team.localeCompare(b.team));
+                headers[1].classList.add('active');
+            } else if (sortBy === 'country') {
+                filteredAthletes.sort((a, b) => a.country.localeCompare(b.country));
+                headers[2].classList.add('active');
+            }
+            
+            renderAthletes();
+        }
+
+        // Generate consistent color for team name
+        function getTeamColor(teamName) {
+            // Hash function to generate consistent color from team name
+            let hash = 0;
+            for (let i = 0; i < teamName.length; i++) {
+                hash = teamName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Generate HSL color with good saturation and lightness
+            const hue = Math.abs(hash % 360);
+            const saturation = 65 + (Math.abs(hash) % 20); // 65-85%
+            const lightness = 85 + (Math.abs(hash >> 8) % 10); // 85-95%
+            
+            const backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            const textColor = `hsl(${hue}, ${saturation + 10}%, ${lightness - 55}%)`; // Darker for text
+            
+            return { backgroundColor, textColor };
+        }
+        
+        // Render athletes
+        function renderAthletes() {
+            const athletesList = document.getElementById('athletesList');
+            
+            if (filteredAthletes.length === 0) {
+                athletesList.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 48px 16px;">
+                            <div class="empty-list">
+                                <i class="mdi mdi-account-off"></i>
+                                <div class="empty-list-title">No athletes found</div>
+                                <div class="empty-list-text">Try adjusting your search</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            athletesList.innerHTML = filteredAthletes.map(athlete => {
+                const teamColor = getTeamColor(athlete.team);
+                return `
+                    <tr>
+                        <td>
+                            <div class="athlete-name-cell">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(athlete.name)}&background=1565c0&color=fff&size=36" 
+                                     alt="${athlete.name}" 
+                                     class="athlete-profile-pic">
+                                <a href="athlete-participation.html?eventId=${eventId}&athleteId=${athlete.id}" class="athlete-link">
+                                    ${athlete.name}
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="team-tag" style="background-color: ${teamColor.backgroundColor}; color: ${teamColor.textColor};">
+                                ${athlete.team}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-country">
+                                <span class="table-flag">${athlete.flag}</span>
+                                <span>${athlete.country}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load referees data
+        function loadReferees() {
+            // Get referees for this event from mock data
+            allReferees = getRefereesByEvent(eventId);
+            filteredReferees = [...allReferees];
+            currentRefereeSort = 'name';
+            sortReferees('name');
+        }
+
+        // Filter referees
+        function filterReferees() {
+            const searchTerm = document.getElementById('refereeSearch').value.toLowerCase();
+            filteredReferees = allReferees.filter(referee => 
+                referee.name.toLowerCase().includes(searchTerm)
+            );
+            renderReferees();
+        }
+
+        // Sort referees
+        function sortReferees(sortBy) {
+            currentRefereeSort = sortBy;
+            
+            // Update header states
+            const headers = document.querySelectorAll('#refereesTable th.sortable');
+            headers.forEach(th => th.classList.remove('active'));
+            
+            if (sortBy === 'name') {
+                filteredReferees.sort((a, b) => a.name.localeCompare(b.name));
+                headers[0].classList.add('active');
+            } else if (sortBy === 'country') {
+                filteredReferees.sort((a, b) => a.country.localeCompare(b.country));
+                headers[1].classList.add('active');
+            }
+            
+            renderReferees();
+        }
+
+        // Render referees
+        function renderReferees() {
+            const refereesList = document.getElementById('refereesList');
+            
+            if (filteredReferees.length === 0) {
+                refereesList.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 48px 16px;">
+                            <div class="empty-list">
+                                <i class="mdi mdi-whistle"></i>
+                                <div class="empty-list-title">No referees found</div>
+                                <div class="empty-list-text">Try adjusting your search</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            refereesList.innerHTML = filteredReferees.map(referee => `
+                <tr>
+                    <td>
+                        <div class="athlete-name-cell">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(referee.name)}&background=2e7d32&color=fff&size=36" 
+                                 alt="${referee.name}" 
+                                 class="athlete-profile-pic">
+                            <span>${referee.name}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-country">
+                            <span class="table-flag">${referee.flag}</span>
+                            <span>${referee.country}</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Load event on page load
+        loadEventDetail();
+    </script>
+</body>
+</html>

@@ -73,6 +73,7 @@
         .event-badge.upcoming { background: #e3f2fd; color: #1565c0; }
         .event-badge.live { background: #e8f5e9; color: #2e7d32; }
         .event-badge.completed { background: #f5f5f5; color: #757575; }
+        .event-badge.cancelled { background: #ffebee; color: #c62828; }
         .event-info { display: flex; gap: 16px; font-size: 14px; color: #666; margin-top: 8px; }
         .event-info-item { display: flex; align-items: center; gap: 4px; }
         .event-info-item i { font-size: 16px; }
@@ -146,6 +147,7 @@
                     <option value="upcoming">Upcoming</option>
                     <option value="live">Live</option>
                     <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
                 </select>
             </div>
 
@@ -237,7 +239,7 @@
                 `;
             } else {
                 eventsList.innerHTML = eventsToShow.map(event => `
-                    <div class="event-card" onclick="alert('Navigate to: ${event.title}')">
+                    <div class="event-card" onclick="window.location.href='../events/event-detail.html?id=${event.id}'">
                         <div class="event-header">
                             <div>
                                 <div class="event-title">${event.title}</div>
