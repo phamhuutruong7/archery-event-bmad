@@ -114,28 +114,109 @@ Local persistence (offline):
 ## Responsive Design Strategy
 
 **Mobile-First Philosophy:**
-The scoresheet is primarily designed for **mobile athletes** entering scores in the field. The interface must feel native and use every pixel efficiently.
+The scoresheet is primarily designed for **mobile athletes** entering scores in the field. The interface must feel native and use every pixel efficiently. However, the system must also provide an excellent experience on **desktop and tablet devices** for coaches, referees, and athletes reviewing scores from the clubhouse.
 
 **Viewport Behavior:**
 
-| Device | Orientation | Strategy | Rationale |
-|--------|-------------|----------|-----------|
-| Mobile (< 768px) | Portrait | **Full Screen** - No borders, 100vw × 100dvh | Athletes need maximum space for score input, native app feel |
-| Tablet (768-1023px) | Portrait | Constrained (500px max), centered | Comfortable reading width, professional appearance |
-| Tablet/Desktop | Landscape | **Full Width** - 100vw utilization | Horizontal space abundant, maximize content visibility |
+| Device | Screen Size | Orientation | Strategy | Rationale |
+|--------|-------------|-------------|----------|-----------|
+| **Mobile** | < 600px | Portrait | **Full Screen** - 100vw × 100dvh, no borders | Athletes need maximum space for score input, native app feel |
+| **Mobile** | < 600px | Landscape | **Full Width** - 100vw, reduced header | Landscape maximizes horizontal space for score buttons |
+| **Tablet** | 600-959px | Portrait | Constrained (550px max), centered | Comfortable reading width, professional appearance |
+| **Tablet** | 600-959px | Landscape | **Full Width** - 100vw, wider layout | Horizontal space abundant, maximize content visibility |
+| **Desktop** | 960-1279px | N/A | Wider (650px max), centered | Larger touch targets, comfortable viewing distance |
+| **Desktop XL** | 1280px+ | N/A | Maximum (700px max), centered | Optimal width for large displays, prevent over-stretching |
 
 **Implementation Details:**
 - Use `100dvh` (dynamic viewport height) to handle mobile browser chrome hiding/showing
 - Remove default padding from v-main container: `<v-main class="pa-0">`
 - Scoresheet container has responsive CSS with media queries for each breakpoint
-- All touch targets minimum 44×44px (WCAG AAA compliance)
+- All touch targets minimum 44×44px on mobile, 48×48px on desktop (WCAG AAA compliance)
 - Score pad buttons scale proportionally using `aspect-ratio: 1`
+- Container uses flexbox centering with max-width constraints per breakpoint
 
-**Adaptive Features:**
-- Font sizes: 14px (mobile) → 16px+ (desktop)
-- Button spacing: 8px (mobile) → 12px (desktop)
-- Header padding: 12px (mobile) → 20px (desktop)
-- End row spacing adapts to available vertical space
+**Adaptive Features by Screen Size:**
+
+| Feature | Mobile (< 600px) | Tablet (600-959px) | Desktop (960px+) |
+|---------|------------------|-------------------|------------------|
+| **Container Width** | 100% (full screen) | 550px max (centered) | 650-700px max (centered) |
+| **Font Size (Body)** | 14px | 15px | 16px |
+| **Font Size (Header)** | 18px | 20px | 24px |
+| **Button Spacing** | 4px | 6px | 8px |
+| **Header Padding** | 12px | 16px | 20px |
+| **End Row Height** | 44px | 48px | 52px |
+| **Arrow Cell Size** | 36px | 40px | 44px |
+| **ScorePad Height** | 25vh | 28vh | 30vh |
+| **Border Radius** | 0px (full screen) | 12px | 16px |
+
+**Desktop-Specific Enhancements:**
+- Hover states on all interactive elements (subtle background change)
+- Keyboard navigation support (Tab, Enter, Backspace for delete)
+- Larger click targets for mouse precision
+- Optional sidebar for competition info (future enhancement)
+- Multi-column layout for very wide screens (> 1600px, future consideration)
+
+**CSS Media Query Breakpoints:**
+
+```css
+/* Mobile Portrait - Full Screen */
+@media (max-width: 599px) and (orientation: portrait) {
+  .scoresheet-container {
+    width: 100vw;
+    height: 100dvh;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+/* Mobile Landscape - Full Width */
+@media (max-width: 959px) and (orientation: landscape) {
+  .scoresheet-container {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+  }
+}
+
+/* Tablet Portrait - Centered */
+@media (min-width: 600px) and (max-width: 959px) and (orientation: portrait) {
+  .scoresheet-container {
+    max-width: 550px;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  }
+}
+
+/* Desktop - Wider Centered */
+@media (min-width: 960px) and (max-width: 1279px) {
+  .scoresheet-container {
+    max-width: 650px;
+    margin: 0 auto;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+  }
+}
+
+/* Desktop XL - Maximum Width */
+@media (min-width: 1280px) {
+  .scoresheet-container {
+    max-width: 700px;
+    margin: 0 auto;
+    border-radius: 16px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+  }
+}
+```
+
+**Responsive Testing Checklist:**
+- ✅ iPhone SE (375×667) - Portrait full screen
+- ✅ iPhone 14 Pro (393×852) - Portrait full screen
+- ✅ iPad Mini (768×1024) - Portrait centered at 550px
+- ✅ iPad Pro (1024×1366) - Landscape full width
+- ✅ Desktop 1920×1080 - Centered at 700px
+- ✅ Desktop 2560×1440 - Centered at 700px
+- ✅ All orientations smooth without layout shift
 
 ---
 
