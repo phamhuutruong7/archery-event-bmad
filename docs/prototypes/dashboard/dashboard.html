@@ -24,11 +24,11 @@
         }
         
         /* Header - 8-column grid like scoresheet */
-        .dashboard-header { display: grid; grid-template-columns: 40px 40px repeat(4, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .dashboard-header { display: grid; grid-template-columns: repeat(6, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
         
-        .header-menu { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        .header-menu:hover { background: rgba(255, 255, 255, 0.1); }
-        .header-menu i { font-size: 24px; }
+        .header-content { grid-column: 1 / 7; display: flex; align-items: center; gap: 12px; }
+        .header-icon { font-size: 28px; }
+        .header-title { font-size: 20px; font-weight: 700; }
         
         .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
         .header-language:hover { background: rgba(255, 255, 255, 0.3); }
@@ -36,10 +36,6 @@
         .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
         .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
         .header-profile i { font-size: 24px; }
-        
-        .header-content { grid-column: 2 / 7; display: flex; align-items: center; gap: 12px; }
-        .header-icon { font-size: 28px; }
-        .header-title { font-size: 20px; font-weight: 700; }
         
         /* Section */
         .section { padding: 16px; }
@@ -111,9 +107,6 @@
     <div class="dashboard-container">
         <!-- Header -->
         <div class="dashboard-header">
-            <div class="header-menu" onclick="alert('Menu clicked - would open navigation drawer')">
-                <i class="mdi mdi-menu"></i>
-            </div>
             <div class="header-content">
                 <span class="header-title">Archery Events</span>
             </div>
