@@ -124,6 +124,8 @@
         .btn-secondary:hover { background: #e0e0e0; }
         .btn-success { background: #2e7d32; color: white; }
         .btn-success:hover { background: #1b5e20; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3); }
+        .btn-danger { background: #d32f2f; color: white; }
+        .btn-danger:hover { background: #b71c1c; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .btn:disabled:hover { transform: none; box-shadow: none; }
         
@@ -325,19 +327,19 @@
             const currentState = getRegistrationState(eventId);
             
             if (currentState === type) {
-                // Already registered as this type, show options to change or unregister
-                showRegistrationOptions(eventId, type);
+                // Already registered as this type, redirect to competition selection to edit
+                window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
             } else if (currentState) {
                 // Registered as different type, confirm switch
                 if (confirm(`You are currently registered as ${currentState}. Switch to ${type}?`)) {
-                    setRegistrationState(eventId, type);
-                    location.reload();
+                    // Clear previous competition selections
+                    localStorage.removeItem(`event_${eventId}_${currentState}_competitions`);
+                    // Redirect to competition selection for new type
+                    window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
                 }
             } else {
-                // Not registered, register now
-                setRegistrationState(eventId, type);
-                alert(`Successfully registered as ${type}!`);
-                location.reload();
+                // Not registered, redirect to competition selection
+                window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
             }
         }
 
@@ -357,6 +359,14 @@
                 }
             }
             location.reload();
+        }
+
+        function cancelRegistration(eventId) {
+            if (confirm('Are you sure you want to cancel your registration and forfeit participation in this event?')) {
+                setRegistrationState(eventId, null);
+                alert('Registration cancelled successfully.');
+                location.reload();
+            }
         }
 
         // Tab switching
@@ -593,25 +603,25 @@
                 } else if (registrationState === 'athlete') {
                     // Already registered as athlete
                     registrationButtons = `
-                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'athlete')">
-                            <i class="mdi mdi-check-circle"></i>
-                            Registered as Athlete
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'athlete')" title="Click to view/edit your competition selections">
+                            <i class="mdi mdi-pencil"></i>
+                            Registered as Athlete - Edit
                         </button>
-                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
-                            <i class="mdi mdi-whistle"></i>
-                            Register as Referee
+                        <button class="btn btn-danger" onclick="cancelRegistration(${event.id})">
+                            <i class="mdi mdi-close-circle"></i>
+                            Cancel Registration
                         </button>
                     `;
                 } else if (registrationState === 'referee') {
                     // Already registered as referee
                     registrationButtons = `
-                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
-                            <i class="mdi mdi-run"></i>
-                            Register as Athlete
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'referee')" title="Click to view/edit your competition selections">
+                            <i class="mdi mdi-pencil"></i>
+                            Registered as Referee - Edit
                         </button>
-                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'referee')">
-                            <i class="mdi mdi-check-circle"></i>
-                            Registered as Referee
+                        <button class="btn btn-danger" onclick="cancelRegistration(${event.id})">
+                            <i class="mdi mdi-close-circle"></i>
+                            Cancel Registration
                         </button>
                     `;
                 } else {

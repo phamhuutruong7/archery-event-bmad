@@ -95,12 +95,12 @@ const eventDetails = [
         currentParticipants: 67,
         status: "upcoming",
         competitions: [
-            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', format: 'Qualification Round' },
-            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', format: 'Qualification Round' },
-            { id: 38, category: 'Recurve', division: "Men's Individual", distance: '30m', format: 'Qualification Round' },
-            { id: 39, category: 'Recurve', division: "Women's Individual", distance: '30m', format: 'Qualification Round' },
-            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' },
-            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
+            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
+            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
+            { id: 38, category: 'Recurve', division: "Men's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
+            { id: 39, category: 'Recurve', division: "Women's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
+            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
+            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 }
         ],
         organizer: {
             name: "Archery Australia",
@@ -121,16 +121,16 @@ const eventDetails = [
         currentParticipants: 198,
         status: "upcoming",
         competitions: [
-            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' },
-            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round' },
-            { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', format: 'Olympic Round' },
-            { id: 4, category: 'Recurve', division: "Women's Team", distance: '70m', format: 'Olympic Round' },
-            { id: 5, category: 'Recurve', division: "Mixed Team", distance: '70m', format: 'Olympic Round' },
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' },
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' },
-            { id: 13, category: 'Compound', division: "Men's Team", distance: '50m', format: 'Compound Round' },
-            { id: 14, category: 'Compound', division: "Women's Team", distance: '50m', format: 'Compound Round' },
-            { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', format: 'Compound Round' }
+            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
+            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
+            { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
+            { id: 4, category: 'Recurve', division: "Women's Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
+            { id: 5, category: 'Recurve', division: "Mixed Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
+            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
+            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
+            { id: 13, category: 'Compound', division: "Men's Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 },
+            { id: 14, category: 'Compound', division: "Women's Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 },
+            { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 }
         ],
         organizer: {
             name: "French Archery Federation",
@@ -177,12 +177,12 @@ const eventDetails = [
         currentParticipants: 45,
         status: "upcoming",
         competitions: [
-            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', format: 'Qualification Round' },
-            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', format: 'Qualification Round' },
-            { id: 42, category: 'Compound', division: "Men's Individual", distance: '30m', format: 'Qualification Round' },
-            { id: 43, category: 'Compound', division: "Women's Individual", distance: '30m', format: 'Qualification Round' },
-            { id: 1000, category: 'Recurve', division: "Masters 50+ Men's", distance: '50m', format: 'Masters Round', isCustom: true },
-            { id: 1001, category: 'Compound', division: "Masters 50+ Men's", distance: '30m', format: 'Masters Round', isCustom: true }
+            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
+            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
+            { id: 42, category: 'Compound', division: "Men's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
+            { id: 43, category: 'Compound', division: "Women's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
+            { id: 1000, category: 'Recurve', division: "Masters 50+ Men's", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6, isCustom: true },
+            { id: 1001, category: 'Compound', division: "Masters 50+ Men's", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6, isCustom: true }
         ],
         organizer: {
             name: "Archery GB",
@@ -203,14 +203,14 @@ const eventDetails = [
         currentParticipants: 134,
         status: "upcoming",
         competitions: [
-            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' },
-            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round' },
-            { id: 34, category: 'Recurve', division: "Men's Individual", distance: '60m', format: 'Qualification Round' },
-            { id: 35, category: 'Recurve', division: "Women's Individual", distance: '60m', format: 'Qualification Round' },
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' },
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' },
-            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' },
-            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
+            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
+            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
+            { id: 34, category: 'Recurve', division: "Men's Individual", distance: '60m', target: '10 ring 122cm', ends: 10, arrows: 6 },
+            { id: 35, category: 'Recurve', division: "Women's Individual", distance: '60m', target: '10 ring 122cm', ends: 10, arrows: 6 },
+            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
+            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
+            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 10, arrows: 6 },
+            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 10, arrows: 6 }
         ],
         organizer: {
             name: "USA Archery - California",

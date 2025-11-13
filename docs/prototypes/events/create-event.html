@@ -326,7 +326,16 @@
                         </div>
                         <div class="custom-form-row">
                             <input type="text" id="customDistance" class="custom-form-input" placeholder="Distance (e.g., 50m, 30m, 18m)">
-                            <input type="text" id="customFormat" class="custom-form-input" placeholder="Format (e.g., Traditional Round)">
+                            <select id="customTarget" class="custom-form-input">
+                                <option value="">Select Target...</option>
+                                <option value="10 ring 40cm">10 ring 40cm</option>
+                                <option value="10 ring 60cm">10 ring 60cm</option>
+                                <option value="10 ring 80cm">10 ring 80cm</option>
+                                <option value="10 ring 122cm">10 ring 122cm</option>
+                            </select>
+                        </div>
+                        <div class="custom-form-row">
+                            <input type="number" id="customArrows" class="custom-form-input" placeholder="Maximum Arrows" min="1">
                         </div>
                         <div class="custom-form-actions">
                             <button type="button" class="btn-small btn-small-primary" onclick="addCustomCompetition()">
@@ -374,7 +383,8 @@
             const category = document.getElementById('customCategory').value;
             const division = document.getElementById('customDivision').value;
             const distance = document.getElementById('customDistance').value.trim();
-            const format = document.getElementById('customFormat').value.trim();
+            const target = document.getElementById('customTarget').value;
+            const arrows = document.getElementById('customArrows').value.trim();
 
             // Validate all fields
             if (!category) {
@@ -389,8 +399,12 @@
                 alert('Please enter a distance');
                 return;
             }
-            if (!format) {
-                alert('Please enter a format');
+            if (!target) {
+                alert('Please select a target');
+                return;
+            }
+            if (!arrows || Number.parseInt(arrows) < 1) {
+                alert('Please enter a valid maximum number of arrows (minimum 1)');
                 return;
             }
 
@@ -400,7 +414,8 @@
                 category: category,
                 division: division,
                 distance: distance,
-                format: format,
+                target: target,
+                arrows: Number.parseInt(arrows),
                 isCustom: true
             };
 
@@ -444,7 +459,7 @@
                                 ${comp.isCustom ? '<i class="mdi mdi-star" style="color: #f57c00; font-size: 14px; margin-left: 4px;" title="Custom competition"></i>' : ''}
                             </div>
                             <div class="selected-competition-details">
-                                ${comp.distance} • ${comp.format}
+                                ${comp.distance} • ${comp.target || comp.format}${comp.arrows ? ` • Max ${comp.arrows} Arrows` : ''}
                             </div>
                         </div>
                         <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
