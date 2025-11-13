@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Competitions - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+        
+        .container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        @media (min-width: 600px) {
+            body { background: #e0e0e0; }
+            .container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header */
+        .header { display: flex; align-items: center; padding: 16px; background: #1565c0; color: white; position: sticky; top: 0; z-index: 100; }
+        .header-back { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-title { flex: 1; font-size: 18px; font-weight: 700; margin-left: 8px; }
+        
+        /* Content */
+        .content { padding: 20px; padding-bottom: 100px; }
+        .page-title { font-size: 24px; font-weight: 700; color: #212121; margin-bottom: 8px; }
+        .page-subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+        
+        /* Event Info */
+        .event-info { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+        .event-info-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 12px; }
+        .event-info-row { font-size: 14px; color: #666; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .event-info-row i { color: #1565c0; }
+        
+        /* Competitions Section */
+        .section-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #1565c0; }
+        
+        /* Competition Item */
+        .competition-item { background: #f9f9f9; border-left: 4px solid #1565c0; border-radius: 8px; padding: 12px 12px 12px 48px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; position: relative; }
+        .competition-item:hover { background: #e3f2fd; }
+        .competition-item.selected { background: #e3f2fd; border-left-color: #2e7d32; }
+        
+        .competition-checkbox { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 2px solid #9e9e9e; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .competition-item.selected .competition-checkbox { background: #2e7d32; border-color: #2e7d32; }
+        .competition-item.selected .competition-checkbox::after { content: ""; color: white; font-size: 16px; font-weight: 700; }
+        
+        .competition-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .competition-badge.recurve { background: #e3f2fd; color: #1565c0; }
+        .competition-badge.compound { background: #e8f5e9; color: #2e7d32; }
+        .competition-badge.barebow { background: #fff3e0; color: #f57c00; }
+        .competition-division { font-size: 14px; font-weight: 600; color: #212121; }
+        .competition-custom-icon { color: #f57c00; font-size: 14px; margin-left: 4px; }
+        .competition-details { font-size: 13px; color: #666; }
+        
+        /* Action Buttons */
+        .action-buttons { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); display: flex; gap: 12px; z-index: 100; }
+        
+        @media (min-width: 600px) {
+            .action-buttons { left: 50%; transform: translateX(-50%); width: 50vw; }
+        }
+        
+        .btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-secondary { background: #f5f5f5; color: #424242; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 48px 20px; color: #999; }
+        .empty-state i { font-size: 64px; margin-bottom: 16px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-back" onclick="goBack()">
+                <i class="mdi mdi-arrow-left" style="font-size: 24px;"></i>
+            </div>
+            <div class="header-title">Select Competitions</div>
+        </div>
+
+        <div class="content">
+            <h1 class="page-title">Competition Registration</h1>
+            <p class="page-subtitle">Select the competitions you want to participate in</p>
+
+            <div id="eventInfo" class="event-info"></div>
+
+            <div class="section-title">
+                <i class="mdi mdi-trophy-variant"></i>
+                Available Competitions
+            </div>
+
+            <div id="competitionList"></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="goBack()">
+                <i class="mdi mdi-close"></i>
+                Cancel
+            </button>
+            <button id="confirmBtn" class="btn btn-primary" onclick="confirmRegistration()" disabled>
+                <i class="mdi mdi-check"></i>
+                Submit Registration
+            </button>
+        </div>
+    </div>
+
+    <script src="../mock-data/event-details.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = Number.parseInt(urlParams.get('eventId'));
+        let selectedCompetitions = [];
+        let currentEvent = null;
+
+        function init() {
+            // Load event data
+            currentEvent = getEventDetail(eventId);
+            if (!currentEvent) {
+                document.querySelector('.content').innerHTML = '<div class="empty-state"><i class="mdi mdi-alert-circle"></i><div>Event not found</div></div>';
+                return;
+            }
+
+            loadExistingSelections();
+            renderEventInfo();
+            renderCompetitions();
+            updateSelectedCount();
+        }
+
+        function loadExistingSelections() {
+            const saved = localStorage.getItem(`event_${eventId}_athlete_competitions`);
+            if (saved) {
+                selectedCompetitions = JSON.parse(saved);
+            }
+        }
+
+        function renderEventInfo() {
+            document.getElementById('eventInfo').innerHTML = `
+                <div class="event-info-title">${currentEvent.title}</div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-calendar"></i>
+                    ${currentEvent.dateDisplay}
+                </div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-map-marker"></i>
+                    ${currentEvent.location}
+                </div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-run"></i>
+                    Registering as: <strong>Athlete</strong>
+                </div>
+            `;
+        }
+
+        function renderCompetitions() {
+            const container = document.getElementById('competitionList');
+            
+            if (!currentEvent.competitions || currentEvent.competitions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="mdi mdi-trophy-outline"></i><div>No competitions available</div></div>';
+                return;
+            }
+
+            let html = '';
+            for (const comp of currentEvent.competitions) {
+                const isSelected = selectedCompetitions.includes(comp.id);
+                const selectedClass = isSelected ? 'selected' : '';
+                const categoryClass = comp.category.toLowerCase();
+                
+                html += `<div class="competition-item ${selectedClass}" onclick="toggleCompetition(${comp.id}, this)">
+                    <div class="competition-checkbox"></div>
+                    <div class="competition-header">
+                        <span class="competition-badge ${categoryClass}">${comp.category}</span>
+                        <span class="competition-division">${comp.division}</span>
+                        ${comp.isCustom ? '<i class="mdi mdi-star competition-custom-icon" title="Custom competition"></i>' : ''}
+                    </div>
+                    <div class="competition-details">`;
+                
+                if (comp.target && comp.arrows) {
+                    html += `${comp.distance}  ${comp.target}  Max ${comp.arrows} Arrows`;
+                } else if (comp.target) {
+                    html += `${comp.distance}  ${comp.target}`;
+                } else if (comp.format) {
+                    html += `${comp.distance}  ${comp.format}`;
+                } else {
+                    html += comp.distance;
+                }
+                
+                html += `</div></div>`;
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function toggleCompetition(compId, element) {
+            const index = selectedCompetitions.indexOf(compId);
+            if (index > -1) {
+                selectedCompetitions.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedCompetitions.push(compId);
+                element.classList.add('selected');
+            }
+            updateSelectedCount();
+        }
+
+        function updateSelectedCount() {
+            const confirmBtn = document.getElementById('confirmBtn');
+
+            if (selectedCompetitions.length > 0) {
+                confirmBtn.disabled = false;
+            } else {
+                confirmBtn.disabled = true;
+            }
+        }
+
+        function confirmRegistration() {
+            if (selectedCompetitions.length === 0) {
+                alert('Please select at least one competition');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem(`event_${eventId}_athlete_competitions`, JSON.stringify(selectedCompetitions));
+            localStorage.setItem(`event_${eventId}_registration`, 'athlete');
+
+            alert(`Successfully registered as athlete for ${selectedCompetitions.length} competition(s)!`);
+            window.location.href = `event-detail.html?id=${eventId}`;
+        }
+
+        function goBack() {
+            window.location.href = `event-detail.html?id=${eventId}`;
+        }
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>

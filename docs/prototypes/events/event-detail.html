@@ -324,22 +324,14 @@
         }
 
         function handleRegistration(eventId, type) {
-            const currentState = getRegistrationState(eventId);
-            
-            if (currentState === type) {
-                // Already registered as this type, redirect to competition selection to edit
-                window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
-            } else if (currentState) {
-                // Registered as different type, confirm switch
-                if (confirm(`You are currently registered as ${currentState}. Switch to ${type}?`)) {
-                    // Clear previous competition selections
-                    localStorage.removeItem(`event_${eventId}_${currentState}_competitions`);
-                    // Redirect to competition selection for new type
-                    window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
-                }
+            // Only athletes need to select competitions
+            if (type === 'athlete') {
+                window.location.href = `competition-selection.html?eventId=${eventId}`;
             } else {
-                // Not registered, redirect to competition selection
-                window.location.href = `competition-selection.html?eventId=${eventId}&type=${type}`;
+                // Referees just register directly
+                setRegistrationState(eventId, type);
+                alert('Successfully registered as referee!');
+                location.reload();
             }
         }
 
