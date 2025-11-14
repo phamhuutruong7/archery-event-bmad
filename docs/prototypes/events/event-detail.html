@@ -88,19 +88,32 @@
         
         /* Competitions Section */
         .competitions-section { margin-bottom: 24px; }
-        .competitions-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .competitions-title { font-size: 18px; font-weight: 700; color: #212121; display: flex; align-items: center; gap: 8px; }
         .competitions-title i { color: #1565c0; }
-        .competition-item { background: #f9f9f9; border-left: 4px solid #1565c0; border-radius: 8px; padding: 12px; margin-bottom: 8px; }
-        .competition-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #666; background: #f5f5f5; padding: 4px 12px; border-radius: 12px; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .competitions-table th:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
         .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
-        .competition-badge.recurve { background: #e3f2fd; color: #1565c0; }
-        .competition-badge.compound { background: #e8f5e9; color: #2e7d32; }
-        .competition-badge.barebow { background: #fff3e0; color: #f57c00; }
-        .competition-badge.traditional { background: #f3e5f5; color: #7b1fa2; }
-        .competition-badge.longbow { background: #fce4ec; color: #c2185b; }
-        .competition-division { font-size: 14px; font-weight: 600; color: #212121; }
-        .competition-custom-icon { color: #f57c00; font-size: 14px; margin-left: 4px; }
-        .competition-details { font-size: 13px; color: #666; margin-left: 28px; }
+        .badge-recurve { background: #e3f2fd; color: #1565c0; }
+        .badge-compound { background: #e8f5e9; color: #2e7d32; }
+        .badge-barebow { background: #fff3e0; color: #e65100; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .competitions-empty { text-align: center; padding: 48px 16px; color: #9e9e9e; }
+        .competitions-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
         
         /* Organizer Section */
         .organizer-section { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
@@ -243,15 +256,15 @@
 
         <!-- Tab Navigation -->
         <div class="tab-navigation">
-            <div class="tab-item active" onclick="switchTab('details')">
+            <div class="tab-item active" onclick="switchTab('details', event)">
                 <i class="mdi mdi-information-outline"></i>
                 <span>Details</span>
             </div>
-            <div class="tab-item" onclick="switchTab('athletes')">
+            <div class="tab-item" onclick="switchTab('athletes', event)">
                 <i class="mdi mdi-account-multiple"></i>
                 <span>Athletes</span>
             </div>
-            <div class="tab-item" onclick="switchTab('referees')">
+            <div class="tab-item" onclick="switchTab('referees', event)">
                 <i class="mdi mdi-whistle"></i>
                 <span>Referees</span>
             </div>
@@ -371,6 +384,11 @@
         let allReferees = [];
         let filteredReferees = [];
         let currentRefereeSort = 'name';
+        
+        // Competitions sorting state
+        let competitionsSortField = null;
+        let competitionsSortOrder = 'asc';
+        let competitionsData = [];
 
         // Registration state management (stored in localStorage)
         function getRegistrationState(eventId) {
@@ -424,14 +442,96 @@
             }
         }
 
+        // Competitions table sorting and rendering
+        function sortCompetitionsTable(field) {
+            if (competitionsSortField === field) {
+                competitionsSortOrder = competitionsSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                competitionsSortField = field;
+                competitionsSortOrder = 'asc';
+            }
+            
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+            
+            const activeHeader = document.querySelector(`[onclick*="sortCompetitionsTable('${field}')"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (competitionsSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+            
+            competitionsData.sort((a, b) => {
+                let aVal = a[field] ? a[field].toString().toLowerCase() : '';
+                let bVal = b[field] ? b[field].toString().toLowerCase() : '';
+                if (competitionsSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderCompetitionsTable();
+        }
+        
+        function renderCompetitionsTable() {
+            const tbody = document.getElementById('competitionsTableBody');
+            if (!tbody || !competitionsData || competitionsData.length === 0) return;
+            
+            tbody.innerHTML = competitionsData.map(comp => {
+                let categoryClass = 'badge-mixed';
+                const catLower = comp.category ? comp.category.toLowerCase() : '';
+                
+                if (catLower === "men's individual") {
+                    categoryClass = 'badge-men-individual';
+                } else if (catLower === "women's individual") {
+                    categoryClass = 'badge-women-individual';
+                } else if (catLower === "men's team") {
+                    categoryClass = 'badge-men-team';
+                } else if (catLower === "women's team") {
+                    categoryClass = 'badge-women-team';
+                } else if (catLower === "mixed team") {
+                    categoryClass = 'badge-mixed';
+                }
+                
+                const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
+                
+                return `
+                <tr>
+                    <td>
+                        <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
+                    </td>
+                    <td>
+                        <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
+                    </td>
+                    <td>${comp.round || 'N/A'}</td>
+                    <td>${comp.subround || 'N/A'}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
         // Tab switching
-        function switchTab(tabName) {
+        function switchTab(tabName, clickEvent) {
             // Remove active class from all tabs
             document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             
             // Add active class to selected tab
-            event.target.closest('.tab-item').classList.add('active');
+            if (clickEvent && clickEvent.target) {
+                clickEvent.target.closest('.tab-item').classList.add('active');
+            } else {
+                // Fallback: find tab by matching tabName
+                const tabs = document.querySelectorAll('.tab-item');
+                tabs.forEach(tab => {
+                    const onclick = tab.getAttribute('onclick');
+                    if (onclick && onclick.includes(tabName)) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
             document.getElementById(tabName + 'Tab').classList.add('active');
             
             // Load data for the tab
@@ -564,33 +664,59 @@
                 <div class="divider"></div>
             `;
 
-            // Competitions
+            // Competitions - store data and render table
+            if (event.competitions && event.competitions.length > 0) {
+                competitionsData = [...event.competitions];
+            }
+            
             html += `
                 <div class="competitions-section">
-                    <div class="competitions-title">
-                        <i class="mdi mdi-trophy"></i>
-                        Competitions (${event.competitions.length})
+                    <div class="competitions-header">
+                        <div class="competitions-title">
+                            <i class="mdi mdi-trophy"></i>
+                            Competitions
+                        </div>
+                        <div class="competitions-count">${event.competitions.length} competition${event.competitions.length > 1 ? 's' : ''}</div>
                     </div>
             `;
 
-            event.competitions.forEach(comp => {
-                const categoryClass = comp.category.toLowerCase();
+            if (event.competitions && event.competitions.length > 0) {
                 html += `
-                    <div class="competition-item">
-                        <div class="competition-header">
-                            <span class="competition-badge ${categoryClass}">${comp.category}</span>
-                            <span class="competition-division">${comp.division}</span>
-                            ${comp.isCustom ? '<i class="mdi mdi-star competition-custom-icon" title="Custom competition"></i>' : ''}
-                        </div>
-                        <div class="competition-details">
-                            Distance: ${comp.distance} | Target: ${comp.target ? comp.target.replace('cm 10-ring', ' cm 10 rings') : comp.format}
-                            ${comp.phases ? 
-                                `<br><strong>Qualification:</strong> ${comp.phases[0].maxArrows} arrows (${comp.phases[0].description})<br><strong>Elimination:</strong> ${comp.phases[1].maxArrows} arrows (${comp.phases[1].description})` : 
-                                `| Arrows: ${comp.maxArrows || 'N/A'}`}
-                        </div>
+                    <div class="competitions-table-container">
+                        <table class="competitions-table">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortCompetitionsTable('bowType')">
+                                        Bow Type
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortCompetitionsTable('category')">
+                                        Category
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortCompetitionsTable('round')">
+                                        Round
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th onclick="sortCompetitionsTable('subround')">
+                                        Subround
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="competitionsTableBody">
+                            </tbody>
+                        </table>
                     </div>
                 `;
-            });
+            } else {
+                html += `
+                    <div class="competitions-empty">
+                        <i class="mdi mdi-trophy"></i>
+                        <div>No competitions available</div>
+                    </div>
+                `;
+            }
 
             html += `</div><div class="divider"></div>`;
 
@@ -642,6 +768,11 @@
             }
 
             eventContent.innerHTML = html;
+            
+            // Render competitions table if data exists
+            if (competitionsData.length > 0) {
+                renderCompetitionsTable();
+            }
 
             // Add action buttons based on status
             renderActionButtons(event);

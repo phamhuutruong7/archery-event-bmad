@@ -17,12 +17,12 @@ const eventDetails = [
         currentParticipants: 156,
         status: "upcoming",
         competitions: [
-            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 4, category: 'Recurve', division: "Women's Team", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round', maxArrows: 72, target: '80cm 10-ring' },
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round', maxArrows: 72, target: '80cm 10-ring' }
+            { id: 1, bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 1440 (90m)' },
+            { id: 2, bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 1440 (70m)' },
+            { id: 3, bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 4, bowType: 'Recurve', category: "Women's Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 5, bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 6, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m' }
         ],
         organizer: {
             name: "Japan Archery Federation",
@@ -43,12 +43,12 @@ const eventDetails = [
         currentParticipants: 142,
         status: "live",
         competitions: [
-            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 5, category: 'Recurve', division: "Mixed Team", distance: '70m', format: 'Olympic Round', maxArrows: 72, target: '122cm 10-ring' },
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round', maxArrows: 72, target: '80cm 10-ring' },
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round', maxArrows: 72, target: '80cm 10-ring' },
-            { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', format: 'Compound Round', maxArrows: 72, target: '80cm 10-ring' }
+            { id: 1, bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 1440 (90m)' },
+            { id: 2, bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 1440 (70m)' },
+            { id: 3, bowType: 'Recurve', category: "Mixed Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 4, bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 5, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 6, bowType: 'Compound', category: "Mixed Team", round: 'WA (International)', subround: 'WA 50m (6 Ring Face)' }
         ],
         organizer: {
             name: "Korean Archery Association",
@@ -69,12 +69,12 @@ const eventDetails = [
         currentParticipants: 89,
         status: "upcoming",
         competitions: [
-            { id: 6, category: 'Recurve', division: "Men's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' },
-            { id: 7, category: 'Recurve', division: "Women's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' },
-            { id: 16, category: 'Compound', division: "Men's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' },
-            { id: 17, category: 'Compound', division: "Women's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' },
-            { id: 53, category: 'Barebow', division: "Men's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' },
-            { id: 54, category: 'Barebow', division: "Women's Individual", distance: '18m', format: 'Indoor', maxArrows: 60, target: '40cm 10-ring' }
+            { id: 1, bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 30m (VI)' },
+            { id: 2, bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 30m (VI)' },
+            { id: 3, bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA Standard' },
+            { id: 4, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA Standard' },
+            { id: 5, bowType: 'Barebow', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m (10 Zone-Barebow)' },
+            { id: 6, bowType: 'Barebow', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m (10 Zone-Barebow)' }
         ],
         organizer: {
             name: "Vietnam Archery Federation",
@@ -95,12 +95,11 @@ const eventDetails = [
         currentParticipants: 67,
         status: "upcoming",
         competitions: [
-            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
-            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
-            { id: 38, category: 'Recurve', division: "Men's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
-            { id: 39, category: 'Recurve', division: "Women's Individual", distance: '30m', target: '10 ring 80cm', ends: 6, arrows: 6 },
-            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 },
-            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', target: '10 ring 122cm', ends: 6, arrows: 6 }
+            { id: 1, bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'Half WA (90m)' },
+            { id: 2, bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'Half WA (70m)' },
+            { id: 3, bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 60m' },
+            { id: 4, bowType: 'Barebow', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m (10 Zone-Barebow)' },
+            { id: 5, bowType: 'Barebow', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m (10 Zone-Barebow)' }
         ],
         organizer: {
             name: "Archery Australia",
@@ -121,13 +120,13 @@ const eventDetails = [
         currentParticipants: 198,
         status: "upcoming",
         competitions: [
-            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
-            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', target: '10 ring 122cm', ends: 12, arrows: 6 },
-            { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
-            { id: 4, category: 'Recurve', division: "Women's Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
-            { id: 5, category: 'Recurve', division: "Mixed Team", distance: '70m', target: '10 ring 122cm', ends: 8, arrows: 6 },
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', target: '10 ring 80cm', ends: 12, arrows: 6 },
+            { id: 1, bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 1440 (90m)' },
+            { id: 2, bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 1440 (70m)' },
+            { id: 3, bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 4, bowType: 'Recurve', category: "Women's Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 5, bowType: 'Recurve', category: "Mixed Team", round: 'WA (International)', subround: 'WA 70m' },
+            { id: 6, bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 7, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m' },
             { id: 13, category: 'Compound', division: "Men's Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 },
             { id: 14, category: 'Compound', division: "Women's Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 },
             { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', target: '10 ring 80cm', ends: 8, arrows: 6 }
