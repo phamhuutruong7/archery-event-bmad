@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Create Event - Archery Events</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
-    <script src="../mock-data/competitions.js"></script>
     <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/rounds.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
@@ -90,49 +90,79 @@
         .btn-icon { width: 40px; height: 44px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #666; }
         .btn-icon:hover { background: #f5f5f5; color: #d32f2f; border-color: #bdbdbd; }
         
-        /* Competition Selector */
-        .competition-search-wrapper { position: relative; margin-bottom: 12px; }
-        .competition-search { display: grid; grid-template-columns: 1fr 40px; gap: 8px; align-items: center; }
-        .competition-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: white; border: 2px solid #e0e0e0; border-radius: 8px; max-height: 300px; overflow-y: auto; display: none; z-index: 10; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
-        .competition-dropdown.show { display: block; }
-        .competition-option { padding: 12px; cursor: pointer; transition: background 0.2s; border-bottom: 1px solid #f5f5f5; }
-        .competition-option:last-child { border-bottom: none; }
-        .competition-option:hover { background: #f5f5f5; }
-        .competition-option-title { font-size: 14px; font-weight: 600; color: #212121; margin-bottom: 2px; }
-        .competition-option-meta { font-size: 12px; color: #666; }
-        .competition-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-right: 6px; }
+        /* Add Competition Button */
+        .add-competition-btn { padding: 12px 24px; border: none; border-radius: 8px; background: #1565c0; color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+        .add-competition-btn:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
+        .add-competition-btn i { font-size: 20px; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .modal-header { padding: 20px 24px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 20px; font-weight: 700; color: #212121; display: flex; align-items: center; gap: 8px; }
+        .modal-title i { color: #1565c0; font-size: 24px; }
+        .modal-close { background: none; border: none; cursor: pointer; color: #666; padding: 8px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #f5f5f5; color: #d32f2f; }
+        .modal-close i { font-size: 24px; }
+        .modal-body { padding: 24px; }
+        
+        /* Competition Form in Modal */
+        .competition-form-title { font-size: 16px; font-weight: 600; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .competition-form-title i { color: #1565c0; font-size: 20px; }
+        .competition-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .competition-form-label { font-size: 13px; font-weight: 600; color: #424242; margin-bottom: 4px; display: block; }
+        .competition-form-select { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; outline: none; transition: all 0.2s; background: white; }
+        .competition-form-select:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .competition-form-select:disabled { background: #f5f5f5; cursor: not-allowed; opacity: 0.6; }
+        .competition-form-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .btn-add { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; background: #1565c0; color: white; }
+        .btn-add:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3); }
+        .btn-add:disabled { background: #bdbdbd; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-clear { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; background: white; color: #666; }
+        .btn-clear:hover { background: #f5f5f5; border-color: #bdbdbd; }
+        
+        /* Selected Competitions */
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #424242; }
+        .sort-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .sort-label { font-size: 12px; color: #666; font-weight: 600; }
+        .sort-btn { padding: 6px 12px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; color: #666; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
+        .sort-btn:hover { border-color: #1565c0; color: #1565c0; }
+        .sort-btn.active { border-color: #1565c0; background: #e3f2fd; color: #1565c0; }
+        .sort-btn i { font-size: 14px; }
+        .selected-competitions { margin-top: 0; }
+        .selected-competition-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; }
+        .selected-competition-item:hover { border-color: #1565c0; box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1); }
+        .selected-competition-info { flex: 1; }
+        .selected-competition-name { font-size: 14px; font-weight: 600; color: #212121; margin-bottom: 4px; }
+        .selected-competition-details { font-size: 12px; color: #666; display: flex; gap: 12px; flex-wrap: wrap; }
+        .competition-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
         .badge-recurve { background: #e3f2fd; color: #1565c0; }
         .badge-compound { background: #e8f5e9; color: #2e7d32; }
         .badge-barebow { background: #fff3e0; color: #e65100; }
-        .no-results { padding: 16px; text-align: center; color: #999; font-size: 14px; }
-        
-        /* Selected Competitions */
-        .selected-competitions { margin-top: 12px; }
-        .selected-competition-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: #f5f5f5; border-radius: 8px; margin-bottom: 8px; }
-        .selected-competition-info { flex: 1; }
-        .selected-competition-name { font-size: 14px; font-weight: 600; color: #212121; margin-bottom: 2px; }
-        .selected-competition-details { font-size: 12px; color: #666; }
-        .remove-btn { background: none; border: none; cursor: pointer; color: #d32f2f; padding: 4px 8px; border-radius: 4px; transition: background 0.2s; }
+        .remove-btn { background: none; border: none; cursor: pointer; color: #d32f2f; padding: 8px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .remove-btn:hover { background: #ffebee; }
         .remove-btn i { font-size: 20px; }
-        .empty-competitions { text-align: center; padding: 24px; color: #999; font-size: 14px; border: 2px dashed #e0e0e0; border-radius: 8px; }
-        
-        /* Custom Competition Form */
-        .custom-competition-form { padding: 16px; background: #f9f9f9; border-radius: 8px; margin-top: 8px; }
-        .custom-competition-title { font-size: 14px; font-weight: 600; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-        .custom-competition-title i { color: #1565c0; }
-        .custom-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 8px; }
-        .custom-form-input { padding: 8px; border: 2px solid #e0e0e0; border-radius: 4px; font-size: 13px; outline: none; transition: all 0.2s; }
-        .custom-form-input:focus { border-color: #1565c0; }
-        .custom-form-actions { display: flex; gap: 8px; margin-top: 12px; }
-        .btn-small { padding: 8px 16px; border: none; border-radius: 6px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
-        .btn-small-primary { background: #1565c0; color: white; }
-        .btn-small-primary:hover { background: #0d47a1; }
-        .btn-small-secondary { background: white; color: #666; border: 2px solid #e0e0e0; }
-        .btn-small-secondary:hover { background: #f5f5f5; }
+        .empty-competitions { text-align: center; padding: 32px 16px; color: #999; font-size: 14px; border: 2px dashed #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .empty-competitions i { font-size: 48px; display: block; margin-bottom: 8px; opacity: 0.3; }
         
         @media (max-width: 599px) {
-            .custom-form-row { grid-template-columns: 1fr; }
+            .competition-form-row { grid-template-columns: 1fr; }
+            .competitions-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .sort-controls { width: 100%; justify-content: flex-start; }
+            .sort-btn { flex: 1; min-width: 0; }
+            .sort-btn span { display: none; }
+            .sort-label { display: none; }
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal-content { max-width: 100%; border-radius: 12px 12px 0 0; max-height: 80vh; }
+            .modal-header { padding: 16px; }
+            .modal-body { padding: 16px; }
+            .modal-title { font-size: 18px; }
+            .competition-form-actions { flex-direction: column; }
+            .btn-add, .btn-clear { width: 100%; justify-content: center; }
+            .add-competition-btn { width: 100%; }
+            .selected-competition-details { flex-direction: column; gap: 4px; }
         }
         
         /* Responsive badge */
@@ -221,31 +251,39 @@
 
                 <!-- Competitions -->
                 <div class="form-group">
-                    <label class="form-label required">Competitions</label>
-                    <div class="competition-search-wrapper">
-                        <div class="competition-search">
-                            <input 
-                                type="text" 
-                                id="competitionSearch" 
-                                class="input-field" 
-                                placeholder="Search competitions (e.g., Men's 70m, Women's Indoor...)" 
-                                oninput="filterCompetitions()"
-                                onfocus="showCompetitionDropdown()"
-                                autocomplete="off"
-                            >
-                            <button type="button" class="btn-icon" onclick="clearSearch()" title="Clear search">
-                                <i class="mdi mdi-close"></i>
+                    <!-- Add Competition Button -->
+                    <button type="button" class="add-competition-btn" onclick="openCompetitionModal()">
+                        <i class="mdi mdi-plus-circle"></i>
+                        <span>Add Competition</span>
+                    </button>
+                    
+                    <!-- Selected Competitions List -->
+                    <div class="competitions-header" id="competitionsHeader" style="display: none;">
+                        <div class="competitions-count" id="competitionsCount">0 competitions</div>
+                        <div class="sort-controls">
+                            <span class="sort-label">Sort by:</span>
+                            <button type="button" class="sort-btn" id="sortBowType" onclick="sortCompetitions('bowType')">
+                                <span>Bow Type</span>
+                                <i class="mdi mdi-sort"></i>
+                            </button>
+                            <button type="button" class="sort-btn" id="sortCategory" onclick="sortCompetitions('category')">
+                                <span>Category</span>
+                                <i class="mdi mdi-sort"></i>
+                            </button>
+                            <button type="button" class="sort-btn" id="sortRound" onclick="sortCompetitions('round')">
+                                <span>Round</span>
+                                <i class="mdi mdi-sort"></i>
+                            </button>
+                            <button type="button" class="sort-btn" id="sortSubround" onclick="sortCompetitions('subround')">
+                                <span>Subround</span>
+                                <i class="mdi mdi-sort"></i>
                             </button>
                         </div>
-                        <div class="competition-dropdown" id="competitionDropdown"></div>
                     </div>
-                    <span class="helper-text">Search and add competitions that will be held in this event</span>
-                    
-                    <!-- Selected Competitions -->
                     <div class="selected-competitions" id="selectedCompetitions">
                         <div class="empty-competitions">
-                            <i class="mdi mdi-trophy-outline" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>
-                            No competitions added yet. Search and add competitions above.
+                            <i class="mdi mdi-trophy-outline"></i>
+                            No competitions added yet
                         </div>
                     </div>
                 </div>
@@ -262,6 +300,71 @@
                     </button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Add Competition Modal -->
+    <div class="modal-overlay" id="competitionModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="mdi mdi-target"></i>
+                    <span>Add Competition</span>
+                </div>
+                <button type="button" class="modal-close" onclick="closeCompetitionModal()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="competition-form-row">
+                    <div>
+                        <label class="competition-form-label" for="bowType">Bow Type</label>
+                        <select id="bowType" class="competition-form-select" onchange="updateAddButton()">
+                            <option value="">Select Bow Type...</option>
+                            <option value="Recurve">Recurve</option>
+                            <option value="Compound">Compound</option>
+                            <option value="Barebow">Barebow</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="competition-form-label" for="category">Category</label>
+                        <select id="category" class="competition-form-select" onchange="updateAddButton()">
+                            <option value="">Select Category...</option>
+                            <option value="Men's Individual">Men's Individual</option>
+                            <option value="Women's Individual">Women's Individual</option>
+                            <option value="Men's Team">Men's Team</option>
+                            <option value="Women's Team">Women's Team</option>
+                            <option value="Mixed Team">Mixed Team</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="competition-form-row">
+                    <div>
+                        <label class="competition-form-label" for="round">Round</label>
+                        <select id="round" class="competition-form-select" onchange="updateSubrounds()">
+                            <option value="">Select Round...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="competition-form-label" for="subround">Subround</label>
+                        <select id="subround" class="competition-form-select" disabled onchange="updateAddButton()">
+                            <option value="">Select Round first...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="competition-form-actions">
+                    <button type="button" class="btn-add" id="addCompetitionBtn" onclick="addCompetition()" disabled>
+                        <i class="mdi mdi-plus-circle"></i>
+                        <span>Add to Event</span>
+                    </button>
+                    <button type="button" class="btn-clear" onclick="clearCompetitionForm()">
+                        <i class="mdi mdi-close"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -324,207 +427,205 @@
 
         // Competition management
         let selectedCompetitions = [];
-        let allCompetitions = getAllCompetitions();
-        let customCompetitionIdCounter = 1000; // Start custom IDs from 1000
+        let competitionIdCounter = 1;
+        let currentSortField = null;
+        let currentSortOrder = 'asc';
 
-        // Show competition dropdown
-        function showCompetitionDropdown() {
-            filterCompetitions();
+        // Open competition modal
+        function openCompetitionModal() {
+            document.getElementById('competitionModal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
-        // Filter competitions based on search
-        function filterCompetitions() {
-            const searchTerm = document.getElementById('competitionSearch').value;
-            const dropdown = document.getElementById('competitionDropdown');
-            const filteredComps = searchCompetitions(searchTerm);
+        // Close competition modal
+        function closeCompetitionModal() {
+            document.getElementById('competitionModal').classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            clearCompetitionForm();
+        }
+
+        // Close modal when clicking overlay
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'competitionModal') {
+                closeCompetitionModal();
+            }
+        }
+
+        // Initialize rounds dropdown
+        function initializeRounds() {
+            const roundSelect = document.getElementById('round');
+            const rounds = getAllRounds();
             
-            // Filter out already selected competitions
-            const availableComps = filteredComps.filter(comp => 
-                !selectedCompetitions.some(selected => selected.id === comp.id)
+            rounds.forEach(round => {
+                const option = document.createElement('option');
+                option.value = round;
+                option.textContent = round;
+                roundSelect.appendChild(option);
+            });
+        }
+
+        // Update subrounds based on selected round
+        function updateSubrounds() {
+            const roundSelect = document.getElementById('round');
+            const subroundSelect = document.getElementById('subround');
+            const selectedRound = roundSelect.value;
+            
+            // Clear existing subrounds
+            subroundSelect.innerHTML = '<option value="">Select Subround...</option>';
+            
+            if (selectedRound) {
+                const subrounds = getSubrounds(selectedRound);
+                subrounds.forEach(subround => {
+                    const option = document.createElement('option');
+                    option.value = subround;
+                    option.textContent = subround;
+                    subroundSelect.appendChild(option);
+                });
+                subroundSelect.disabled = false;
+            } else {
+                subroundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">Select Round first...</option>';
+            }
+            
+            updateAddButton();
+        }
+
+        // Update add button state
+        function updateAddButton() {
+            const bowType = document.getElementById('bowType').value;
+            const category = document.getElementById('category').value;
+            const round = document.getElementById('round').value;
+            const subround = document.getElementById('subround').value;
+            const addBtn = document.getElementById('addCompetitionBtn');
+            
+            // Enable button only if all fields are filled
+            if (bowType && category && round && subround) {
+                addBtn.disabled = false;
+            } else {
+                addBtn.disabled = true;
+            }
+        }
+
+        // Add competition to list
+        function addCompetition() {
+            const bowType = document.getElementById('bowType').value;
+            const category = document.getElementById('category').value;
+            const round = document.getElementById('round').value;
+            const subround = document.getElementById('subround').value;
+            
+            if (!bowType || !category || !round || !subround) {
+                alert('Please fill in all competition fields');
+                return;
+            }
+            
+            // Check for duplicate
+            const isDuplicate = selectedCompetitions.some(comp => 
+                comp.bowType === bowType && 
+                comp.category === category && 
+                comp.round === round && 
+                comp.subround === subround
             );
             
-            if (availableComps.length === 0 && searchTerm.trim() !== '') {
-                dropdown.innerHTML = `
-                    <div class="no-results">No competitions found matching "${searchTerm}"</div>
-                    <div class="custom-competition-form">
-                        <div class="custom-competition-title">
-                            <i class="mdi mdi-plus-circle"></i>
-                            Create Custom Competition
-                        </div>
-                        <div class="custom-form-row">
-                            <input 
-                                type="text" 
-                                id="customCategory" 
-                                list="categoryOptions"
-                                class="custom-form-input" 
-                                placeholder="Select or type category..."
-                            />
-                            <datalist id="categoryOptions">
-                                <option value="Recurve">
-                                <option value="Compound">
-                                <option value="Barebow">
-                                <option value="Traditional">
-                                <option value="Longbow">
-                            </datalist>
-                            <input 
-                                type="text" 
-                                id="customDivision" 
-                                list="divisionOptions"
-                                class="custom-form-input" 
-                                placeholder="Select or type division..."
-                            />
-                            <datalist id="divisionOptions">
-                                <option value="Men's Individual">
-                                <option value="Women's Individual">
-                                <option value="Men's Team">
-                                <option value="Women's Team">
-                                <option value="Mixed Team">
-                                <option value="Junior Men's Individual">
-                                <option value="Junior Women's Individual">
-                                <option value="Cadet Men's Individual">
-                                <option value="Cadet Women's Individual">
-                            </datalist>
-                        </div>
-                        <div class="custom-form-row">
-                            <input type="text" id="customDistance" class="custom-form-input" placeholder="Distance (e.g., 50m, 30m, 18m)">
-                            <select id="customTarget" class="custom-form-input">
-                                <option value="">Select Target...</option>
-                                <option value="10 ring 40cm">10 ring 40cm</option>
-                                <option value="10 ring 60cm">10 ring 60cm</option>
-                                <option value="10 ring 80cm">10 ring 80cm</option>
-                                <option value="10 ring 122cm">10 ring 122cm</option>
-                            </select>
-                        </div>
-                        <div class="custom-form-row">
-                            <input type="number" id="customArrows" class="custom-form-input" placeholder="Maximum Arrows" min="1">
-                        </div>
-                        <div class="custom-form-actions">
-                            <button type="button" class="btn-small btn-small-primary" onclick="addCustomCompetition()">
-                                <i class="mdi mdi-plus"></i>
-                                Add Custom Competition
-                            </button>
-                            <button type="button" class="btn-small btn-small-secondary" onclick="clearSearch()">
-                                Cancel
-                            </button>
-                        </div>
-                    </div>
-                `;
-            } else if (availableComps.length === 0) {
-                dropdown.innerHTML = '<div class="no-results">Start typing to search competitions...</div>';
-            } else {
-                dropdown.innerHTML = availableComps.slice(0, 20).map(comp => `
-                    <div class="competition-option" onclick="addCompetition(${comp.id})">
-                        <div class="competition-option-title">
-                            <span class="competition-badge badge-${comp.category.toLowerCase()}">${comp.category}</span>
-                            ${comp.division}
-                        </div>
-                        <div class="competition-option-meta">
-                            Distance: ${comp.distance} | Target: ${comp.target.replace('cm 10-ring', ' cm 10 rings')} | ${comp.phases ? 
-                                `Qualification: ${comp.phases[0].maxArrows} arrows • Elimination: ${comp.phases[1].maxArrows} arrows` : 
-                                `Arrows: ${comp.maxArrows || 'N/A'}`}
-                        </div>
-                    </div>
-                `).join('');
+            if (isDuplicate) {
+                alert('This competition has already been added');
+                return;
             }
             
-            dropdown.classList.add('show');
-        }
-
-        // Add competition to selected list
-        function addCompetition(compId) {
-            const competition = allCompetitions.find(c => c.id === compId);
-            if (competition && !selectedCompetitions.some(c => c.id === compId)) {
-                selectedCompetitions.push(competition);
-                renderSelectedCompetitions();
-                document.getElementById('competitionSearch').value = '';
-                document.getElementById('competitionDropdown').classList.remove('show');
-            }
-        }
-
-        // Add custom competition
-        function addCustomCompetition() {
-            const category = document.getElementById('customCategory').value;
-            const division = document.getElementById('customDivision').value;
-            const distance = document.getElementById('customDistance').value.trim();
-            const target = document.getElementById('customTarget').value;
-            const arrows = document.getElementById('customArrows').value.trim();
-
-            // Validate all fields
-            if (!category) {
-                alert('Please select a category');
-                return;
-            }
-            if (!division) {
-                alert('Please select a division');
-                return;
-            }
-            if (!distance) {
-                alert('Please enter a distance');
-                return;
-            }
-            if (!target) {
-                alert('Please select a target');
-                return;
-            }
-            if (!arrows || Number.parseInt(arrows) < 1) {
-                alert('Please enter a valid maximum number of arrows (minimum 1)');
-                return;
-            }
-
-            // Create custom competition object
-            const customCompetition = {
-                id: customCompetitionIdCounter++,
+            // Create competition object
+            const competition = {
+                id: competitionIdCounter++,
+                bowType: bowType,
                 category: category,
-                division: division,
-                distance: distance,
-                target: target,
-                arrows: Number.parseInt(arrows),
-                isCustom: true
+                round: round,
+                subround: subround
             };
-
-            // Add to both selected list and all competitions (for this session)
-            selectedCompetitions.push(customCompetition);
-            allCompetitions.push(customCompetition);
             
-            console.log('Custom competition created:', customCompetition);
-            
-            // Clear and close
+            selectedCompetitions.push(competition);
             renderSelectedCompetitions();
-            document.getElementById('competitionSearch').value = '';
-            document.getElementById('competitionDropdown').classList.remove('show');
+            clearCompetitionForm();
+            
+            // Close the modal
+            closeCompetitionModal();
+            
+            // Scroll to competitions list
+            setTimeout(() => {
+                document.getElementById('selectedCompetitions').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+            
+            console.log('Competition added:', competition);
         }
 
-        // Remove competition from selected list
-        function removeCompetition(compId) {
-            selectedCompetitions = selectedCompetitions.filter(c => c.id !== compId);
+        // Remove competition from list
+        function removeCompetition(id) {
+            selectedCompetitions = selectedCompetitions.filter(comp => comp.id !== id);
             renderSelectedCompetitions();
-            filterCompetitions(); // Refresh dropdown
+        }
+
+        // Sort competitions
+        function sortCompetitions(field) {
+            // Toggle sort order if clicking the same field
+            if (currentSortField === field) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortField = field;
+                currentSortOrder = 'asc';
+            }
+            
+            // Update button states
+            document.querySelectorAll('.sort-btn').forEach(btn => {
+                btn.classList.remove('active');
+                const icon = btn.querySelector('i');
+                icon.className = 'mdi mdi-sort';
+            });
+            
+            const activeBtn = document.getElementById(`sort${field.charAt(0).toUpperCase() + field.slice(1)}`);
+            activeBtn.classList.add('active');
+            const icon = activeBtn.querySelector('i');
+            icon.className = currentSortOrder === 'asc' ? 'mdi mdi-sort-ascending' : 'mdi mdi-sort-descending';
+            
+            // Sort the array
+            selectedCompetitions.sort((a, b) => {
+                let aVal = a[field].toLowerCase();
+                let bVal = b[field].toLowerCase();
+                
+                if (currentSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderSelectedCompetitions();
         }
 
         // Render selected competitions
         function renderSelectedCompetitions() {
             const container = document.getElementById('selectedCompetitions');
+            const header = document.getElementById('competitionsHeader');
+            const count = document.getElementById('competitionsCount');
             
             if (selectedCompetitions.length === 0) {
+                header.style.display = 'none';
                 container.innerHTML = `
                     <div class="empty-competitions">
-                        <i class="mdi mdi-trophy-outline" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>
-                        No competitions added yet. Search and add competitions above.
+                        <i class="mdi mdi-trophy-outline"></i>
+                        No competitions added yet
                     </div>
                 `;
             } else {
+                header.style.display = 'flex';
+                count.textContent = `${selectedCompetitions.length} competition${selectedCompetitions.length > 1 ? 's' : ''}`;
+                
                 container.innerHTML = selectedCompetitions.map(comp => `
                     <div class="selected-competition-item">
                         <div class="selected-competition-info">
                             <div class="selected-competition-name">
-                                <span class="competition-badge badge-${comp.category.toLowerCase()}">${comp.category}</span>
-                                ${comp.division}
-                                ${comp.isCustom ? '<i class="mdi mdi-star" style="color: #f57c00; font-size: 14px; margin-left: 4px;" title="Custom competition"></i>' : ''}
+                                <span class="competition-badge badge-${comp.bowType.toLowerCase()}">${comp.bowType}</span>
+                                ${comp.category}
                             </div>
                             <div class="selected-competition-details">
-                                Distance: ${comp.distance} | Target: ${comp.target.replace('cm 10-ring', ' cm 10 rings')} | ${comp.phases ? 
-                                    `Qual: ${comp.phases[0].maxArrows} • Elim: ${comp.phases[1].maxArrows} arrows` : 
-                                    `Arrows: ${comp.maxArrows || 'N/A'}`}
+                                <span><i class="mdi mdi-target" style="font-size: 14px;"></i> ${comp.round}</span>
+                                <span><i class="mdi mdi-arrow-right-thin" style="font-size: 14px;"></i> ${comp.subround}</span>
                             </div>
                         </div>
                         <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
@@ -535,28 +636,27 @@
             }
         }
 
-        // Clear search
-        function clearSearch() {
-            document.getElementById('competitionSearch').value = '';
-            document.getElementById('competitionDropdown').classList.remove('show');
+        // Clear competition form
+        function clearCompetitionForm() {
+            document.getElementById('bowType').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('round').value = '';
+            document.getElementById('subround').value = '';
+            document.getElementById('subround').disabled = true;
+            document.getElementById('subround').innerHTML = '<option value="">Select Round first...</option>';
+            updateAddButton();
         }
 
-        // Close dropdown when clicking outside
-        document.addEventListener('click', function(event) {
-            const searchWrapper = document.querySelector('.competition-search-wrapper');
-            const dropdown = document.getElementById('competitionDropdown');
-            if (!searchWrapper.contains(event.target)) {
-                dropdown.classList.remove('show');
-            }
-        });
+        // Initialize rounds on page load
+        initializeRounds();
 
         // Handle form submission
         function handleSubmit(event) {
             event.preventDefault();
             
-            // Validate at least one competition is selected
+            // Validate at least one competition is added
             if (selectedCompetitions.length === 0) {
-                alert('Please add at least one competition to your event.');
+                alert('Please add at least one competition to the event');
                 return;
             }
             
@@ -568,19 +668,12 @@
                 endDate: document.getElementById('endDate').value,
                 registrationDeadline: document.getElementById('registrationDeadline').value,
                 maxParticipants: document.getElementById('maxParticipants').value || null,
-                competitions: selectedCompetitions.map(c => ({
-                    id: c.id,
-                    name: formatCompetitionName(c),
-                    category: c.category,
-                    division: c.division,
-                    distance: c.distance,
-                    format: c.format
-                })),
+                competitions: selectedCompetitions,
                 status: 'upcoming'
             };
 
             console.log('Creating event:', formData);
-            console.log('Selected competitions:', selectedCompetitions.length);
+            console.log('Competitions:', selectedCompetitions);
             
             // In production, this would send to API
             alert(`Event created successfully!\n\nEvent: ${formData.eventName}\nLocation: ${formData.location}\nCompetitions: ${selectedCompetitions.length}`);
@@ -588,9 +681,6 @@
             // Redirect back to dashboard
             window.location.href = '../dashboard/dashboard.html';
         }
-
-        // Initialize
-        renderSelectedCompetitions();
     </script>
 </body>
 </html>
