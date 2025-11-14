@@ -564,7 +564,10 @@
                             ${comp.isCustom ? '<i class="mdi mdi-star competition-custom-icon" title="Custom competition"></i>' : ''}
                         </div>
                         <div class="competition-details">
-                            ${comp.distance} • ${comp.format}
+                            Distance: ${comp.distance} | Target: ${comp.target ? comp.target.replace('cm 10-ring', ' cm 10 rings') : comp.format}
+                            ${comp.phases ? 
+                                `<br><strong>Qualification:</strong> ${comp.phases[0].maxArrows} arrows (${comp.phases[0].description})<br><strong>Elimination:</strong> ${comp.phases[1].maxArrows} arrows (${comp.phases[1].description})` : 
+                                `| Arrows: ${comp.maxArrows || 'N/A'}`}
                         </div>
                     </div>
                 `;

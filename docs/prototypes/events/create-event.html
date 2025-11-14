@@ -419,7 +419,9 @@
                             ${comp.division}
                         </div>
                         <div class="competition-option-meta">
-                            Distance: ${comp.distance} | Format: ${comp.format}
+                            Distance: ${comp.distance} | Target: ${comp.target.replace('cm 10-ring', ' cm 10 rings')} | ${comp.phases ? 
+                                `Qualification: ${comp.phases[0].maxArrows} arrows • Elimination: ${comp.phases[1].maxArrows} arrows` : 
+                                `Arrows: ${comp.maxArrows || 'N/A'}`}
                         </div>
                     </div>
                 `).join('');
@@ -520,7 +522,9 @@
                                 ${comp.isCustom ? '<i class="mdi mdi-star" style="color: #f57c00; font-size: 14px; margin-left: 4px;" title="Custom competition"></i>' : ''}
                             </div>
                             <div class="selected-competition-details">
-                                ${comp.distance} • ${comp.target || comp.format}${comp.arrows ? ` • Max ${comp.arrows} Arrows` : ''}
+                                Distance: ${comp.distance} | Target: ${comp.target.replace('cm 10-ring', ' cm 10 rings')} | ${comp.phases ? 
+                                    `Qual: ${comp.phases[0].maxArrows} • Elim: ${comp.phases[1].maxArrows} arrows` : 
+                                    `Arrows: ${comp.maxArrows || 'N/A'}`}
                             </div>
                         </div>
                         <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
