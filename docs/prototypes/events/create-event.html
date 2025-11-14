@@ -123,25 +123,33 @@
         .btn-clear:hover { background: #f5f5f5; border-color: #bdbdbd; }
         
         /* Selected Competitions */
-        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 8px 0; }
-        .competitions-count { font-size: 14px; font-weight: 600; color: #424242; }
-        .sort-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .sort-label { font-size: 12px; color: #666; font-weight: 600; }
-        .sort-btn { padding: 6px 12px; border: 2px solid #e0e0e0; border-radius: 6px; background: white; color: #666; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px; }
-        .sort-btn:hover { border-color: #1565c0; color: #1565c0; }
-        .sort-btn.active { border-color: #1565c0; background: #e3f2fd; color: #1565c0; }
-        .sort-btn i { font-size: 14px; }
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #666; background: #f5f5f5; padding: 4px 12px; border-radius: 12px; }
         .selected-competitions { margin-top: 0; }
-        .selected-competition-item { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px; transition: all 0.2s; }
-        .selected-competition-item:hover { border-color: #1565c0; box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1); }
-        .selected-competition-info { flex: 1; }
-        .selected-competition-name { font-size: 14px; font-weight: 600; color: #212121; margin-bottom: 4px; }
-        .selected-competition-details { font-size: 12px; color: #666; display: flex; gap: 12px; flex-wrap: wrap; }
-        .competition-badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .competitions-table th:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table th:last-child { text-align: center; width: 60px; cursor: default; }
+        .competitions-table th:last-child:hover { background: #f5f5f5; }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
+        .competitions-table td:last-child { text-align: center; }
+        .competition-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
         .badge-recurve { background: #e3f2fd; color: #1565c0; }
         .badge-compound { background: #e8f5e9; color: #2e7d32; }
         .badge-barebow { background: #fff3e0; color: #e65100; }
-        .remove-btn { background: none; border: none; cursor: pointer; color: #d32f2f; padding: 8px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .remove-btn { background: none; border: none; cursor: pointer; color: #d32f2f; padding: 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
         .remove-btn:hover { background: #ffebee; }
         .remove-btn i { font-size: 20px; }
         .empty-competitions { text-align: center; padding: 32px 16px; color: #999; font-size: 14px; border: 2px dashed #e0e0e0; border-radius: 8px; background: #fafafa; }
@@ -150,10 +158,6 @@
         @media (max-width: 599px) {
             .competition-form-row { grid-template-columns: 1fr; }
             .competitions-header { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .sort-controls { width: 100%; justify-content: flex-start; }
-            .sort-btn { flex: 1; min-width: 0; }
-            .sort-btn span { display: none; }
-            .sort-label { display: none; }
             .modal-overlay { padding: 0; align-items: flex-end; }
             .modal-content { max-width: 100%; border-radius: 12px 12px 0 0; max-height: 80vh; }
             .modal-header { padding: 16px; }
@@ -162,7 +166,9 @@
             .competition-form-actions { flex-direction: column; }
             .btn-add, .btn-clear { width: 100%; justify-content: center; }
             .add-competition-btn { width: 100%; }
-            .selected-competition-details { flex-direction: column; gap: 4px; }
+            .competitions-table-container { border-radius: 0; margin-left: -16px; margin-right: -16px; box-shadow: none; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; }
+            .competitions-table th { font-size: 11px; padding: 10px 8px; }
+            .competitions-table td { font-size: 13px; padding: 10px 8px; }
         }
         
         /* Responsive badge */
@@ -257,28 +263,9 @@
                         <span>Add Competition</span>
                     </button>
                     
-                    <!-- Selected Competitions List -->
+                    <!-- Selected Competitions Table -->
                     <div class="competitions-header" id="competitionsHeader" style="display: none;">
                         <div class="competitions-count" id="competitionsCount">0 competitions</div>
-                        <div class="sort-controls">
-                            <span class="sort-label">Sort by:</span>
-                            <button type="button" class="sort-btn" id="sortBowType" onclick="sortCompetitions('bowType')">
-                                <span>Bow Type</span>
-                                <i class="mdi mdi-sort"></i>
-                            </button>
-                            <button type="button" class="sort-btn" id="sortCategory" onclick="sortCompetitions('category')">
-                                <span>Category</span>
-                                <i class="mdi mdi-sort"></i>
-                            </button>
-                            <button type="button" class="sort-btn" id="sortRound" onclick="sortCompetitions('round')">
-                                <span>Round</span>
-                                <i class="mdi mdi-sort"></i>
-                            </button>
-                            <button type="button" class="sort-btn" id="sortSubround" onclick="sortCompetitions('subround')">
-                                <span>Subround</span>
-                                <i class="mdi mdi-sort"></i>
-                            </button>
-                        </div>
                     </div>
                     <div class="selected-competitions" id="selectedCompetitions">
                         <div class="empty-competitions">
@@ -561,7 +548,7 @@
             renderSelectedCompetitions();
         }
 
-        // Sort competitions
+        // Sort competitions table
         function sortCompetitions(field) {
             // Toggle sort order if clicking the same field
             if (currentSortField === field) {
@@ -571,17 +558,18 @@
                 currentSortOrder = 'asc';
             }
             
-            // Update button states
-            document.querySelectorAll('.sort-btn').forEach(btn => {
-                btn.classList.remove('active');
-                const icon = btn.querySelector('i');
-                icon.className = 'mdi mdi-sort';
+            // Update header states
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
             });
             
-            const activeBtn = document.getElementById(`sort${field.charAt(0).toUpperCase() + field.slice(1)}`);
-            activeBtn.classList.add('active');
-            const icon = activeBtn.querySelector('i');
-            icon.className = currentSortOrder === 'asc' ? 'mdi mdi-sort-ascending' : 'mdi mdi-sort-descending';
+            const activeHeader = document.getElementById(`sort${field.charAt(0).toUpperCase() + field.slice(1)}`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (currentSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
             
             // Sort the array
             selectedCompetitions.sort((a, b) => {
@@ -616,23 +604,70 @@
                 header.style.display = 'flex';
                 count.textContent = `${selectedCompetitions.length} competition${selectedCompetitions.length > 1 ? 's' : ''}`;
                 
-                container.innerHTML = selectedCompetitions.map(comp => `
-                    <div class="selected-competition-item">
-                        <div class="selected-competition-info">
-                            <div class="selected-competition-name">
-                                <span class="competition-badge badge-${comp.bowType.toLowerCase()}">${comp.bowType}</span>
-                                ${comp.category}
-                            </div>
-                            <div class="selected-competition-details">
-                                <span><i class="mdi mdi-target" style="font-size: 14px;"></i> ${comp.round}</span>
-                                <span><i class="mdi mdi-arrow-right-thin" style="font-size: 14px;"></i> ${comp.subround}</span>
-                            </div>
-                        </div>
-                        <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
-                            <i class="mdi mdi-close"></i>
-                        </button>
+                container.innerHTML = `
+                    <div class="competitions-table-container">
+                        <table class="competitions-table">
+                            <thead>
+                                <tr>
+                                    <th id="sortBowType" onclick="sortCompetitions('bowType')">
+                                        Bow Type
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortCategory" onclick="sortCompetitions('category')">
+                                        Category
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortRound" onclick="sortCompetitions('round')">
+                                        Round
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortSubround" onclick="sortCompetitions('subround')">
+                                        Subround
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${selectedCompetitions.map(comp => {
+                                    // Determine category badge class
+                                    let categoryClass = 'badge-mixed';
+                                    const catLower = comp.category.toLowerCase();
+                                    
+                                    if (catLower === "men's individual") {
+                                        categoryClass = 'badge-men-individual';
+                                    } else if (catLower === "women's individual") {
+                                        categoryClass = 'badge-women-individual';
+                                    } else if (catLower === "men's team") {
+                                        categoryClass = 'badge-men-team';
+                                    } else if (catLower === "women's team") {
+                                        categoryClass = 'badge-women-team';
+                                    } else if (catLower === "mixed team") {
+                                        categoryClass = 'badge-mixed';
+                                    }
+                                    
+                                    return `
+                                    <tr>
+                                        <td>
+                                            <span class="competition-badge badge-${comp.bowType.toLowerCase()}">${comp.bowType}</span>
+                                        </td>
+                                        <td>
+                                            <span class="competition-badge ${categoryClass}">${comp.category}</span>
+                                        </td>
+                                        <td>${comp.round}</td>
+                                        <td>${comp.subround}</td>
+                                        <td>
+                                            <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
+                                                <i class="mdi mdi-close"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
                     </div>
-                `).join('');
+                `;
             }
         }
 
