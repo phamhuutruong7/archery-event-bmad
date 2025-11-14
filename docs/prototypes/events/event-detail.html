@@ -70,7 +70,12 @@
         .status-badge.cancelled { background: #ffebee; color: #c62828; }
         
         /* Event Title */
-        .event-title { font-size: 24px; font-weight: 700; color: #212121; margin-bottom: 20px; line-height: 1.3; }
+        .event-title-section { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+        .event-title { font-size: 24px; font-weight: 700; color: #212121; line-height: 1.3; flex: 1; }
+        .edit-btn-host { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; background: #1565c0; color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
+        .edit-btn-host:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3); }
+        .edit-btn-host i { font-size: 16px; }
+        .host-only-label { display: block; font-size: 10px; opacity: 0.9; font-weight: 400; margin-top: 2px; }
         
         /* Info Section */
         .info-section { margin-bottom: 24px; }
@@ -437,6 +442,14 @@
             }
         }
 
+        // Edit event (Host only)
+        function editEvent(eventId) {
+            // In production, this would check if current user is the host
+            // For now, navigate to edit page
+            console.log('Edit event:', eventId);
+            window.location.href = `event-edit.html?id=${eventId}`;
+        }
+
         // Load event details
         function loadEventDetail() {
             const eventContent = document.getElementById('detailsTab');
@@ -476,7 +489,13 @@
             // Render event details
             let html = `
                 <span class="status-badge ${event.status}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
-                <h1 class="event-title">${event.title}</h1>
+                <div class="event-title-section">
+                    <h1 class="event-title">${event.title}</h1>
+                    <button class="edit-btn-host" onclick="editEvent(${event.id})" title="Edit event (Host only)">
+                        <i class="mdi mdi-pencil"></i>
+                        <span>Edit<span class="host-only-label">Host only</span></span>
+                    </button>
+                </div>
             `;
 
             // Show cancellation notice if cancelled
