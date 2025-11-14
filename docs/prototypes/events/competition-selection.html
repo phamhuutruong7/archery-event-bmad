@@ -54,23 +54,37 @@
         .section-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .section-title i { color: #1565c0; }
         
-        /* Competition Item */
-        .competition-item { background: #f9f9f9; border-left: 4px solid #1565c0; border-radius: 8px; padding: 12px 12px 12px 48px; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; position: relative; }
-        .competition-item:hover { background: #e3f2fd; }
-        .competition-item.selected { background: #e3f2fd; border-left-color: #2e7d32; }
-        
-        .competition-checkbox { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 24px; height: 24px; border: 2px solid #9e9e9e; border-radius: 4px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
-        .competition-item.selected .competition-checkbox { background: #2e7d32; border-color: #2e7d32; }
-        .competition-item.selected .competition-checkbox::after { content: ""; color: white; font-size: 16px; font-weight: 700; }
-        
-        .competition-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+        /* Competitions Table */
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #666; background: #f5f5f5; padding: 4px 12px; border-radius: 12px; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; user-select: none; transition: background 0.2s; }
+        .competitions-table th.sortable { cursor: pointer; }
+        .competitions-table th.sortable:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table tbody tr.selected { background: #e3f2fd; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
         .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
-        .competition-badge.recurve { background: #e3f2fd; color: #1565c0; }
-        .competition-badge.compound { background: #e8f5e9; color: #2e7d32; }
-        .competition-badge.barebow { background: #fff3e0; color: #f57c00; }
-        .competition-division { font-size: 14px; font-weight: 600; color: #212121; }
-        .competition-custom-icon { color: #f57c00; font-size: 14px; margin-left: 4px; }
-        .competition-details { font-size: 13px; color: #666; }
+        .badge-recurve { background: #e3f2fd; color: #1565c0; }
+        .badge-compound { background: #e8f5e9; color: #2e7d32; }
+        .badge-barebow { background: #fff3e0; color: #e65100; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .competitions-empty { text-align: center; padding: 48px 16px; color: #9e9e9e; }
+        .competitions-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
+        
+        /* Selection Checkbox */
+        .selection-cell { text-align: center; width: 60px; }
+        .selection-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: #2e7d32; }
         
         /* Action Buttons */
         .action-buttons { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); display: flex; gap: 12px; z-index: 100; }
@@ -180,6 +194,11 @@
         const eventId = Number.parseInt(urlParams.get('eventId'));
         let selectedCompetitions = [];
         let currentEvent = null;
+        
+        // Competitions sorting state
+        let competitionsSortField = null;
+        let competitionsSortOrder = 'asc';
+        let competitionsData = [];
 
         function init() {
             // Load event data
@@ -220,6 +239,83 @@
             `;
         }
 
+        function sortCompetitionsTable(field) {
+            if (competitionsSortField === field) {
+                competitionsSortOrder = competitionsSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                competitionsSortField = field;
+                competitionsSortOrder = 'asc';
+            }
+            
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+            
+            const activeHeader = document.querySelector(`[onclick*="sortCompetitionsTable('${field}')"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (competitionsSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+            
+            competitionsData.sort((a, b) => {
+                let aVal = a[field] ? a[field].toString().toLowerCase() : '';
+                let bVal = b[field] ? b[field].toString().toLowerCase() : '';
+                if (competitionsSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderCompetitionsTable();
+        }
+        
+        function renderCompetitionsTable() {
+            const tbody = document.getElementById('competitionsTableBody');
+            if (!tbody || !competitionsData || competitionsData.length === 0) return;
+            
+            tbody.innerHTML = competitionsData.map(comp => {
+                let categoryClass = 'badge-mixed';
+                const catLower = comp.category ? comp.category.toLowerCase() : '';
+                
+                if (catLower === "men's individual") {
+                    categoryClass = 'badge-men-individual';
+                } else if (catLower === "women's individual") {
+                    categoryClass = 'badge-women-individual';
+                } else if (catLower === "men's team") {
+                    categoryClass = 'badge-men-team';
+                } else if (catLower === "women's team") {
+                    categoryClass = 'badge-women-team';
+                } else if (catLower === "mixed team") {
+                    categoryClass = 'badge-mixed';
+                }
+                
+                const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
+                const isSelected = selectedCompetitions.includes(comp.id);
+                const rowClass = isSelected ? 'selected' : '';
+                
+                return `
+                <tr class="${rowClass}">
+                    <td class="selection-cell">
+                        <input type="checkbox" class="selection-checkbox" 
+                               ${isSelected ? 'checked' : ''} 
+                               onchange="toggleCompetitionSelection(${comp.id}, this)">
+                    </td>
+                    <td>
+                        <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
+                    </td>
+                    <td>
+                        <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
+                    </td>
+                    <td>${comp.round || 'N/A'}</td>
+                    <td>${comp.subround || 'N/A'}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
         function renderCompetitions() {
             const container = document.getElementById('competitionList');
             
@@ -228,45 +324,55 @@
                 return;
             }
 
-            let html = '';
-            for (const comp of currentEvent.competitions) {
-                const isSelected = selectedCompetitions.includes(comp.id);
-                const selectedClass = isSelected ? 'selected' : '';
-                const categoryClass = comp.category.toLowerCase();
-                
-                html += `<div class="competition-item ${selectedClass}" onclick="toggleCompetition(${comp.id}, this)">
-                    <div class="competition-checkbox"></div>
-                    <div class="competition-header">
-                        <span class="competition-badge ${categoryClass}">${comp.category}</span>
-                        <span class="competition-division">${comp.division}</span>
-                        ${comp.isCustom ? '<i class="mdi mdi-star competition-custom-icon" title="Custom competition"></i>' : ''}
-                    </div>
-                    <div class="competition-details">`;
-                
-                if (comp.target && comp.arrows) {
-                    html += `${comp.distance}  ${comp.target}  Max ${comp.arrows} Arrows`;
-                } else if (comp.target) {
-                    html += `${comp.distance}  ${comp.target}`;
-                } else if (comp.format) {
-                    html += `${comp.distance}  ${comp.format}`;
-                } else {
-                    html += comp.distance;
-                }
-                
-                html += `</div></div>`;
-            }
+            competitionsData = [...currentEvent.competitions];
             
-            container.innerHTML = html;
+            container.innerHTML = `
+                <div class="competitions-table-container">
+                    <table class="competitions-table">
+                        <thead>
+                            <tr>
+                                <th>Select</th>
+                                <th class="sortable" onclick="sortCompetitionsTable('bowType')">
+                                    Bow Type
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('category')">
+                                    Category
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('round')">
+                                    Round
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('subround')">
+                                    Subround
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="competitionsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            renderCompetitionsTable();
         }
 
-        function toggleCompetition(compId, element) {
+        function toggleCompetitionSelection(compId, checkbox) {
             const index = selectedCompetitions.indexOf(compId);
-            if (index > -1) {
-                selectedCompetitions.splice(index, 1);
-                element.classList.remove('selected');
+            const row = checkbox.closest('tr');
+            
+            if (checkbox.checked) {
+                if (index === -1) {
+                    selectedCompetitions.push(compId);
+                }
+                row.classList.add('selected');
             } else {
-                selectedCompetitions.push(compId);
-                element.classList.add('selected');
+                if (index > -1) {
+                    selectedCompetitions.splice(index, 1);
+                }
+                row.classList.remove('selected');
             }
             updateSelectedCount();
         }
