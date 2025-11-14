@@ -9,6 +9,7 @@
     <script src="../mock-data/athletes.js"></script>
     <script src="../mock-data/referees.js"></script>
     <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/rounds.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
@@ -114,6 +115,29 @@
         .badge-mixed { background: #c8e6c9; color: #1b5e20; }
         .competitions-empty { text-align: center; padding: 48px 16px; color: #9e9e9e; }
         .competitions-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
+        .info-icon-cell { text-align: center; width: 40px; }
+        .info-icon-btn { background: none; border: none; cursor: pointer; color: #1565c0; padding: 4px; border-radius: 50%; transition: all 0.2s; }
+        .info-icon-btn:hover { background: #e3f2fd; transform: scale(1.1); }
+        .info-icon-btn i { font-size: 20px; }
+        
+        /* Subround Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-container { background: white; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .modal-header { padding: 20px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 700; color: #212121; }
+        .modal-close-btn { background: none; border: none; cursor: pointer; color: #757575; padding: 4px; border-radius: 50%; transition: all 0.2s; }
+        .modal-close-btn:hover { background: #f5f5f5; color: #212121; }
+        .modal-close-btn i { font-size: 24px; }
+        .modal-body { padding: 20px; }
+        .phase-card { background: #f9f9f9; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #1565c0; }
+        .phase-card:last-child { margin-bottom: 0; }
+        .phase-header { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 12px; }
+        .phase-header .phase-target-size { font-size: 13px; color: #666; font-weight: 400; }
+        .phase-details { font-size: 14px; color: #424242; }
+        .phase-details span { font-weight: 600; color: #212121; }
+        .modal-empty { text-align: center; padding: 32px 16px; color: #9e9e9e; }
+        .modal-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; display: block; }
         
         /* Organizer Section */
         .organizer-section { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
@@ -330,6 +354,20 @@
         </div>
     </div>
 
+    <!-- Subround Details Modal -->
+    <div id="subroundModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalSubroundTitle"></div>
+                <button class="modal-close-btn" onclick="closeSubroundModal()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalSubroundBody">
+            </div>
+        </div>
+    </div>
+
     <script>
         // Language selector functionality
         function initLanguageSelector() {
@@ -508,10 +546,61 @@
                     </td>
                     <td>${comp.round || 'N/A'}</td>
                     <td>${comp.subround || 'N/A'}</td>
+                    <td class="info-icon-cell">
+                        <button class="info-icon-btn" onclick="showSubroundDetails('${comp.subround}')">
+                            <i class="mdi mdi-information"></i>
+                        </button>
+                    </td>
                 </tr>
                 `;
             }).join('');
         }
+
+        // Show subround details modal
+        function showSubroundDetails(subroundName) {
+            const modal = document.getElementById('subroundModal');
+            const modalTitle = document.getElementById('modalSubroundTitle');
+            const modalBody = document.getElementById('modalSubroundBody');
+            
+            modalTitle.textContent = subroundName;
+            
+            const details = getSubroundDetails(subroundName);
+            
+            if (!details || details.length === 0) {
+                modalBody.innerHTML = `
+                    <div class="modal-empty">
+                        <i class="mdi mdi-information-outline"></i>
+                        <div>No detailed information available for this subround</div>
+                    </div>
+                `;
+            } else {
+                modalBody.innerHTML = details.map((phase, index) => `
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            Distance: ${phase.distance} <span class="phase-target-size">(Target Size: ${phase.targetSize})</span>
+                        </div>
+                        <div class="phase-details">
+                            Ends: <span>${phase.ends}</span> - ${phase.target} - Arrows: <span>${phase.arrows}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        function closeSubroundModal() {
+            const modal = document.getElementById('subroundModal');
+            modal.classList.remove('show');
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('subroundModal');
+            if (event.target === modal) {
+                closeSubroundModal();
+            }
+        });
 
         // Tab switching
         function switchTab(tabName, clickEvent) {
@@ -702,6 +791,7 @@
                                         Subround
                                         <i class="mdi mdi-arrow-up sort-icon"></i>
                                     </th>
+                                    <th>Info</th>
                                 </tr>
                             </thead>
                             <tbody id="competitionsTableBody">
