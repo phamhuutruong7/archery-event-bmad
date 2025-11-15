@@ -127,6 +127,13 @@
         .status-switch.closed:hover { background: #ffcdd2; border-color: #e57373; transform: scale(1.05); }
         .status-switch i { font-size: 14px; margin-right: 6px; }
         
+        /* Snackbar Notification */
+        .snackbar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); font-size: 14px; font-weight: 500; z-index: 10000; transition: bottom 0.3s ease-in-out; display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: 90vw; }
+        .snackbar.show { bottom: 30px; }
+        .snackbar i { font-size: 20px; }
+        .snackbar.success { background: #2e7d32; }
+        .snackbar.error { background: #c62828; }
+        
         /* Subround Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
@@ -453,7 +460,40 @@
             
             // Show feedback
             const statusText = newStatus === 'open' ? 'Open' : 'Closed';
-            alert(`Competition status is now ${statusText}.`);
+            const icon = newStatus === 'open' ? 'mdi-check-circle' : 'mdi-close-circle';
+            showSnackbar(`Competition status changed to ${statusText}`, icon, 'success');
+        }
+        
+        // Snackbar notification function
+        function showSnackbar(message, icon = 'mdi-information', type = 'success') {
+            // Remove existing snackbar if any
+            const existingSnackbar = document.querySelector('.snackbar');
+            if (existingSnackbar) {
+                existingSnackbar.remove();
+            }
+            
+            // Create snackbar
+            const snackbar = document.createElement('div');
+            snackbar.className = `snackbar ${type}`;
+            snackbar.innerHTML = `
+                <i class="mdi ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(snackbar);
+            
+            // Show snackbar
+            setTimeout(() => {
+                snackbar.classList.add('show');
+            }, 10);
+            
+            // Hide and remove after 3 seconds
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+                setTimeout(() => {
+                    snackbar.remove();
+                }, 300);
+            }, 3000);
         }
 
         // Registration state management (stored in localStorage)
