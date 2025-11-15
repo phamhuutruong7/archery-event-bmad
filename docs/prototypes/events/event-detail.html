@@ -277,6 +277,14 @@
             .data-table { min-width: 600px; }
             .data-table th, .data-table td { padding: 10px 8px; font-size: 13px; }
         }
+        
+        /* Hide Round column in mobile portrait mode */
+        @media (max-width: 599px) {
+            .competitions-table th:nth-child(3),
+            .competitions-table td:nth-child(3) {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -455,15 +463,8 @@
         
         // Open competition scoring view
         function openCompetitionScoring(eventId, competitionId, category, bowType) {
-            const status = getCompetitionStatus(eventId, competitionId);
-            
-            // Only allow opening if competition is in progress
-            if (status !== 'open') {
-                showSnackbar('This competition is closed. Only In Progress competitions can be scored.', 'mdi-alert-circle', 'error');
-                return;
-            }
-            
-            // Navigate to scoring page
+            // Navigate to scoring page - status check will be done there
+            // Users can always view, but editing requires "open" status
             window.location.href = `../scoring/competition-scoring.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
         }
         
@@ -629,8 +630,12 @@
                 const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
                 const statusText = status === 'open' ? 'In Progress' : 'Closed';
                 
+                const clickTitle = status === 'open' ? 'Click row to view/enter scores' : 'Click row to view scores (read-only)';
+                const categoryEscaped = (comp.category || '').replace(/'/g, "\\'");
+                const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
+                
                 return `
-                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, ${competitionId}, '${comp.category}', '${comp.bowType}')" title="Click to view/enter scores">
+                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, ${competitionId}, '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
                     <td>
                         <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
                     </td>
@@ -639,10 +644,10 @@
                     </td>
                     <td>${comp.round || 'N/A'}</td>
                     <td>
-                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
+                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')" title="Click to view round details">${comp.subround || 'N/A'}</span>
                     </td>
                     <td class="status-switch-cell">
-                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle competition status">
+                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle: In Progress (scoring allowed) / Closed (read-only)">
                             <i class="mdi ${statusIcon}"></i>
                             <span>${statusText}</span>
                         </div>

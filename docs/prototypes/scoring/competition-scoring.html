@@ -6,6 +6,7 @@
     <title>Competition Scoring - Archery Events</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/competition-scoring.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
@@ -280,46 +281,38 @@
 
         // Mock current user role (in production, this would come from authentication)
         const currentUser = {
-            id: 1,
+            id: 10,
             name: 'John Doe',
             role: 'athlete', // athlete, referee, host, admin, spectator
             targetId: 3,
             targetPosition: 'B'
         };
 
-        // Mock targets data
-        const targetsData = [
-            {
-                id: 1,
-                number: 'Target 1',
-                athletes: [
-                    { id: 1, position: 'A', name: 'Alex Wong', score: 680, totalArrows: 72, completed: true },
-                    { id: 2, position: 'B', name: 'Brian Song', score: 650, totalArrows: 72, completed: true },
-                    { id: 3, position: 'C', name: 'Charlie Mungo', score: 0, totalArrows: 0, completed: false },
-                    { id: 4, position: 'D', name: 'Daniel Crap', score: 245, totalArrows: 24, completed: false }
-                ]
-            },
-            {
-                id: 2,
-                number: 'Target 2',
-                athletes: [
-                    { id: 5, position: 'A', name: 'Emily Zhang', score: 695, totalArrows: 72, completed: true },
-                    { id: 6, position: 'B', name: 'Frank Miller', score: 670, totalArrows: 72, completed: true },
-                    { id: 7, position: 'C', name: 'Grace Lee', score: 655, totalArrows: 72, completed: true },
-                    { id: 8, position: 'D', name: 'Henry Park', score: 640, totalArrows: 72, completed: true }
-                ]
-            },
-            {
-                id: 3,
-                number: 'Target 3',
-                athletes: [
-                    { id: 9, position: 'A', name: 'Isabella Chen', score: 685, totalArrows: 72, completed: true },
-                    { id: 10, position: 'B', name: 'John Doe', score: 560, totalArrows: 60, completed: false },
-                    { id: 11, position: 'C', name: 'Kate Wilson', score: 720, totalArrows: 72, completed: true },
-                    { id: 12, position: 'D', name: 'Leo Martinez', score: 590, totalArrows: 48, completed: false }
-                ]
+        // Load competition data from mock data file
+        const competitionData = getCompetitionScoringData(eventId, competitionId);
+        const targetsData = competitionData ? competitionData.targets : [];
+        
+        // Update header with competition info
+        if (competitionData) {
+            document.querySelector('.header-title').innerHTML = `
+                ${competitionData.competitionName}
+                <div class="header-subtitle">${competitionData.eventName}</div>
+            `;
+            
+            // Update spectator tab info
+            document.getElementById('spectatorCompName').textContent = competitionData.competitionName;
+            document.getElementById('participantCount').textContent = `${getParticipantCount(eventId, competitionId)} Athletes`;
+            
+            const status = competitionData.status;
+            const statusBadge = document.getElementById('spectatorStatus');
+            if (status === 'open') {
+                statusBadge.className = 'status-badge in-progress';
+                statusBadge.textContent = 'In Progress';
+            } else {
+                statusBadge.className = 'status-badge closed';
+                statusBadge.textContent = 'Closed';
             }
-        ];
+        }
 
         // Tab switching
         function switchTab(tabName, clickEvent) {
