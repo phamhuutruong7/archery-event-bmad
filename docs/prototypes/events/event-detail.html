@@ -118,6 +118,15 @@
         .subround-clickable { cursor: pointer; color: #1565c0; transition: all 0.2s; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
         .subround-clickable:hover { color: #0d47a1; background: #e3f2fd; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; }
         
+        /* Competition Status */
+        .status-switch-cell { text-align: center; min-width: 150px; }
+        .status-switch { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: 2px solid; user-select: none; min-width: 120px; }
+        .status-switch.open { background: #e8f5e9; color: #2e7d32; border-color: #81c784; }
+        .status-switch.open:hover { background: #c8e6c9; border-color: #66bb6a; transform: scale(1.05); }
+        .status-switch.closed { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
+        .status-switch.closed:hover { background: #ffcdd2; border-color: #e57373; transform: scale(1.05); }
+        .status-switch i { font-size: 14px; margin-right: 6px; }
+        
         /* Subround Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
         .modal-overlay.show { display: flex; }
@@ -425,6 +434,27 @@
         let competitionsSortField = null;
         let competitionsSortOrder = 'asc';
         let competitionsData = [];
+        
+        // Competition status management
+        function getCompetitionStatus(eventId, competitionId) {
+            const key = `event_${eventId}_comp_${competitionId}_status`;
+            const status = localStorage.getItem(key);
+            return status === 'open' ? 'open' : 'closed';
+        }
+        
+        function toggleCompetitionStatus(eventId, competitionId) {
+            const key = `event_${eventId}_comp_${competitionId}_status`;
+            const currentStatus = getCompetitionStatus(eventId, competitionId);
+            const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+            localStorage.setItem(key, newStatus);
+            
+            // Update UI
+            renderCompetitionsTable();
+            
+            // Show feedback
+            const statusText = newStatus === 'open' ? 'Open' : 'Closed';
+            alert(`Competition status is now ${statusText}.`);
+        }
 
         // Registration state management (stored in localStorage)
         function getRegistrationState(eventId) {
@@ -516,7 +546,7 @@
             const tbody = document.getElementById('competitionsTableBody');
             if (!tbody || !competitionsData || competitionsData.length === 0) return;
             
-            tbody.innerHTML = competitionsData.map(comp => {
+            tbody.innerHTML = competitionsData.map((comp, index) => {
                 let categoryClass = 'badge-mixed';
                 const catLower = comp.category ? comp.category.toLowerCase() : '';
                 
@@ -534,6 +564,13 @@
                 
                 const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
                 
+                // Get competition status
+                const competitionId = comp.id || index;
+                const status = getCompetitionStatus(eventId, competitionId);
+                const statusClass = status;
+                const statusIcon = status === 'open' ? 'mdi-check-circle' : 'mdi-close-circle';
+                const statusText = status === 'open' ? 'Open' : 'Closed';
+                
                 return `
                 <tr>
                     <td>
@@ -545,6 +582,12 @@
                     <td>${comp.round || 'N/A'}</td>
                     <td>
                         <span class="subround-clickable" onclick="showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
+                    </td>
+                    <td class="status-switch-cell">
+                        <div class="status-switch ${statusClass}" onclick="toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle competition status">
+                            <i class="mdi ${statusIcon}"></i>
+                            <span>${statusText}</span>
+                        </div>
                     </td>
                 </tr>
                 `;
@@ -785,6 +828,10 @@
                                     <th onclick="sortCompetitionsTable('subround')">
                                         Subround
                                         <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th>
+                                        Competition Status
+                                        <i class="mdi mdi-information-outline" title="Toggle competition status"></i>
                                     </th>
                                 </tr>
                             </thead>
