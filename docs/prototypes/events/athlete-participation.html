@@ -6,6 +6,7 @@
     <title>Athlete Participation</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/rounds.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #f5f5f5; }
@@ -70,16 +71,57 @@
         .section-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .section-title i { color: #1565c0; font-size: 22px; }
         
-        /* Competition List */
-        .competition-item { background: white; border-radius: 8px; padding: 16px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); border-left: 4px solid #1565c0; }
-        .competition-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 8px; }
-        .competition-division { font-size: 16px; font-weight: 600; color: #212121; flex: 1; }
-        .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #e3f2fd; color: #1565c0; white-space: nowrap; }
-        .competition-badge.compound { background: #f3e5f5; color: #7b1fa2; }
-        .competition-badge.barebow { background: #fff3e0; color: #ef6c00; }
-        .competition-details { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: #666; }
-        .competition-detail { display: flex; align-items: center; gap: 4px; }
-        .competition-detail i { font-size: 14px; color: #1565c0; }
+        /* Competitions Table */
+        .competitions-section { margin-bottom: 24px; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .competitions-table th:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table th.no-sort { cursor: default; }
+        .competitions-table th.no-sort:hover { background: #f5f5f5; }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
+        .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-recurve { background: #e3f2fd; color: #1565c0; }
+        .badge-compound { background: #e8f5e9; color: #2e7d32; }
+        .badge-barebow { background: #fff3e0; color: #e65100; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .info-icon-cell { text-align: center; width: 40px; }
+        .info-icon-btn { background: none; border: none; cursor: pointer; color: #1565c0; padding: 4px; border-radius: 50%; transition: all 0.2s; }
+        .info-icon-btn:hover { background: #e3f2fd; transform: scale(1.1); }
+        .info-icon-btn i { font-size: 20px; }
+        
+        /* Subround Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal-overlay.show { display: flex; }
+        .modal-container { background: white; border-radius: 12px; width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .modal-header { padding: 20px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 700; color: #212121; }
+        .modal-close-btn { background: none; border: none; cursor: pointer; color: #757575; padding: 4px; border-radius: 50%; transition: all 0.2s; }
+        .modal-close-btn:hover { background: #f5f5f5; color: #212121; }
+        .modal-close-btn i { font-size: 24px; }
+        .modal-body { padding: 20px; }
+        .phase-card { background: #f9f9f9; border-radius: 8px; padding: 16px; margin-bottom: 12px; border-left: 4px solid #1565c0; }
+        .phase-card:last-child { margin-bottom: 0; }
+        .phase-header { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 12px; }
+        .phase-header .phase-target-size { font-size: 13px; color: #666; font-weight: 400; }
+        .phase-details { font-size: 14px; color: #424242; }
+        .phase-details span { font-weight: 600; color: #212121; }
+        .modal-empty { text-align: center; padding: 32px 16px; color: #9e9e9e; }
+        .modal-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; display: block; }
+        
+        @media (max-width: 599px) {
+            .competitions-table-container { border-radius: 0; margin-left: -20px; margin-right: -20px; box-shadow: none; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; }
+        }
         
         /* Empty State */
         .empty-state { text-align: center; padding: 48px 16px; }
@@ -114,6 +156,21 @@
         <div class="content" id="content">
             <div class="loading">
                 <i class="mdi mdi-loading"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subround Details Modal -->
+    <div id="subroundModal" class="modal-overlay" onclick="closeSubroundModal()">
+        <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title" id="modalSubroundTitle">Subround Details</div>
+                <button class="modal-close-btn" onclick="closeSubroundModal()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalSubroundBody">
+                <!-- Subround details will be loaded here -->
             </div>
         </div>
     </div>
@@ -171,6 +228,158 @@
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = parseInt(urlParams.get('eventId'));
         const athleteId = parseInt(urlParams.get('athleteId'));
+        
+        // Sorting state
+        let currentSortField = null;
+        let currentSortOrder = 'asc';
+        
+        // Sort competitions
+        function sortCompetitions(field, competitions) {
+            if (currentSortField === field) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortField = field;
+                currentSortOrder = 'asc';
+            }
+            
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+            
+            const activeHeader = document.getElementById('sort' + field.charAt(0).toUpperCase() + field.slice(1));
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (currentSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+            
+            competitions.sort((a, b) => {
+                const aVal = (a[field] || '').toLowerCase();
+                const bVal = (b[field] || '').toLowerCase();
+                return currentSortOrder === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+            });
+            
+            renderCompetitionsTable(competitions);
+        }
+        
+        // Show subround details modal
+        function showSubroundDetails(subroundName) {
+            const modal = document.getElementById('subroundModal');
+            const titleElement = document.getElementById('modalSubroundTitle');
+            const bodyElement = document.getElementById('modalSubroundBody');
+            
+            titleElement.textContent = subroundName;
+            
+            const details = getSubroundDetails(subroundName);
+            
+            if (!details || details.length === 0) {
+                bodyElement.innerHTML = `
+                    <div class="modal-empty">
+                        <i class="mdi mdi-information-outline"></i>
+                        <div>No detailed information available for this subround</div>
+                    </div>
+                `;
+            } else {
+                bodyElement.innerHTML = details.map((phase, index) => `
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            Phase ${index + 1}: <span class="phase-target-size">Distance: ${phase.distance} (Target Size: ${phase.targetSize})</span>
+                        </div>
+                        <div class="phase-details">
+                            <span>Ends:</span> ${phase.ends} - <span>${phase.target}</span> - <span>Arrows:</span> ${phase.arrows}
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        // Close subround modal
+        function closeSubroundModal() {
+            const modal = document.getElementById('subroundModal');
+            modal.classList.remove('show');
+        }
+        
+        // Render competitions table
+        function renderCompetitionsTable(athleteCompetitions) {
+            if (athleteCompetitions.length === 0) {
+                return `
+                    <div class="empty-state">
+                        <i class="mdi mdi-target-variant"></i>
+                        <div class="empty-state-title">No competitions registered</div>
+                        <div class="empty-state-text">This athlete hasn't registered for any competitions yet</div>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="competitions-table-container">
+                    <table class="competitions-table">
+                        <thead>
+                            <tr>
+                                <th id="sortBowType" onclick="sortCompetitions('bowType', ${JSON.stringify(athleteCompetitions).replace(/"/g, '&quot;')})">
+                                    Bow Type
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th id="sortCategory" onclick="sortCompetitions('category', ${JSON.stringify(athleteCompetitions).replace(/"/g, '&quot;')})">
+                                    Category
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th id="sortRound" onclick="sortCompetitions('round', ${JSON.stringify(athleteCompetitions).replace(/"/g, '&quot;')})">
+                                    Round
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th id="sortSubround" onclick="sortCompetitions('subround', ${JSON.stringify(athleteCompetitions).replace(/"/g, '&quot;')})">
+                                    Subround
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="no-sort">Info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${athleteCompetitions.map(comp => {
+                                let categoryClass = 'badge-mixed';
+                                const catLower = (comp.category || '').toLowerCase();
+                                
+                                if (catLower === "men's individual") {
+                                    categoryClass = 'badge-men-individual';
+                                } else if (catLower === "women's individual") {
+                                    categoryClass = 'badge-women-individual';
+                                } else if (catLower === "men's team") {
+                                    categoryClass = 'badge-men-team';
+                                } else if (catLower === "women's team") {
+                                    categoryClass = 'badge-women-team';
+                                } else if (catLower === "mixed team") {
+                                    categoryClass = 'badge-mixed';
+                                }
+                                
+                                const bowTypeClass = `badge-${(comp.bowType || 'recurve').toLowerCase()}`;
+                                
+                                return `
+                                    <tr>
+                                        <td>
+                                            <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'Recurve'}</span>
+                                        </td>
+                                        <td>
+                                            <span class="competition-badge ${categoryClass}">${comp.category || 'Individual'}</span>
+                                        </td>
+                                        <td>${comp.round || 'WA (International)'}</td>
+                                        <td>${comp.subround || 'WA 70m'}</td>
+                                        <td class="info-icon-cell">
+                                            <button class="info-icon-btn" onclick="showSubroundDetails('${comp.subround || 'WA 70m'}')">
+                                                <i class="mdi mdi-information"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
 
         // Load athlete participation data
         function loadAthleteParticipation() {
@@ -225,42 +434,26 @@
                 </div>
                 
                 <!-- Competitions Section -->
-                <div class="section-title">
-                    <i class="mdi mdi-target"></i>
-                    Registered Competitions (${athleteCompetitions.length})
+                <div class="competitions-section">
+                    <div class="section-title">
+                        <i class="mdi mdi-target"></i>
+                        Registered Competitions (${athleteCompetitions.length})
+                    </div>
+                    ${renderCompetitionsTable(athleteCompetitions)}
                 </div>
             `;
             
-            if (athleteCompetitions.length === 0) {
-                html += `
-                    <div class="empty-state">
-                        <i class="mdi mdi-target-variant"></i>
-                        <div class="empty-state-title">No competitions registered</div>
-                        <div class="empty-state-text">This athlete hasn't registered for any competitions yet</div>
-                    </div>
-                `;
-            } else {
-                athleteCompetitions.forEach(comp => {
-                    html += `
-                        <div class="competition-item">
-                            <div class="competition-header">
-                                <div class="competition-division">${comp.division}</div>
-                                <span class="competition-badge ${comp.category.toLowerCase()}">${comp.category}</span>
-                            </div>
-                            <div class="competition-details">
-                                <div class="competition-detail">
-                                    <i class="mdi mdi-map-marker-distance"></i>
-                                    <span>${comp.distance}</span>
-                                </div>
-                                <div class="competition-detail">
-                                    <i class="mdi mdi-format-list-bulleted"></i>
-                                    <span>${comp.format}</span>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
+            // Convert old data format to new format with proper structure
+            const formattedCompetitions = athleteCompetitions.map(comp => ({
+                bowType: comp.category || 'Recurve',
+                category: comp.division || "Men's Individual",
+                round: 'WA (International)',
+                subround: comp.distance === '70m' ? 'WA 70m' : comp.distance === '50m' ? 'WA 50m' : 'WA 70m'
+            }));
+            
+            html += `
+                <div style="display: none;" id="athleteCompetitionsData">${JSON.stringify(formattedCompetitions)}</div>
+            `
             
             content.innerHTML = html;
         }
