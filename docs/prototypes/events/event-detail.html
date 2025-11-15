@@ -115,10 +115,8 @@
         .badge-mixed { background: #c8e6c9; color: #1b5e20; }
         .competitions-empty { text-align: center; padding: 48px 16px; color: #9e9e9e; }
         .competitions-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
-        .info-icon-cell { text-align: center; width: 40px; }
-        .info-icon-btn { background: none; border: none; cursor: pointer; color: #1565c0; padding: 4px; border-radius: 50%; transition: all 0.2s; }
-        .info-icon-btn:hover { background: #e3f2fd; transform: scale(1.1); }
-        .info-icon-btn i { font-size: 20px; }
+        .subround-clickable { cursor: pointer; color: #1565c0; transition: all 0.2s; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 3px; }
+        .subround-clickable:hover { color: #0d47a1; background: #e3f2fd; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; }
         
         /* Subround Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
@@ -545,11 +543,8 @@
                         <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
                     </td>
                     <td>${comp.round || 'N/A'}</td>
-                    <td>${comp.subround || 'N/A'}</td>
-                    <td class="info-icon-cell">
-                        <button class="info-icon-btn" onclick="showSubroundDetails('${comp.subround}')">
-                            <i class="mdi mdi-information"></i>
-                        </button>
+                    <td>
+                        <span class="subround-clickable" onclick="showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
                     </td>
                 </tr>
                 `;
@@ -791,7 +786,6 @@
                                         Subround
                                         <i class="mdi mdi-arrow-up sort-icon"></i>
                                     </th>
-                                    <th>Info</th>
                                 </tr>
                             </thead>
                             <tbody id="competitionsTableBody">
