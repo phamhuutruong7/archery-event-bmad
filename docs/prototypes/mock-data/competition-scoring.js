@@ -28,10 +28,7 @@ const competitionScoringData = {
                         name: 'Alex Wong', 
                         team: 'Blue Arrows',
                         score: 680, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 2, 
@@ -39,10 +36,7 @@ const competitionScoringData = {
                         name: 'Brian Song', 
                         team: 'Red Dragons',
                         score: 650, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 3, 
@@ -50,10 +44,7 @@ const competitionScoringData = {
                         name: 'Charlie Mungo', 
                         team: 'Green Hawks',
                         score: 0, 
-                        totalArrows: 0, 
-                        completed: false,
-                        endsCompleted: 0,
-                        totalEnds: 12
+                        totalArrows: 0
                     },
                     { 
                         id: 4, 
@@ -61,10 +52,7 @@ const competitionScoringData = {
                         name: 'Daniel Crap', 
                         team: 'Yellow Tigers',
                         score: 245, 
-                        totalArrows: 24, 
-                        completed: false,
-                        endsCompleted: 4,
-                        totalEnds: 12
+                        totalArrows: 24
                     }
                 ]
             },
@@ -78,10 +66,7 @@ const competitionScoringData = {
                         name: 'Emily Zhang', 
                         team: 'Blue Arrows',
                         score: 695, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 6, 
@@ -89,10 +74,7 @@ const competitionScoringData = {
                         name: 'Frank Miller', 
                         team: 'Silver Knights',
                         score: 670, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 7, 
@@ -100,10 +82,7 @@ const competitionScoringData = {
                         name: 'Grace Lee', 
                         team: 'Purple Panthers',
                         score: 655, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 8, 
@@ -111,10 +90,7 @@ const competitionScoringData = {
                         name: 'Henry Park', 
                         team: 'Orange Lions',
                         score: 640, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             },
@@ -128,10 +104,7 @@ const competitionScoringData = {
                         name: 'Isabella Chen', 
                         team: 'Pink Phoenixes',
                         score: 685, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 10, 
@@ -139,10 +112,7 @@ const competitionScoringData = {
                         name: 'John Doe', 
                         team: 'Black Eagles',
                         score: 560, 
-                        totalArrows: 60, 
-                        completed: false,
-                        endsCompleted: 10,
-                        totalEnds: 12
+                        totalArrows: 60
                     },
                     { 
                         id: 11, 
@@ -150,10 +120,7 @@ const competitionScoringData = {
                         name: 'Kate Wilson', 
                         team: 'White Wolves',
                         score: 720, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 12, 
@@ -161,10 +128,7 @@ const competitionScoringData = {
                         name: 'Leo Martinez', 
                         team: 'Brown Bears',
                         score: 590, 
-                        totalArrows: 48, 
-                        completed: false,
-                        endsCompleted: 8,
-                        totalEnds: 12
+                        totalArrows: 48
                     }
                 ]
             },
@@ -178,10 +142,7 @@ const competitionScoringData = {
                         name: 'Michael Johnson', 
                         team: 'Teal Titans',
                         score: 702, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 14, 
@@ -189,10 +150,7 @@ const competitionScoringData = {
                         name: 'Nancy Kim', 
                         team: 'Maroon Mustangs',
                         score: 688, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 15, 
@@ -200,10 +158,7 @@ const competitionScoringData = {
                         name: 'Oliver Brown', 
                         team: 'Navy Ninjas',
                         score: 665, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 16, 
@@ -211,10 +166,7 @@ const competitionScoringData = {
                         name: 'Patricia Davis', 
                         team: 'Crimson Cobras',
                         score: 642, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             }
@@ -242,10 +194,7 @@ const competitionScoringData = {
                         name: 'Sarah Johnson', 
                         team: 'Sky Shooters',
                         score: 695, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 18, 
@@ -253,10 +202,7 @@ const competitionScoringData = {
                         name: 'Tina Lee', 
                         team: 'Fire Arrows',
                         score: 678, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 19, 
@@ -264,10 +210,7 @@ const competitionScoringData = {
                         name: 'Uma Patel', 
                         team: 'Storm Hawks',
                         score: 660, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 20, 
@@ -275,10 +218,7 @@ const competitionScoringData = {
                         name: 'Vera Chang', 
                         team: 'Thunder Bolts',
                         score: 645, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             },
@@ -292,10 +232,7 @@ const competitionScoringData = {
                         name: 'Wendy Martinez', 
                         team: 'Lightning Strikers',
                         score: 710, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 22, 
@@ -303,10 +240,7 @@ const competitionScoringData = {
                         name: 'Xena Wu', 
                         team: 'Wind Warriors',
                         score: 692, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 23, 
@@ -314,10 +248,7 @@ const competitionScoringData = {
                         name: 'Yvonne Park', 
                         team: 'Ice Archers',
                         score: 675, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 24, 
@@ -325,10 +256,7 @@ const competitionScoringData = {
                         name: 'Zoe Kim', 
                         team: 'Star Shooters',
                         score: 658, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             }
@@ -356,10 +284,7 @@ const competitionScoringData = {
                         name: 'David Chen', 
                         team: 'Phoenix Archers',
                         score: 672, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 26, 
@@ -367,10 +292,7 @@ const competitionScoringData = {
                         name: 'Marcus Williams', 
                         team: 'Outback Bowmen',
                         score: 658, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 27, 
@@ -378,10 +300,7 @@ const competitionScoringData = {
                         name: 'James Taylor', 
                         team: 'Sydney Arrows',
                         score: 645, 
-                        totalArrows: 66, 
-                        completed: false,
-                        endsCompleted: 11,
-                        totalEnds: 12
+                        totalArrows: 66
                     },
                     { 
                         id: 28, 
@@ -389,10 +308,7 @@ const competitionScoringData = {
                         name: 'Robert Anderson', 
                         team: 'Melbourne Shooters',
                         score: 630, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             },
@@ -406,10 +322,7 @@ const competitionScoringData = {
                         name: 'Thomas Brown', 
                         team: 'Brisbane Bulls',
                         score: 690, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 30, 
@@ -417,10 +330,7 @@ const competitionScoringData = {
                         name: 'Andrew Wilson', 
                         team: 'Perth Hawks',
                         score: 675, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 31, 
@@ -428,10 +338,7 @@ const competitionScoringData = {
                         name: 'Christopher Lee', 
                         team: 'Adelaide Eagles',
                         score: 662, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 32, 
@@ -439,10 +346,159 @@ const competitionScoringData = {
                         name: 'Daniel Smith', 
                         team: 'Canberra Arrows',
                         score: 648, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
+                    }
+                ]
+            },
+            {
+                id: 9,
+                number: 'Target 3',
+                athletes: [
+                    { 
+                        id: 33, 
+                        position: 'A', 
+                        name: 'Michael Johnson', 
+                        team: 'Gold Coast Archers',
+                        score: 682, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 34, 
+                        position: 'B', 
+                        name: 'Joshua Martinez', 
+                        team: 'Hobart Hawks',
+                        score: 668, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 35, 
+                        position: 'C', 
+                        name: 'Matthew Garcia', 
+                        team: 'Darwin Dragons',
+                        score: 654, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 36, 
+                        position: 'D', 
+                        name: 'Joseph Rodriguez', 
+                        team: 'Townsville Tigers',
+                        score: 641, 
+                        totalArrows: 72
+                    }
+                ]
+            },
+            {
+                id: 10,
+                number: 'Target 4',
+                athletes: [
+                    { 
+                        id: 37, 
+                        position: 'A', 
+                        name: 'Anthony White', 
+                        team: 'Cairns Cyclones',
+                        score: 695, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 38, 
+                        position: 'B', 
+                        name: 'Ryan Thompson', 
+                        team: 'Newcastle Knights',
+                        score: 681, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 39, 
+                        position: 'C', 
+                        name: 'Kevin Davis', 
+                        team: 'Wollongong Warriors',
+                        score: 667, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 40, 
+                        position: 'D', 
+                        name: 'Steven Martinez', 
+                        team: 'Geelong Giants',
+                        score: 653, 
+                        totalArrows: 72
+                    }
+                ]
+            },
+            {
+                id: 11,
+                number: 'Target 5',
+                athletes: [
+                    { 
+                        id: 41, 
+                        position: 'A', 
+                        name: 'Brandon Wilson', 
+                        team: 'Ballarat Bowmen',
+                        score: 688, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 42, 
+                        position: 'B', 
+                        name: 'Jason Moore', 
+                        team: 'Launceston Lions',
+                        score: 674, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 43, 
+                        position: 'C', 
+                        name: 'Justin Taylor', 
+                        team: 'Albury Arrows',
+                        score: 660, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 44, 
+                        position: 'D', 
+                        name: 'Nathan Anderson', 
+                        team: 'Bendigo Bulls',
+                        score: 646, 
+                        totalArrows: 72
+                    }
+                ]
+            },
+            {
+                id: 12,
+                number: 'Target 6',
+                athletes: [
+                    { 
+                        id: 45, 
+                        position: 'A', 
+                        name: 'Jacob Thomas', 
+                        team: 'Toowoomba Titans',
+                        score: 703, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 46, 
+                        position: 'B', 
+                        name: 'Nicholas Jackson', 
+                        team: 'Mackay Marksmen',
+                        score: 689, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 47, 
+                        position: 'C', 
+                        name: 'Tyler White', 
+                        team: 'Rockhampton Rangers',
+                        score: 675, 
+                        totalArrows: 72
+                    },
+                    { 
+                        id: 48, 
+                        position: 'D', 
+                        name: 'Aaron Harris', 
+                        team: 'Bunbury Blazers',
+                        score: 661, 
+                        totalArrows: 72
                     }
                 ]
             }
@@ -470,10 +526,7 @@ const competitionScoringData = {
                         name: 'Emma Johnson', 
                         team: 'Sydney Stars',
                         score: 685, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 34, 
@@ -481,10 +534,7 @@ const competitionScoringData = {
                         name: 'Olivia Brown', 
                         team: 'Melbourne Maidens',
                         score: 670, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 35, 
@@ -492,10 +542,7 @@ const competitionScoringData = {
                         name: 'Sophia Wilson', 
                         team: 'Brisbane Belles',
                         score: 655, 
-                        totalArrows: 60, 
-                        completed: false,
-                        endsCompleted: 10,
-                        totalEnds: 12
+                        totalArrows: 60
                     },
                     { 
                         id: 36, 
@@ -503,10 +550,7 @@ const competitionScoringData = {
                         name: 'Isabella Taylor', 
                         team: 'Perth Panthers',
                         score: 640, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             }
@@ -534,10 +578,7 @@ const competitionScoringData = {
                         name: 'Lucas Martinez', 
                         team: 'Gold Coast Warriors',
                         score: 695, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 38, 
@@ -545,10 +586,7 @@ const competitionScoringData = {
                         name: 'Ryan Garcia', 
                         team: 'Gold Coast Warriors',
                         score: 688, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 39, 
@@ -556,10 +594,7 @@ const competitionScoringData = {
                         name: 'Ethan Rodriguez', 
                         team: 'Gold Coast Warriors',
                         score: 675, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 40, 
@@ -567,10 +602,7 @@ const competitionScoringData = {
                         name: 'Nathan Davis', 
                         team: 'Hobart Hawks',
                         score: 660, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             }
@@ -598,10 +630,7 @@ const competitionScoringData = {
                         name: 'Benjamin Clark', 
                         team: 'Darwin Archers',
                         score: 620, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 42, 
@@ -609,10 +638,7 @@ const competitionScoringData = {
                         name: 'Samuel White', 
                         team: 'Townsville Targets',
                         score: 605, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 43, 
@@ -620,10 +646,7 @@ const competitionScoringData = {
                         name: 'Matthew Harris', 
                         team: 'Cairns Crew',
                         score: 590, 
-                        totalArrows: 54, 
-                        completed: false,
-                        endsCompleted: 9,
-                        totalEnds: 12
+                        totalArrows: 54
                     },
                     { 
                         id: 44, 
@@ -631,10 +654,7 @@ const competitionScoringData = {
                         name: 'Joseph Martin', 
                         team: 'Newcastle Nomads',
                         score: 575, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     }
                 ]
             }
@@ -662,10 +682,7 @@ const competitionScoringData = {
                         name: 'Charlotte Thompson', 
                         team: 'Wollongong Warriors',
                         score: 615, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 46, 
@@ -673,10 +690,7 @@ const competitionScoringData = {
                         name: 'Amelia Martinez', 
                         team: 'Geelong Gems',
                         score: 600, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 47, 
@@ -684,10 +698,7 @@ const competitionScoringData = {
                         name: 'Harper Anderson', 
                         team: 'Ballarat Bows',
                         score: 585, 
-                        totalArrows: 72, 
-                        completed: true,
-                        endsCompleted: 12,
-                        totalEnds: 12
+                        totalArrows: 72
                     },
                     { 
                         id: 48, 
@@ -695,10 +706,7 @@ const competitionScoringData = {
                         name: 'Evelyn Thomas', 
                         team: 'Launceston Ladies',
                         score: 570, 
-                        totalArrows: 48, 
-                        completed: false,
-                        endsCompleted: 8,
-                        totalEnds: 12
+                        totalArrows: 48
                     }
                 ]
             }
@@ -811,3 +819,4 @@ function getParticipantCount(eventId, competitionId) {
     const targets = getCompetitionTargets(eventId, competitionId);
     return targets.reduce((total, target) => total + target.athletes.length, 0);
 }
+
