@@ -119,13 +119,17 @@
         .subround-clickable:hover { color: #0d47a1; background: #e3f2fd; padding: 4px 8px; margin: -4px -8px; border-radius: 4px; }
         
         /* Competition Status */
-        .status-switch-cell { text-align: center; min-width: 150px; }
-        .status-switch { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: 2px solid; user-select: none; min-width: 120px; }
+        .status-switch-cell { text-align: center; min-width: 170px; }
+        .status-switch { display: inline-flex; align-items: center; justify-content: center; padding: 8px 16px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: all 0.3s; border: 2px solid; user-select: none; min-width: 140px; }
         .status-switch.open { background: #e8f5e9; color: #2e7d32; border-color: #81c784; }
         .status-switch.open:hover { background: #c8e6c9; border-color: #66bb6a; transform: scale(1.05); }
         .status-switch.closed { background: #ffebee; color: #c62828; border-color: #ef9a9a; }
         .status-switch.closed:hover { background: #ffcdd2; border-color: #e57373; transform: scale(1.05); }
         .status-switch i { font-size: 14px; margin-right: 6px; }
+        
+        /* Competition row hover effect */
+        .competitions-table tbody tr { cursor: pointer; }
+        .competitions-table tbody tr:hover { background: #e3f2fd !important; }
         
         /* Snackbar Notification */
         .snackbar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); font-size: 14px; font-weight: 500; z-index: 10000; transition: bottom 0.3s ease-in-out; display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: 90vw; }
@@ -449,6 +453,20 @@
             return status === 'open' ? 'open' : 'closed';
         }
         
+        // Open competition scoring view
+        function openCompetitionScoring(eventId, competitionId, category, bowType) {
+            const status = getCompetitionStatus(eventId, competitionId);
+            
+            // Only allow opening if competition is in progress
+            if (status !== 'open') {
+                showSnackbar('This competition is closed. Only In Progress competitions can be scored.', 'mdi-alert-circle', 'error');
+                return;
+            }
+            
+            // Navigate to scoring page
+            window.location.href = `../scoring/competition-scoring.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
+        }
+        
         function toggleCompetitionStatus(eventId, competitionId) {
             const key = `event_${eventId}_comp_${competitionId}_status`;
             const currentStatus = getCompetitionStatus(eventId, competitionId);
@@ -459,8 +477,8 @@
             renderCompetitionsTable();
             
             // Show feedback
-            const statusText = newStatus === 'open' ? 'Open' : 'Closed';
-            const icon = newStatus === 'open' ? 'mdi-check-circle' : 'mdi-close-circle';
+            const statusText = newStatus === 'open' ? 'In Progress' : 'Closed';
+            const icon = newStatus === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
             showSnackbar(`Competition status changed to ${statusText}`, icon, 'success');
         }
         
@@ -608,11 +626,11 @@
                 const competitionId = comp.id || index;
                 const status = getCompetitionStatus(eventId, competitionId);
                 const statusClass = status;
-                const statusIcon = status === 'open' ? 'mdi-check-circle' : 'mdi-close-circle';
-                const statusText = status === 'open' ? 'Open' : 'Closed';
+                const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
+                const statusText = status === 'open' ? 'In Progress' : 'Closed';
                 
                 return `
-                <tr>
+                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, ${competitionId}, '${comp.category}', '${comp.bowType}')" title="Click to view/enter scores">
                     <td>
                         <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
                     </td>
@@ -621,10 +639,10 @@
                     </td>
                     <td>${comp.round || 'N/A'}</td>
                     <td>
-                        <span class="subround-clickable" onclick="showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
+                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
                     </td>
                     <td class="status-switch-cell">
-                        <div class="status-switch ${statusClass}" onclick="toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle competition status">
+                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle competition status">
                             <i class="mdi ${statusIcon}"></i>
                             <span>${statusText}</span>
                         </div>

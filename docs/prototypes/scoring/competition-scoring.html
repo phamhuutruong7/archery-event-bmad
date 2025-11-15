@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Competition Scoring - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/languages.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* Responsive container */
+        .scoring-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        @media (max-width: 599px) {
+            .scoring-container { width: 100%; }
+        }
+        
+        @media (min-width: 600px) {
+            body { background: #e0e0e0; }
+            .scoring-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header - 8-column grid */
+        .scoring-header { display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        
+        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-back i { font-size: 24px; }
+        
+        .header-title { grid-column: 2 / 7; font-size: 16px; font-weight: 700; }
+        .header-subtitle { font-size: 12px; font-weight: 400; opacity: 0.9; margin-top: 2px; }
+        
+        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
+        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
+        
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+        
+        /* Language Dropdown */
+        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
+        .language-dropdown.show { display: block; }
+        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
+        .language-item:hover { background: #f5f5f5; }
+        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .language-flag { font-size: 20px; }
+        .language-name { flex: 1; }
+        
+        /* Tab Navigation */
+        .tab-navigation { display: flex; border-bottom: 2px solid #e0e0e0; background: white; position: sticky; top: 64px; z-index: 99; }
+        .tab-item { flex: 1; padding: 16px; text-align: center; font-size: 14px; font-weight: 600; color: #757575; cursor: pointer; transition: all 0.2s; border-bottom: 3px solid transparent; margin-bottom: -2px; }
+        .tab-item:hover { color: #1565c0; background: #f5f5f5; }
+        .tab-item.active { color: #1565c0; border-bottom-color: #1565c0; }
+        .tab-item i { display: block; font-size: 20px; margin-bottom: 4px; }
+        
+        /* Content */
+        .content { padding: 20px; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        /* Competition Info Card */
+        .info-card { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 20px; border-left: 4px solid #1565c0; }
+        .info-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        .info-row:last-child { margin-bottom: 0; }
+        .info-label { font-size: 13px; color: #666; font-weight: 600; }
+        .info-value { font-size: 14px; color: #212121; font-weight: 600; }
+        .status-badge { padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; }
+        .status-badge.in-progress { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.closed { background: #ffebee; color: #c62828; }
+        
+        /* Target List */
+        .targets-section { margin-bottom: 24px; }
+        .section-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #1565c0; }
+        
+        .target-card { background: white; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08); border: 2px solid #e0e0e0; transition: all 0.2s; }
+        .target-card:hover { border-color: #1565c0; box-shadow: 0 4px 12px rgba(21, 101, 192, 0.15); }
+        
+        .target-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 2px solid #f0f0f0; }
+        .target-number { font-size: 20px; font-weight: 700; color: #1565c0; }
+        .target-status { font-size: 12px; padding: 4px 10px; border-radius: 10px; font-weight: 600; }
+        .target-status.complete { background: #e8f5e9; color: #2e7d32; }
+        .target-status.partial { background: #fff3e0; color: #e65100; }
+        .target-status.pending { background: #f5f5f5; color: #757575; }
+        
+        .athletes-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        
+        .athlete-cell { background: #fafafa; border-radius: 8px; padding: 12px; border: 2px solid #e0e0e0; cursor: pointer; transition: all 0.2s; position: relative; }
+        .athlete-cell:hover { background: #e3f2fd; border-color: #1565c0; }
+        .athlete-cell.scored { background: #e8f5e9; border-color: #66bb6a; }
+        .athlete-cell.scored::after { content: '✓'; position: absolute; top: 6px; right: 6px; background: #2e7d32; color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; }
+        
+        .athlete-position { font-size: 16px; font-weight: 700; color: #1565c0; margin-bottom: 4px; }
+        .athlete-name { font-size: 14px; color: #212121; font-weight: 600; margin-bottom: 2px; }
+        .athlete-score { font-size: 13px; color: #666; }
+        .athlete-score strong { color: #ff6f00; }
+        
+        /* Spectator Tab - Leaderboard */
+        .leaderboard { margin-bottom: 24px; }
+        .leaderboard-item { background: white; border-radius: 8px; padding: 14px; margin-bottom: 8px; box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08); display: flex; align-items: center; gap: 12px; }
+        .leaderboard-rank { font-size: 24px; font-weight: 700; color: #1565c0; min-width: 40px; text-align: center; }
+        .leaderboard-rank.gold { color: #ffd700; }
+        .leaderboard-rank.silver { color: #c0c0c0; }
+        .leaderboard-rank.bronze { color: #cd7f32; }
+        .leaderboard-info { flex: 1; }
+        .leaderboard-name { font-size: 15px; font-weight: 600; color: #212121; margin-bottom: 2px; }
+        .leaderboard-target { font-size: 12px; color: #666; }
+        .leaderboard-score { font-size: 20px; font-weight: 700; color: #ff6f00; }
+        .leaderboard-details { font-size: 11px; color: #999; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 48px 16px; color: #9e9e9e; }
+        .empty-state i { font-size: 64px; color: #e0e0e0; margin-bottom: 16px; }
+        .empty-state-title { font-size: 18px; font-weight: 700; color: #757575; margin-bottom: 8px; }
+        .empty-state-text { font-size: 14px; color: #9e9e9e; }
+        
+        /* Filters */
+        .filters { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 16px; border: 2px solid #e0e0e0; border-radius: 20px; background: white; font-size: 13px; font-weight: 600; color: #666; cursor: pointer; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #1565c0; color: #1565c0; }
+        .filter-btn.active { background: #1565c0; color: white; border-color: #1565c0; }
+        
+        /* Loading */
+        .loading { text-align: center; padding: 48px 16px; }
+        .loading i { font-size: 48px; color: #1565c0; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+    <div class="scoring-container">
+        <!-- Header -->
+        <div class="scoring-header">
+            <div class="header-back" onclick="window.history.back()">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">
+                <div id="competitionTitle">Men's 70m Qualification</div>
+                <div class="header-subtitle" id="eventTitle">National Championship 2025</div>
+            </div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇺🇸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <div class="tab-item active" onclick="switchTab('scorer', event)">
+                <i class="mdi mdi-scoreboard"></i>
+                <span>Scorer</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('spectator', event)">
+                <i class="mdi mdi-eye"></i>
+                <span>Spectator</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Scorer Tab (For Host, Athlete, Referee, Admin) -->
+            <div id="scorerTab" class="tab-content active">
+                <!-- Competition Info -->
+                <div class="info-card">
+                    <div class="info-row">
+                        <span class="info-label">Competition Status</span>
+                        <span class="status-badge in-progress" id="competitionStatus">In Progress</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Your Role</span>
+                        <span class="info-value" id="userRole">Athlete</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Your Target</span>
+                        <span class="info-value" id="userTarget">Target 3B</span>
+                    </div>
+                </div>
+
+                <!-- Targets List -->
+                <div class="targets-section">
+                    <div class="section-title">
+                        <i class="mdi mdi-target"></i>
+                        Targets
+                    </div>
+                    <div id="targetsList">
+                        <!-- Targets will be dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Spectator Tab (Public leaderboard view) -->
+            <div id="spectatorTab" class="tab-content">
+                <!-- Competition Info -->
+                <div class="info-card">
+                    <div class="info-row">
+                        <span class="info-label">Competition</span>
+                        <span class="info-value" id="spectatorCompName">Men's 70m Qualification</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Participants</span>
+                        <span class="info-value" id="participantCount">24 Athletes</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="status-badge in-progress" id="spectatorStatus">In Progress</span>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterLeaderboard('all')">All</button>
+                    <button class="filter-btn" onclick="filterLeaderboard('completed')">Completed</button>
+                    <button class="filter-btn" onclick="filterLeaderboard('in-progress')">In Progress</button>
+                </div>
+
+                <!-- Leaderboard -->
+                <div class="leaderboard">
+                    <div class="section-title">
+                        <i class="mdi mdi-trophy"></i>
+                        Live Leaderboard
+                    </div>
+                    <div id="leaderboardList">
+                        <!-- Leaderboard will be dynamically loaded -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+            
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = parseInt(urlParams.get('eventId'));
+        const competitionId = parseInt(urlParams.get('competitionId'));
+
+        // Mock current user role (in production, this would come from authentication)
+        const currentUser = {
+            id: 1,
+            name: 'John Doe',
+            role: 'athlete', // athlete, referee, host, admin, spectator
+            targetId: 3,
+            targetPosition: 'B'
+        };
+
+        // Mock targets data
+        const targetsData = [
+            {
+                id: 1,
+                number: 'Target 1',
+                athletes: [
+                    { id: 1, position: 'A', name: 'Alex Wong', score: 680, totalArrows: 72, completed: true },
+                    { id: 2, position: 'B', name: 'Brian Song', score: 650, totalArrows: 72, completed: true },
+                    { id: 3, position: 'C', name: 'Charlie Mungo', score: 0, totalArrows: 0, completed: false },
+                    { id: 4, position: 'D', name: 'Daniel Crap', score: 245, totalArrows: 24, completed: false }
+                ]
+            },
+            {
+                id: 2,
+                number: 'Target 2',
+                athletes: [
+                    { id: 5, position: 'A', name: 'Emily Zhang', score: 695, totalArrows: 72, completed: true },
+                    { id: 6, position: 'B', name: 'Frank Miller', score: 670, totalArrows: 72, completed: true },
+                    { id: 7, position: 'C', name: 'Grace Lee', score: 655, totalArrows: 72, completed: true },
+                    { id: 8, position: 'D', name: 'Henry Park', score: 640, totalArrows: 72, completed: true }
+                ]
+            },
+            {
+                id: 3,
+                number: 'Target 3',
+                athletes: [
+                    { id: 9, position: 'A', name: 'Isabella Chen', score: 685, totalArrows: 72, completed: true },
+                    { id: 10, position: 'B', name: 'John Doe', score: 560, totalArrows: 60, completed: false },
+                    { id: 11, position: 'C', name: 'Kate Wilson', score: 720, totalArrows: 72, completed: true },
+                    { id: 12, position: 'D', name: 'Leo Martinez', score: 590, totalArrows: 48, completed: false }
+                ]
+            }
+        ];
+
+        // Tab switching
+        function switchTab(tabName, clickEvent) {
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            if (clickEvent && clickEvent.target) {
+                clickEvent.target.closest('.tab-item').classList.add('active');
+            }
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            
+            if (tabName === 'spectator') {
+                loadLeaderboard();
+            }
+        }
+
+        // Load targets list
+        function loadTargets() {
+            const targetsList = document.getElementById('targetsList');
+            
+            targetsList.innerHTML = targetsData.map(target => {
+                const completedCount = target.athletes.filter(a => a.completed).length;
+                const totalCount = target.athletes.length;
+                let targetStatus = 'pending';
+                let targetStatusText = 'Pending';
+                
+                if (completedCount === totalCount) {
+                    targetStatus = 'complete';
+                    targetStatusText = 'Complete';
+                } else if (completedCount > 0) {
+                    targetStatus = 'partial';
+                    targetStatusText = `${completedCount}/${totalCount} Done`;
+                }
+                
+                return `
+                    <div class="target-card">
+                        <div class="target-header">
+                            <div class="target-number">${target.number}</div>
+                            <div class="target-status ${targetStatus}">${targetStatusText}</div>
+                        </div>
+                        <div class="athletes-grid">
+                            ${target.athletes.map(athlete => {
+                                const isCurrentUser = athlete.id === currentUser.id;
+                                const canScore = canScoreForAthlete(target.id, athlete.id);
+                                const scoredClass = athlete.score > 0 ? 'scored' : '';
+                                
+                                return `
+                                    <div class="athlete-cell ${scoredClass}" 
+                                         onclick="openScoresheet(${target.id}, ${athlete.id}, '${athlete.position}', '${athlete.name}')"
+                                         title="${canScore ? 'Click to enter score' : 'View scoresheet'}">
+                                        <div class="athlete-position">Position ${athlete.position}</div>
+                                        <div class="athlete-name">${athlete.name}${isCurrentUser ? ' (You)' : ''}</div>
+                                        <div class="athlete-score">
+                                            Score: <strong>${athlete.score}</strong> / 720
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Check if current user can score for an athlete
+        function canScoreForAthlete(targetId, athleteId) {
+            // Admins and Hosts can score/edit for anyone
+            if (currentUser.role === 'admin' || currentUser.role === 'host') {
+                return true;
+            }
+            
+            // Referees can score/edit for anyone
+            if (currentUser.role === 'referee') {
+                return true;
+            }
+            
+            // Athletes can score for others on their target (peer scoring)
+            // But NOT for themselves initially
+            if (currentUser.role === 'athlete' && currentUser.targetId === targetId) {
+                return athleteId !== currentUser.id;
+            }
+            
+            // Spectators cannot score
+            return false;
+        }
+
+        // Open scoresheet for an athlete
+        function openScoresheet(targetId, athleteId, position, athleteName) {
+            const canScore = canScoreForAthlete(targetId, athleteId);
+            const isCurrentUser = athleteId === currentUser.id;
+            
+            // Check if user has permission
+            if (!canScore && !isCurrentUser && currentUser.role === 'spectator') {
+                alert('You do not have permission to view this scoresheet.');
+                return;
+            }
+            
+            // Navigate to scoresheet page with parameters
+            window.location.href = `scoresheet.html?eventId=${eventId}&competitionId=${competitionId}&targetId=${targetId}&athleteId=${athleteId}&athleteName=${encodeURIComponent(athleteName)}&position=${position}`;
+        }
+
+        // Load leaderboard
+        function loadLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboardList');
+            
+            // Flatten all athletes from all targets
+            const allAthletes = targetsData.flatMap(target => 
+                target.athletes.map(athlete => ({
+                    ...athlete,
+                    targetNumber: target.number
+                }))
+            );
+            
+            // Sort by score (descending)
+            allAthletes.sort((a, b) => b.score - a.score);
+            
+            leaderboardList.innerHTML = allAthletes.map((athlete, index) => {
+                const rank = index + 1;
+                let rankClass = '';
+                if (rank === 1) rankClass = 'gold';
+                else if (rank === 2) rankClass = 'silver';
+                else if (rank === 3) rankClass = 'bronze';
+                
+                const arrowAvg = athlete.totalArrows > 0 ? (athlete.score / athlete.totalArrows).toFixed(2) : '0.00';
+                const golds = Math.floor(athlete.score / 10 * 0.6); // Mock golds calculation
+                
+                return `
+                    <div class="leaderboard-item">
+                        <div class="leaderboard-rank ${rankClass}">${rank}</div>
+                        <div class="leaderboard-info">
+                            <div class="leaderboard-name">${athlete.name}</div>
+                            <div class="leaderboard-target">${athlete.targetNumber} - Position ${athlete.position}</div>
+                            <div class="leaderboard-details">Avg: ${arrowAvg} | Golds: ${golds}</div>
+                        </div>
+                        <div class="leaderboard-score">
+                            ${athlete.score}
+                            ${athlete.completed ? '' : '<br><span style="font-size: 11px; color: #666;">(In Progress)</span>'}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Filter leaderboard
+        function filterLeaderboard(filter) {
+            // Update active filter button
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // In production, this would filter the leaderboard
+            // For now, just reload with all data
+            loadLeaderboard();
+        }
+
+        // Initialize language selector
+        initLanguageSelector();
+
+        // Load data
+        loadTargets();
+        
+        // Update user info
+        document.getElementById('userRole').textContent = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1);
+        document.getElementById('userTarget').textContent = `Target ${currentUser.targetId} - Position ${currentUser.targetPosition}`;
+    </script>
+</body>
+</html>

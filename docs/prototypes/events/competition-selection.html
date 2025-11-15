@@ -123,9 +123,35 @@
 
         <div class="content">
             <h1 class="page-title">Competition Registration</h1>
-            <p class="page-subtitle">Select the competitions you want to participate in</p>
+            <p class="page-subtitle">Enter your team information and select competitions</p>
 
             <div id="eventInfo" class="event-info"></div>
+
+            <!-- Team Name Section -->
+            <div class="event-info">
+                <div class="event-info-title">
+                    <i class="mdi mdi-account-group"></i>
+                    Team Information
+                </div>
+                <div style="margin-top: 12px;">
+                    <label for="teamNameInput" style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px;">
+                        Team Name <span style="color: #c62828;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="teamNameInput" 
+                        placeholder="Enter your team name (or create new)" 
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s;"
+                        oninput="validateTeamName()"
+                        onfocus="this.style.borderColor='#1565c0'"
+                        onblur="this.style.borderColor='#e0e0e0'"
+                    />
+                    <div id="teamNameHelp" style="font-size: 12px; color: #666; margin-top: 6px;">
+                        <i class="mdi mdi-information-outline"></i>
+                        If your team doesn't exist, it will be created automatically
+                    </div>
+                </div>
+            </div>
 
             <div class="section-title">
                 <i class="mdi mdi-trophy-variant"></i>
@@ -377,12 +403,27 @@
             updateSelectedCount();
         }
 
-        function updateSelectedCount() {
+        function validateTeamName() {
+            const teamName = document.getElementById('teamNameInput').value.trim();
             const confirmBtn = document.getElementById('confirmBtn');
-            confirmBtn.disabled = selectedCompetitions.length === 0;
+            
+            // Enable button only if team name is provided AND competitions are selected
+            confirmBtn.disabled = !teamName || selectedCompetitions.length === 0;
+        }
+
+        function updateSelectedCount() {
+            validateTeamName(); // Re-validate whenever selection changes
         }
 
         function confirmRegistration() {
+            const teamName = document.getElementById('teamNameInput').value.trim();
+            
+            if (!teamName) {
+                alert('Please enter your team name');
+                document.getElementById('teamNameInput').focus();
+                return;
+            }
+            
             if (selectedCompetitions.length === 0) {
                 alert('Please select at least one competition');
                 return;
@@ -390,9 +431,10 @@
 
             // Save to localStorage
             localStorage.setItem(`event_${eventId}_athlete_competitions`, JSON.stringify(selectedCompetitions));
+            localStorage.setItem(`event_${eventId}_athlete_team`, teamName);
             localStorage.setItem(`event_${eventId}_registration`, 'athlete');
 
-            alert(`Successfully registered as athlete for ${selectedCompetitions.length} competition(s)!`);
+            alert(`Successfully registered as athlete for team "${teamName}" in ${selectedCompetitions.length} competition(s)!`);
             window.location.href = `event-detail.html?id=${eventId}`;
         }
 

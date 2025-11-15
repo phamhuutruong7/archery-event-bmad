@@ -650,13 +650,46 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
-## Epic 5: Real-Time Qualification Scoring
+## Epic 5: Real-Time Qualification Scoring with Peer Scoring System
 
-**Goal:** Implement real-time score submission, synchronization, and live leaderboard
+**Goal:** Implement target-based peer scoring, real-time score submission, synchronization, and live leaderboard with role-based permissions
 
-**Business Value:** Core competition functionality with live updates
+**Business Value:** Core competition functionality with live updates and integrity-focused peer scoring to prevent bias
 
 **Duration:** Weeks 6-8
+
+**Key Innovation:** Athletes score each other on the same target (peer scoring) rather than themselves, ensuring unbiased score entry while maintaining real-time engagement
+
+---
+
+### Story 5.0: Target Organization & Peer Scoring Infrastructure
+
+**As a** backend developer,  
+**I want** database schema for target-based organization and peer scoring permissions,  
+**So that** athletes can be assigned to targets and score each other with proper validation.
+
+**Acceptance Criteria:**
+1. `competition_targets` table created with: id, competition_id, target_number, created_at
+2. `target_assignments` table created with: id, competition_id, target_id, athlete_id, position (A/B/C/D), assigned_at
+3. Each target supports exactly 4 positions (A, B, C, D)
+4. `CanScoreForAthlete(userId, targetAthleteId)` authorization policy:
+   - Returns TRUE if user is Admin, Host, or Referee
+   - Returns TRUE if user is Athlete on SAME target AND targetAthleteId ≠ userId (peer scoring)
+   - Returns FALSE if user is Athlete trying to score for themselves
+   - Returns FALSE if user is Athlete on DIFFERENT target
+5. GET `/api/v1/competitions/{compId}/targets` returns list of targets with athletes
+6. POST `/api/v1/competitions/{compId}/targets/assign` assigns athletes to target positions
+7. Endpoint validates unique athlete per target position
+8. Migration script for existing data
+
+**Technical Notes:**
+- Use EF Core for migrations
+- Position enum: A, B, C, D
+- Foreign keys: competition_id → competitions.id, athlete_id → users.id
+- Composite unique constraint: (competition_id, target_number, position)
+- Authorization policy in ASP.NET Core: `[Authorize(Policy = "CanScoreForAthlete")]`
+
+**Prerequisites:** Story 4.1 (Athlete registration), Story 2.2 (JWT auth)
 
 ---
 
@@ -687,30 +720,38 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
-### Story 5.2: Qualification Score Submission API
+### Story 5.2: Peer Scoring Submission API with Team Registration
 
 **As an** athlete,  
-**I want** to submit my arrow scores for an end,  
-**So that** my performance is recorded.
+**I want** to submit arrow scores for OTHER athletes on my target (peer scoring),  
+**So that** scores are entered without self-scoring bias.
 
 **Acceptance Criteria:**
-1. POST `/api/v1/games/{gameId}/scores` accepts: endNumber, scores (array of 6 integers)
-2. Validates: user is registered athlete for game, scores are 0-10, endNumber sequential
-3. Creates qualification_scores record with calculated endTotal and cumulativeTotal
-4. Athlete can only submit own scores
-5. Cannot submit if scores are locked
-6. Scores array must have exactly 6 values (or configured arrow count per end)
-7. Response returns created score with rank update
-8. Duplicate end submission returns 400
-9. After successful save, triggers SignalR broadcast to game group
+1. POST `/api/v1/competitions/{compId}/scores` accepts: targetAthleteId, endNumber, arrows (array of 6 strings: "X", "10", "9", ..., "M")
+2. Validates: 
+   - User has permission to score for targetAthleteId (uses `CanScoreForAthlete` policy)
+   - If user is Athlete: targetAthleteId must be on SAME target AND targetAthleteId ≠ userId
+   - If user is Referee/Host/Admin: can score for ANY athlete
+   - Scores are valid values (X, 10-1, M)
+   - End number is sequential
+   - Competition status is "In Progress" (not "Closed")
+3. Creates scoresheet_ends record with: athlete_id (target athlete), end_number, arrows JSON, end_total, cumulative_total, submitted_by (current user), submitted_at
+4. Cannot submit if end already exists (idempotency)
+5. Response returns created score with rank update and completion status
+6. After successful save, triggers SignalR broadcast to competition group
+7. Team registration: Athletes must have team_name in registration (required field)
+8. Team auto-creation: If team_name doesn't exist in teams table, create new team record
+9. Store team_id in athlete registration
 
 **Technical Notes:**
-- Calculate endTotal = sum(scores)
-- Calculate cumulativeTotal from previous ends
+- Calculate endTotal: X/10=10 points, M=0 points, 1-9 = face value
+- Calculate cumulativeTotal from previous ends for this athlete
 - Use transaction for score save + broadcast
-- Return current rank in response
+- Return current rank and completion percentage
+- Resource-based authorization: `[Authorize(Policy = "CanScoreForAthlete")]`
+- Team creation: INSERT INTO teams (name) VALUES (teamName) ON CONFLICT DO NOTHING
 
-**Prerequisites:** Story 5.1 (SignalR hub), Story 4.1 (Athlete registration)
+**Prerequisites:** Story 5.0 (Target organization), Story 5.1 (SignalR hub), Story 4.1 (Athlete registration)
 
 ---
 
@@ -796,29 +837,44 @@ This document provides the complete epic and user story breakdown for the Archer
 
 ---
 
-### Story 5.6: Live Leaderboard Calculation & API
+### Story 5.6: Live Leaderboard with Spectator View & Medal Colors
 
-**As a** user,  
-**I want** to view real-time ranked leaderboard,  
-**So that** I can see athlete standings.
+**As a** spectator,  
+**I want** to view real-time ranked leaderboard with visual hierarchy,  
+**So that** I can follow competition standings.
 
 **Acceptance Criteria:**
-1. GET `/api/v1/games/{gameId}/leaderboard` returns ranked list of athletes
+1. GET `/api/v1/competitions/{compId}/leaderboard` returns ranked list of athletes
 2. Sorted by cumulativeTotal descending
-3. Includes: rank, athleteId, athleteName, totalScore, endsCompleted, lastUpdated
+3. Includes: rank, athleteId, athleteName, teamName, targetNumber, targetPosition, totalScore, totalArrows, golds, averagePerArrow, completionStatus ("Complete" or "In Progress"), lastUpdated
 4. Handles ties (same rank for equal scores)
-5. Public endpoint (no auth required if event is public)
-6. Cached for 5 seconds to reduce database load
-7. Real-time updates via SignalR (not polling)
-8. Supports pagination (top 50 default, all on request)
+5. Medal color indicators:
+   - 🥇 Rank 1: Gold color (#ffd700)
+   - 🥈 Rank 2: Silver color (#c0c0c0)
+   - 🥉 Rank 3: Bronze color (#cd7f32)
+6. Filter options:
+   - All athletes
+   - Completed only (all ends confirmed)
+   - In Progress only (partial submissions)
+7. Public endpoint (no auth required if competition is public)
+8. Cached for 3 seconds to reduce database load
+9. Real-time updates via SignalR (not polling)
+10. Supports pagination (top 50 default, all on request)
+11. Spectator Tab in UI:
+    - Competition info card (status, participant count)
+    - Filter buttons (All, Completed, In Progress)
+    - Leaderboard list with rankings and medal colors
 
 **Technical Notes:**
-- Aggregate scores from qualification_scores table
-- Use RANK() window function in SQL
+- Aggregate scores from scoresheet_ends table grouped by athlete_id
+- Use RANK() OVER (ORDER BY cumulative_total DESC) window function
+- Join with teams table for team_name
+- Join with target_assignments for target info
 - Cache with MemoryCache, invalidate on new scores
-- Return 304 Not Modified if no changes
+- Return 304 Not Modified if ETag matches
+- Frontend: Separate "Spectator" tab in competition-scoring.html
 
-**Prerequisites:** Story 5.3 (Real-time broadcasting)
+**Prerequisites:** Story 5.3 (Real-time broadcasting), Story 5.0 (Target organization)
 
 ---
 

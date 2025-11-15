@@ -220,10 +220,18 @@ frontend/
 5. ✅ Athlete multi-game registration within events
 
 **Real-Time Scoring System:**
-6. ✅ Live score input (Athletes: insert only, Referees/Host: insert + update)
-7. ✅ Real-time score synchronization across all connected clients
-8. ✅ Live leaderboard with automatic ranking
-9. ✅ Qualification round management (72 arrows, rank top performers)
+6. ✅ Target-based athlete organization (4 positions per target: A, B, C, D)
+7. ✅ Peer scoring system (Athletes score each other on same target, not themselves)
+8. ✅ Live score input with role-based permissions:
+   - Athletes: Insert scores for OTHER athletes on same target (peer scoring)
+   - Referees/Host/Admin: Insert/update ANY athlete's scores
+   - Athletes CANNOT score themselves initially (prevents bias)
+   - Only Referees/Host/Admin can edit after submission
+9. ✅ Real-time score synchronization across all connected clients via SignalR
+10. ✅ Live leaderboard with automatic ranking and medal colors (🥇🥈🥉)
+11. ✅ Qualification round management (72 arrows, rank top performers)
+12. ✅ Competition status: "In Progress" (scoring allowed) / "Closed" (scoring blocked)
+13. ✅ Team registration with auto-creation of new teams
 
 **Tournament Bracket System:**
 10. ✅ Host-controlled athlete selection for elimination rounds (top 16, 8, etc.)
@@ -292,11 +300,11 @@ frontend/
 
 | Role | Access Level | Primary Responsibilities |
 |------|-------------|-------------------------|
-| **Admin** | System-wide | Platform management, user moderation, system configuration |
-| **Host** | Event-scoped | Create events, configure games, approve referees, manage brackets, full scoring control |
-| **Referee** | Event-scoped | Insert/update all scores, resolve shoot-offs, monitor competition integrity |
-| **Athlete** | Self-scoped | Register for events/games, input own scores, view competition status |
-| **Spectator** | Read-only | View live leaderboards and brackets (public or authenticated) |
+| **Admin** | System-wide | Platform management, full scoring access, can override any restrictions |
+| **Host** | Event-scoped | Create events, toggle competition status, approve referees, manage brackets, edit ANY athlete's scoresheet, manually select athletes for elimination rounds |
+| **Referee** | Event-scoped | View all scoresheets, edit ANY athlete's scoresheet (even after submission), enter scores for any athlete, supervise competition integrity |
+| **Athlete** | Target-scoped | Register with team name, score for OTHER athletes on SAME target (peer scoring), CANNOT score for themselves initially, view own scoresheet and leaderboard |
+| **Spectator** | Read-only | View live leaderboard with real-time updates, see overall competition scores, CANNOT view detailed scoresheets or enter scores |
 
 ### Permission Matrix
 
@@ -308,9 +316,10 @@ frontend/
 | Approve Referee Applications | ✅ | ✅ (own event) | ❌ | ❌ |
 | Register as Athlete | ✅ | ✅ | ✅ | ✅ |
 | Register as Referee | ✅ | ✅ | ✅ | ✅ |
-| Insert Own Score | ✅ | ✅ | ✅ | ✅ |
-| Update Own Score | ✅ | ✅ | ✅ | ✅ (before lock) |
-| Insert Other Athlete Score | ✅ | ✅ | ✅ | ❌ |
+| Insert Own Score | ✅ | ✅ | ✅ | ❌ (peer scoring only) |
+| Update Own Score | ✅ | ✅ | ✅ | ❌ (after submission) |
+| Insert Other Athlete Score (Same Target) | ✅ | ✅ | ✅ | ✅ (peer scoring) |
+| Insert Other Athlete Score (Any Target) | ✅ | ✅ | ✅ | ❌ |
 | Update Other Athlete Score | ✅ | ✅ | ✅ | ❌ |
 | Lock Scores | ✅ | ✅ | ❌ | ❌ |
 | Select Elimination Participants | ✅ | ✅ | ❌ | ❌ |
@@ -386,27 +395,61 @@ frontend/
 - Approved referees receive notification
 - Approved referees gain scoring permissions for that event
 
-**FR-3.3: Athlete Game Selection**
+**FR-3.3: Athlete Game Selection & Team Registration**
+- Athletes enter team name during registration (required field)
+- System auto-creates team if name doesn't exist, or joins existing team
 - Athletes select which games to participate in (from available options)
 - Multi-game participation supported
-- Athletes see registration confirmation per game
+- Athletes see registration confirmation per game with team name
+- Team information stored per athlete per event
+- Host can manage team assignments in database if needed
 
 ---
 
 ### FR-4: Qualification Round Scoring
 
-**FR-4.1: Score Input Interface**
+**FR-4.1: Target-Based Organization**
+- Athletes organized by targets (e.g., Target 1, Target 2, Target 3)
+- Each target has 4 positions: A, B, C, D
+- Visual display shows all athletes per target with completion status:
+  - ✅ Green checkmark: Scoresheet completed
+  - 🟡 Yellow indicator: Partial scores entered  
+  - ⚪ Gray indicator: No scores yet
+- Competition Scoring View with 2 tabs:
+  - **Scorer Tab:** For Host/Athlete/Referee/Admin to view targets and enter scores
+  - **Spectator Tab:** Public leaderboard view with real-time rankings
+
+**FR-4.2: Peer Scoring System**
+- **Athletes (Peer Scoring):**
+  - Can score for OTHER athletes on the SAME target only
+  - CANNOT score for themselves initially (prevents self-scoring bias)
+  - Example: Athlete at Target 3-Position B can score for positions A, C, D
+  - After submission, CANNOT edit scores (locked for integrity)
+- **Referees/Host/Admin:**
+  - Can score for ANY athlete on ANY target
+  - Can edit ANY athlete's scoresheet even after submission
+  - Useful for corrections, disputes, or referee-led scoring
+- **Spectators:**
+  - Cannot enter scores
+  - Can only view live leaderboard
+- Clear audit trail of who entered/modified each score
+
+**FR-4.3: Score Input Interface**
 - Mobile-optimized score entry form
-- Input per "end" (typically 6 arrows)
-- Running total display
+- Click athlete cell → Opens scoresheet page
+- Arrow-by-arrow score entry per end (typically 6 arrows)
+- Color-coded ring values:
+  - 🟡 Yellow: X, 10, 9
+  - 🔴 Red: 8, 7
+  - 🔵 Blue: 6, 5
+  - ⚫ Black: 4, 3
+  - ⚪ White: 2, 1
+  - 🟢 Green: M (Miss)
+- Running total display with live statistics (total score, golds, average per arrow)
+- End-by-end confirmation with ✓ button
+- Locked ends cannot be edited after confirmation (except by Referee/Host/Admin)
 - Visual feedback on score submission
 - Offline support with sync when connection restores
-
-**FR-4.2: Score Permissions**
-- **Athletes:** Can insert/update own scores before lock
-- **Referees/Host:** Can insert/update any athlete's scores anytime
-- Clear visual indicator of who last modified a score
-- Audit trail of all score changes
 
 **FR-4.3: Real-Time Synchronization**
 - Score updates broadcast to all connected clients within 2 seconds
@@ -421,11 +464,29 @@ frontend/
 - Auto-refresh without page reload
 - Accessible on mobile and desktop
 
-**FR-4.5: Score Locking**
-- Host can lock scores after qualification round (e.g., after 72 arrows)
-- Locked scores can only be modified by Host/Referee
-- Visual indicator when scores are locked
-- Lock applies per game, not entire event
+**FR-4.5: Competition Status Management**
+- Competition status toggle: **"In Progress"** ↔ **"Closed"**
+- **In Progress (Green):**
+  - Icon: `mdi-play-circle`
+  - Color: Green (#2e7d32)
+  - Athletes, Referees, Admins, Hosts can enter scores
+  - Clicking competition row opens scoring view
+- **Closed (Red):**
+  - Icon: `mdi-close-circle`
+  - Color: Red (#c62828)
+  - No scoring allowed
+  - Clicking shows error notification
+- Only Host can toggle competition status
+- Status stored per competition in localStorage/database
+- Visual feedback via snackbar notifications (3-second display)
+
+**FR-4.6: Score Locking & Edit Restrictions**
+- Athletes can submit scores but CANNOT edit after submission
+- Only Host/Referee/Admin can edit submitted scores
+- Individual scoresheet ends lock after confirmation
+- Visual indicator showing locked status
+- Complete scoresheet shows green checkmark on target view
+- Audit trail tracks all modifications
 
 ---
 
