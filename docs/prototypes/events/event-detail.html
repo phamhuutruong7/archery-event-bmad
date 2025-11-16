@@ -869,6 +869,10 @@
                         <div class="competitions-count">${event.competitions.length} competition${event.competitions.length > 1 ? 's' : ''}</div>
                     </div>
                     <div class="button-row" style="margin-bottom: 16px;">
+                        <button class="btn btn-secondary" onclick="manageIndividualCompetitions()">
+                            <i class="mdi mdi-account"></i>
+                            Individual Competition
+                        </button>
                         <button class="btn btn-secondary" onclick="manageTeamCompetitions()">
                             <i class="mdi mdi-account-group"></i>
                             Teams Competition
@@ -1265,6 +1269,11 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // Individual Competition Management
+        function manageIndividualCompetitions() {
+            window.location.href = `../competition-manage/individual-competition.html?eventId=${eventId}`;
         }
 
         // Team Competitions Management
