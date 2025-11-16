@@ -104,7 +104,8 @@
         .leaderboard-rank.bronze { color: #cd7f32; }
         .leaderboard-info { flex: 1; }
         .leaderboard-name { font-size: 14px; font-weight: 600; color: #212121; }
-        .leaderboard-score { font-size: 18px; font-weight: 700; color: #ff6f00; }
+        .leaderboard-team { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; color: white; text-align: center; min-width: 80px; }
+        .leaderboard-score { font-size: 18px; font-weight: 700; color: #ff6f00; min-width: 50px; text-align: right; }
         
         /* Empty State */
         .empty-state { text-align: center; padding: 48px 16px; color: #9e9e9e; }
@@ -357,6 +358,19 @@
             window.location.href = `scoresheet.html?eventId=${eventId}&competitionId=${competitionId}&targetId=${targetId}&athleteId=${athleteId}&athleteName=${encodeURIComponent(athleteName)}&position=${position}`;
         }
 
+        // Generate consistent color for team names
+        function getTeamColor(teamName) {
+            // Hash function to generate consistent color from team name
+            let hash = 0;
+            for (let i = 0; i < teamName.length; i++) {
+                hash = teamName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            
+            // Generate HSL color with good saturation and brightness
+            const hue = Math.abs(hash % 360);
+            return `hsl(${hue}, 70%, 50%)`;
+        }
+        
         // Load leaderboard
         function loadLeaderboard() {
             const leaderboardList = document.getElementById('leaderboardList');
@@ -382,12 +396,15 @@
                 const arrowAvg = athlete.totalArrows > 0 ? (athlete.score / athlete.totalArrows).toFixed(2) : '0.00';
                 const golds = Math.floor(athlete.score / 10 * 0.6); // Mock golds calculation
                 
+                const teamColor = getTeamColor(athlete.team);
+                
                 return `
                     <div class="leaderboard-item">
                         <div class="leaderboard-rank ${rankClass}">${rank}</div>
                         <div class="leaderboard-info">
                             <div class="leaderboard-name">${athlete.name}</div>
                         </div>
+                        <div class="leaderboard-team" style="background-color: ${teamColor};">${athlete.team}</div>
                         <div class="leaderboard-score">${athlete.score}</div>
                     </div>
                 `;

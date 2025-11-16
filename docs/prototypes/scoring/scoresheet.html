@@ -33,8 +33,7 @@
         .back-btn:hover { background: rgba(255, 255, 255, 0.15); }
         .back-btn:active { background: rgba(255, 255, 255, 0.25); }
         .header-content { grid-column: 2 / 7; display: flex; flex-direction: column; align-items: center; text-align: center; }
-        .scoresheet-header h2 { font-size: 18px; margin-bottom: 8px; font-weight: 600; }
-        .stats-row { display: flex; gap: 20px; font-size: 14px; opacity: 0.95; }
+        .scoresheet-header h2 { font-size: 18px; font-weight: 600; }
         
         .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
         .header-language:hover { background: rgba(255, 255, 255, 0.3); }
@@ -58,6 +57,11 @@
         }
         .ends-list { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 12px; scrollbar-width: none; -ms-overflow-style: none; }
         .ends-list::-webkit-scrollbar { display: none; }
+        .phase-header { background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%); padding: 12px; margin: 8px -12px; border-left: 4px solid #1565c0; display: flex; justify-content: space-between; align-items: center; }
+        .phase-title { font-size: 16px; font-weight: 700; color: #1565c0; margin: 0; }
+        .phase-stats { display: flex; gap: 16px; font-size: 13px; color: #666; }
+        .phase-stats span { font-weight: 600; }
+        .phase-stats strong { color: #212121; }
         .end-row { display: grid; grid-template-columns: 40px repeat(6, 1fr) 60px; gap: 4px; align-items: center; padding: 6px 0; margin-bottom: 2px; border-bottom: 1px solid #f0f0f0; }
         .end-row.active { background: rgba(21, 101, 192, 0.05); }
         .end-row.active .arrow-cell { box-shadow: 0 0 0 2px #1565c0; }
@@ -146,11 +150,6 @@
             <button class="back-btn" onclick="goBack()">←</button>
             <div class="header-content">
                 <h2 id="competitionName">Men's 70m Qualification</h2>
-                <div class="stats-row">
-                    <span id="distance">70m</span>
-                    <span>Golds: <strong id="golds">0</strong></span>
-                    <span>Avg: <strong id="average">0.00</strong></span>
-                </div>
             </div>
             <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
                 <span id="currentLanguageFlag">🇺🇸</span>
@@ -186,6 +185,7 @@
         </div>
         <div class="saving-overlay" id="savingOverlay" style="display: none;">Saving...</div>
     </div>
+    <script src="../mock-data/rounds.js"></script>
     <script>
         // Language selector functionality
         function initLanguageSelector() {
@@ -231,9 +231,73 @@
         // Initialize language selector
         initLanguageSelector();
 
-        const state = { ends: [], currentEndIndex: 0, arrowsPerEnd: 6, totalEnds: 12 }
-        function initEnds() { for (let i = 0; i < state.totalEnds; i++) { state.ends.push({ endNumber: i + 1, arrows: Array(state.arrowsPerEnd).fill(null), confirmed: false }) } render() }
-        function render() { const list = document.getElementById('endsList'); list.innerHTML = ''; state.ends.forEach((end, idx) => { const isActive = idx === state.currentEndIndex && !end.confirmed; const row = document.createElement('div'); row.className = 'end-row' + (isActive ? ' active' : '') + (end.confirmed ? ' locked' : ''); const sum = calcSum(end.arrows); const allFilled = end.arrows.every(a => a !== null); const arrowsHtml = end.arrows.map(a => '<div class="arrow-cell'+(a ? '' : ' empty')+'" style="'+getArrowStyle(a)+'">'+(a || '-')+'</div>').join(''); const actionsHtml = '<div class="end-actions">'+(isActive && allFilled && !end.confirmed ? '<button class="action-btn btn-confirm" onclick="confirmEnd()">✓</button>' : '')+'<div class="end-sum">'+(sum || '')+'</div></div>'; row.innerHTML = '<div class="end-number">'+end.endNumber+'</div>'+arrowsHtml+actionsHtml; list.appendChild(row) }); updateStats(); document.getElementById('deleteBtn').disabled = !canDelete() }
+        // Get subround from URL or default to WA 900 for demo
+        const urlParams = new URLSearchParams(window.location.search);
+        const subroundName = urlParams.get('subround') || 'WA 900';
+        const subroundPhases = getSubroundDetails(subroundName) || [{ distance: "70m", targetSize: "122cm", ends: 12, target: "Metric 10 Zone", arrows: 72 }];
+        
+        const state = { ends: [], currentEndIndex: 0, arrowsPerEnd: 6, totalEnds: 0, phases: subroundPhases }
+        function initEnds() { 
+            let endCounter = 1;
+            state.phases.forEach((phase, phaseIdx) => {
+                for (let i = 0; i < phase.ends; i++) { 
+                    state.ends.push({ 
+                        endNumber: endCounter++, 
+                        arrows: Array(state.arrowsPerEnd).fill(null), 
+                        confirmed: false,
+                        phaseIndex: phaseIdx
+                    }) 
+                }
+            });
+            state.totalEnds = state.ends.length;
+            render();
+        }
+        
+        function render() { 
+            const list = document.getElementById('endsList'); 
+            list.innerHTML = ''; 
+            
+            let currentPhase = -1;
+            state.ends.forEach((end, idx) => { 
+                // Insert phase header when phase changes
+                if (end.phaseIndex !== currentPhase) {
+                    currentPhase = end.phaseIndex;
+                    const phase = state.phases[currentPhase];
+                    
+                    // Calculate phase stats
+                    const phaseEnds = state.ends.filter(e => e.phaseIndex === currentPhase);
+                    const phaseTotal = phaseEnds.filter(e => e.confirmed).reduce((s, e) => s + calcSum(e.arrows), 0);
+                    const phaseArrows = phaseEnds.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a).length, 0);
+                    const phaseGolds = phaseEnds.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a === 'X' || a === '10').length, 0);
+                    const phaseAvg = phaseArrows > 0 ? (phaseTotal / phaseArrows).toFixed(2) : '0.00';
+                    
+                    const phaseHeader = document.createElement('div');
+                    phaseHeader.className = 'phase-header';
+                    phaseHeader.innerHTML = `
+                        <div class="phase-title">Distance: ${phase.distance}</div>
+                        <div class="phase-stats">
+                            <span>Golds: <strong>${phaseGolds}</strong></span>
+                            <span>Avg: <strong>${phaseAvg}</strong></span>
+                            <span>Total: <strong>${phaseTotal}</strong> / ${phase.ends * 6 * 10}</span>
+                        </div>
+                    `;
+                    list.appendChild(phaseHeader);
+                }
+                
+                const isActive = idx === state.currentEndIndex && !end.confirmed; 
+                const row = document.createElement('div'); 
+                row.className = 'end-row' + (isActive ? ' active' : '') + (end.confirmed ? ' locked' : ''); 
+                const sum = calcSum(end.arrows); 
+                const allFilled = end.arrows.every(a => a !== null); 
+                const arrowsHtml = end.arrows.map(a => '<div class="arrow-cell'+(a ? '' : ' empty')+'" style="'+getArrowStyle(a)+'">'+(a || '-')+'</div>').join(''); 
+                const actionsHtml = '<div class="end-actions">'+(isActive && allFilled && !end.confirmed ? '<button class="action-btn btn-confirm" onclick="confirmEnd()">✓</button>' : '')+'<div class="end-sum">'+(sum || '')+'</div></div>'; 
+                row.innerHTML = '<div class="end-number">'+end.endNumber+'</div>'+arrowsHtml+actionsHtml; 
+                list.appendChild(row);
+            }); 
+            
+            updateStats(); 
+            document.getElementById('deleteBtn').disabled = !canDelete();
+        }
         function getArrowStyle(val) { if (!val) return ''; const colors = { X: 'background:#e8de27;color:#000', '10': 'background:#e8de27;color:#000', '9': 'background:#e8de27;color:#000', '8': 'background:#d92d41;color:white', '7': 'background:#d92d41;color:white', '6': 'background:#1884cc;color:white', '5': 'background:#1884cc;color:white', '4': 'background:#000;color:white', '3': 'background:#000;color:white', '2': 'background:#f5f5f5;color:#000;border:2px solid #ccc', '1': 'background:#f5f5f5;color:#000;border:2px solid #ccc', M: 'background:#0a8c0a;color:white' }; return colors[val] || '' }
         function calcSum(arrows) { return arrows.reduce((s, a) => s + scoreVal(a), 0) }
         function scoreVal(v) { if (v === 'X' || v === '10') return 10; if (v === 'M' || !v) return 0; return parseInt(v) }
@@ -241,24 +305,22 @@
             // Calculate for confirmed ends
             const confirmedTotal = state.ends.filter(e => e.confirmed).reduce((s, e) => s + calcSum(e.arrows), 0); 
             const confirmedArrows = state.ends.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a).length, 0); 
-            const confirmedGolds = state.ends.filter(e => e.confirmed).reduce((c, e) => c + e.arrows.filter(a => a === 'X' || a === '10').length, 0); 
             
             // Include current end in progress for live stats
             const currentEnd = state.ends[state.currentEndIndex];
             const currentArrows = currentEnd.arrows.filter(a => a);
             const currentSum = calcSum(currentEnd.arrows);
-            const currentGolds = currentEnd.arrows.filter(a => a === 'X' || a === '10').length;
             
             const totalWithCurrent = confirmedTotal + currentSum;
             const arrowsWithCurrent = confirmedArrows + currentArrows.length;
-            const goldsWithCurrent = confirmedGolds + currentGolds;
             const avg = arrowsWithCurrent > 0 ? (totalWithCurrent / arrowsWithCurrent).toFixed(2) : '0.00'; 
             
             document.getElementById('totalScore').textContent = totalWithCurrent; 
             document.getElementById('maxScore').textContent = state.totalEnds * state.arrowsPerEnd * 10; 
-            document.getElementById('golds').textContent = goldsWithCurrent; 
-            document.getElementById('average').textContent = avg; 
             document.getElementById('liveAvg').textContent = avg;
+            
+            // Update competition name header with subround name
+            document.getElementById('competitionName').textContent = subroundName;
         }
         function inputScore(score) { const end = state.ends[state.currentEndIndex]; if (end.confirmed) return; const emptyIdx = end.arrows.findIndex(a => a === null); if (emptyIdx !== -1) { end.arrows[emptyIdx] = score; render() } }
         function canDelete() { const end = state.ends[state.currentEndIndex]; return end && !end.confirmed && end.arrows.some(a => a !== null) }

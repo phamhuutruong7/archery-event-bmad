@@ -868,6 +868,16 @@
                         </div>
                         <div class="competitions-count">${event.competitions.length} competition${event.competitions.length > 1 ? 's' : ''}</div>
                     </div>
+                    <div class="button-row" style="margin-bottom: 16px;">
+                        <button class="btn btn-secondary" onclick="manageTeamCompetitions()">
+                            <i class="mdi mdi-account-group"></i>
+                            Teams Competition
+                        </button>
+                        <button class="btn btn-secondary" onclick="manageMixedTeamCompetitions()">
+                            <i class="mdi mdi-account-multiple"></i>
+                            Mixed Team Competition
+                        </button>
+                    </div>
             `;
 
             if (event.competitions && event.competitions.length > 0) {
@@ -1255,6 +1265,16 @@
                     </td>
                 </tr>
             `).join('');
+        }
+
+        // Team Competitions Management
+        function manageTeamCompetitions() {
+            alert('Teams Competition management will be implemented here.\n\nThis feature will allow:\n- Creating team competitions based on individual results\n- Grouping athletes by team and bow type\n- Calculating team scores (sum of top 3 scores)\n- Managing team rankings');
+        }
+
+        // Mixed Team Competitions Management
+        function manageMixedTeamCompetitions() {
+            alert('Mixed Team Competition management will be implemented here.\n\nThis feature will allow:\n- Creating mixed team competitions (1 man + 1 woman per team)\n- Pairing athletes from same team or organization\n- Calculating combined scores\n- Managing mixed team rankings');
         }
 
         // Initialize language selector
