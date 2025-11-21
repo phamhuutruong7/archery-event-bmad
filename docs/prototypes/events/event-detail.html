@@ -1561,6 +1561,9 @@
         let competitionsSortField = null;
         let competitionsSortOrder = 'asc';
         let competitionsData = [];
+        
+        // Elimination data (separate from ranking competitions)
+        let eliminationData = [];
 
         // Competition status management
         function getCompetitionStatus(eventId, competitionId) {
@@ -1589,6 +1592,21 @@
             const statusText = newStatus === 'open' ? 'In Progress' : 'Closed';
             const icon = newStatus === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
             showSnackbar(`Competition status changed to ${statusText}`, icon, 'success');
+        }
+
+        function toggleEliminationStatus(eventId, competitionId) {
+            const key = `event_${eventId}_elim_${competitionId}_status`;
+            const currentStatus = localStorage.getItem(key) || 'closed';
+            const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+            localStorage.setItem(key, newStatus);
+
+            // Update UI
+            renderEliminationTable();
+
+            // Show feedback
+            const statusText = newStatus === 'open' ? 'In Progress' : 'Closed';
+            const icon = newStatus === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
+            showSnackbar(`Match status changed to ${statusText}`, icon, 'success');
         }
 
         // Snackbar notification function
@@ -1749,7 +1767,7 @@
                 }
             }
 
-            const sortedData = [...competitionsData].sort((a, b) => {
+            const sortedData = [...eliminationData].sort((a, b) => {
                 let aVal = a[field] ? a[field].toString().toLowerCase() : '';
                 let bVal = b[field] ? b[field].toString().toLowerCase() : '';
                 if (eliminationSortOrder === 'asc') {
@@ -1822,7 +1840,7 @@
             const tbody = document.getElementById('eliminationTableBody');
             if (!tbody) return;
             
-            const data = dataToRender || competitionsData;
+            const data = dataToRender || eliminationData;
             if (!data || data.length === 0) return;
 
             tbody.innerHTML = data.map((comp, index) => {
@@ -1843,9 +1861,10 @@
 
                 const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
 
-                // Get competition status
+                // Get elimination match status
                 const competitionId = comp.id || index;
-                const status = getCompetitionStatus(eventId, competitionId);
+                const key = `event_${eventId}_elim_${competitionId}_status`;
+                const status = localStorage.getItem(key) || 'closed';
                 const statusClass = status;
                 const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
                 const statusText = status === 'open' ? 'In Progress' : 'Closed';
@@ -1855,7 +1874,7 @@
                 const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
 
                 return `
-                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, ${competitionId}, '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
+                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, '${competitionId}', '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
                     <td>
                         <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
                     </td>
@@ -1864,10 +1883,10 @@
                     </td>
                     <td>${comp.round || 'N/A'}</td>
                     <td>
-                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')">${comp.subround || 'N/A'}</span>
+                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')" title="Click to view round details">${comp.subround || 'N/A'}</span>
                     </td>
                     <td class="status-switch-cell">
-                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle: In Progress (scoring allowed) / Closed (read-only)">
+                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleEliminationStatus(${eventId}, '${competitionId}')" title="Click to toggle: In Progress (scoring allowed) / Closed (read-only)">
                             <i class="mdi ${statusIcon}"></i>
                             <span>${statusText}</span>
                         </div>
@@ -2077,6 +2096,18 @@
             // Competitions - store data and render table
             if (event.competitions && event.competitions.length > 0) {
                 competitionsData = [...event.competitions];
+                
+                // Generate mock elimination data (bracket matches)
+                eliminationData = [
+                    { id: 'e1', bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 70m Elimination' },
+                    { id: 'e2', bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 70m Elimination' },
+                    { id: 'e3', bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m Elimination' },
+                    { id: 'e4', bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m Elimination' },
+                    { id: 'e5', bowType: 'Recurve', category: "Mixed Team", round: 'WA (International)', subround: 'WA 70m Mixed Elimination' },
+                    { id: 'e6', bowType: 'Barebow', category: "Men's Individual", round: 'National Round', subround: 'Half WA' },
+                    { id: 'e7', bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 70m Team Elimination' },
+                    { id: 'e8', bowType: 'Compound', category: "Women's Team", round: 'WA (International)', subround: 'WA 50m Team Elimination' }
+                ];
             }
 
             html += `
@@ -2175,8 +2206,8 @@
                                             <i class="mdi mdi-arrow-up sort-icon"></i>
                                         </th>
                                         <th>
-                                            Competition Status
-                                            <i class="mdi mdi-information-outline" title="Toggle competition status"></i>
+                                            Match Status
+                                            <i class="mdi mdi-information-outline" title="Toggle match status"></i>
                                         </th>
                                     </tr>
                                 </thead>
