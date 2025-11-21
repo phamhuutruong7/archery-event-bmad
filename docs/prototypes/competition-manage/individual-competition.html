@@ -1,135 +1,688 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Individual Competition Management - Archery Events</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
     <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/individual-eliminate.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
-        
-        .manage-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
-        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .manage-container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            margin: 0 auto;
+        }
+
         @media (max-width: 599px) {
-            .manage-container { width: 100%; }
+            .manage-container {
+                width: 100%;
+            }
         }
-        
+
         @media (min-width: 600px) {
-            body { background: #e0e0e0; }
-            .manage-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+            body {
+                background: #e0e0e0;
+            }
+
+            .manage-container {
+                width: 50vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
         }
-        
+
         /* Header */
-        .manage-header { display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
-        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
-        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
-        .header-back i { font-size: 24px; }
-        .header-title { grid-column: 2 / 7; font-size: 16px; font-weight: 700; }
-        .header-subtitle { font-size: 12px; opacity: 0.9; margin-top: 2px; }
-        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
-        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
-        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
-        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
-        .header-profile i { font-size: 24px; }
-        
-        /* Language Dropdown */
-        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
-        .language-dropdown.show { display: block; }
-        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
-        .language-item:hover { background: #f5f5f5; }
-        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
-        .language-flag { font-size: 20px; }
-        .language-name { flex: 1; }
-        
-        /* Content */
-        .content { padding: 20px; padding-bottom: 100px; }
-        
-        /* Page Title */
-        .page-title { font-size: 20px; font-weight: 700; color: #212121; margin-bottom: 8px; }
-        .page-subtitle { font-size: 14px; color: #666; margin-bottom: 20px; }
-        
-        /* Category Filter */
-        .category-filter { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 8px; }
-        .category-btn { padding: 10px 16px; border: 2px solid #e0e0e0; border-radius: 20px; background: white; font-size: 13px; font-weight: 600; color: #666; cursor: pointer; transition: all 0.2s; white-space: nowrap; }
-        .category-btn:hover { border-color: #1565c0; color: #1565c0; }
-        .category-btn.active { background: #1565c0; color: white; border-color: #1565c0; }
-        .category-btn i { margin-right: 6px; }
-        
-        /* Stats Cards */
-        .stats-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
-        .stat-card { background: #f9f9f9; border-radius: 12px; padding: 16px; text-align: center; border: 2px solid #e0e0e0; }
-        .stat-value { font-size: 24px; font-weight: 700; color: #1565c0; margin-bottom: 4px; }
-        .stat-label { font-size: 11px; color: #757575; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        /* Results Table */
-        .results-section { margin-bottom: 24px; }
-        .section-title { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .section-title-left { display: flex; align-items: center; gap: 8px; }
-        .section-title i { color: #1565c0; }
-        
-        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
-        .results-table { width: 100%; border-collapse: collapse; }
-        .results-table thead { background: #f5f5f5; position: sticky; top: 0; z-index: 10; }
-        .results-table th { padding: 12px 8px; text-align: left; font-size: 11px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; }
-        .results-table tbody tr { border-bottom: 1px solid #f0f0f0; transition: background 0.2s; }
-        .results-table tbody tr:hover { background: #fafafa; }
-        .results-table tbody tr.selected { background: #e3f2fd; }
-        .results-table td { padding: 12px 8px; font-size: 13px; color: #212121; }
-        
-        /* Rank Column */
-        .rank-cell { font-size: 16px; font-weight: 700; color: #1565c0; min-width: 40px; text-align: center; }
-        .rank-cell.gold { color: #ffd700; }
-        .rank-cell.silver { color: #c0c0c0; }
-        .rank-cell.bronze { color: #cd7f32; }
-        
-        /* Checkbox Column */
-        .checkbox-cell { text-align: center; padding: 8px; }
-        .checkbox-cell input[type="checkbox"] { width: 20px; height: 20px; cursor: pointer; }
-        
-        /* Athlete Name */
-        .athlete-name { font-weight: 600; color: #212121; }
-        
-        /* Team Badge */
-        .team-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 10px; font-weight: 700; color: white; margin-left: 6px; }
-        
-        /* Score */
-        .score-cell { font-size: 15px; font-weight: 700; color: #ff6f00; text-align: center; }
-        
-        /* Golds & Average */
-        .golds-cell, .avg-cell { text-align: center; color: #666; }
-        
-        /* Action Buttons */
-        .action-buttons { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08); z-index: 100; }
-        @media (min-width: 600px) {
-            .action-buttons { left: 25vw; right: 25vw; }
+        .manage-header {
+            display: grid;
+            grid-template-columns: 40px repeat(5, 1fr) 40px 40px;
+            gap: 4px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .button-row { display: flex; gap: 12px; }
-        .btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        .btn-primary { background: #1565c0; color: white; }
-        .btn-primary:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
-        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-        .btn-secondary { background: #f5f5f5; color: #424242; }
-        .btn-secondary:hover { background: #e0e0e0; }
-        
-        /* Badge Styles */
-        .selection-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; background: #e8f5e9; color: #2e7d32; margin-left: 8px; }
-        
+
+        .header-back {
+            grid-column: 1 / 2;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-back i {
+            font-size: 24px;
+        }
+
+        .header-title {
+            grid-column: 2 / 7;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-language {
+            grid-column: 7 / 8;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .header-language:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile {
+            grid-column: 8 / 9;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+        }
+
+        .header-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile i {
+            font-size: 24px;
+        }
+
+        /* Language Dropdown */
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #424242;
+            font-size: 14px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: white;
+        }
+
+        .language-item:hover {
+            background: #f5f5f5;
+        }
+
+        .language-item.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .language-flag {
+            font-size: 20px;
+        }
+
+        .language-name {
+            flex: 1;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 8px;
+        }
+
+        .category-btn {
+            padding: 10px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .category-btn:hover {
+            border-color: #1565c0;
+            color: #1565c0;
+        }
+
+        .category-btn.active {
+            background: #1565c0;
+            color: white;
+            border-color: #1565c0;
+        }
+
+        .category-btn i {
+            margin-right: 6px;
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #757575;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Selection Controls */
+        .selection-controls {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            align-items: center;
+        }
+
+        .dropdown-container {
+            position: relative;
+        }
+
+        .select-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            background: white;
+            color: #424242;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .select-btn:hover {
+            background: #f5f5f5;
+            border-color: #bdbdbd;
+        }
+
+        .select-btn.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-color: #1565c0;
+        }
+
+        .select-btn i {
+            font-size: 18px;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            margin-top: 4px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 160px;
+            display: none;
+            z-index: 50;
+            overflow: hidden;
+            border: 1px solid #e0e0e0;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #424242;
+            font-size: 13px;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .dropdown-item i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .clear-btn {
+            margin-left: auto;
+            color: #c62828;
+            border: 1px solid #ffcdd2;
+            background: #ffebee;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .clear-btn.show {
+            display: flex;
+        }
+
+        .clear-btn:hover {
+            background: #ffcdd2;
+        }
+
+        /* Results Table */
+        .results-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .section-title-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1565c0;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .results-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .results-table thead {
+            background: #f5f5f5;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .results-table th {
+            padding: 12px 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #424242;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        .results-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .results-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .results-table tbody tr.selected {
+            background: #e3f2fd;
+        }
+
+        .results-table td {
+            padding: 12px 8px;
+            font-size: 13px;
+            color: #212121;
+        }
+
+        /* Cutoff Line */
+        .cutoff-line td {
+            border-bottom: 2px dashed #ff5252 !important;
+            position: relative;
+        }
+
+        .cutoff-line td::after {
+            content: 'CUTOFF';
+            position: absolute;
+            right: 8px;
+            bottom: -10px;
+            font-size: 9px;
+            color: #ff5252;
+            background: white;
+            padding: 0 4px;
+            font-weight: 700;
+        }
+
+        /* Rank Column */
+        .rank-cell {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1565c0;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .rank-cell.gold {
+            color: #ffd700;
+        }
+
+        .rank-cell.silver {
+            color: #c0c0c0;
+        }
+
+        .rank-cell.bronze {
+            color: #cd7f32;
+        }
+
+        /* Checkbox Column */
+        .checkbox-cell {
+            text-align: center;
+            padding: 8px;
+            width: 40px;
+        }
+
+        .checkbox-cell input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #1565c0;
+        }
+
+        /* Athlete Name */
+        .athlete-name {
+            font-weight: 600;
+            color: #212121;
+            display: block;
+        }
+
+        /* Nation */
+        .nation-cell {
+            font-weight: 600;
+            color: #424242;
+            font-size: 12px;
+        }
+
+        /* Team Badge */
+        .team-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+        }
+
+        /* Score */
+        .score-cell {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ff6f00;
+            text-align: center;
+        }
+
+        /* Golds & Average */
+        .golds-cell,
+        .avg-cell {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+        }
+
+        @media (min-width: 600px) {
+            .action-buttons {
+                left: 25vw;
+                right: 25vw;
+            }
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1565c0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d47a1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            background: #9e9e9e;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #424242;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
         /* Empty State */
-        .empty-state { text-align: center; padding: 48px 16px; color: #9e9e9e; }
-        .empty-state i { font-size: 64px; color: #e0e0e0; margin-bottom: 16px; }
-        .empty-state-title { font-size: 18px; font-weight: 700; color: #757575; margin-bottom: 8px; }
-        .empty-state-text { font-size: 14px; color: #9e9e9e; }
-        
+        .empty-state {
+            text-align: center;
+            padding: 48px 16px;
+            color: #9e9e9e;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #757575;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            color: #9e9e9e;
+        }
+
         /* Snackbar */
-        .snackbar { position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%); background: #323232; color: white; padding: 16px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); font-size: 14px; font-weight: 500; z-index: 10000; transition: bottom 0.3s ease-in-out; display: flex; align-items: center; gap: 12px; min-width: 300px; max-width: 90vw; }
-        .snackbar.show { bottom: 30px; }
-        .snackbar i { font-size: 20px; }
-        .snackbar.success { background: #2e7d32; }
-        .snackbar.error { background: #c62828; }
+        .snackbar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            transition: bottom 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        .snackbar.show {
+            bottom: 30px;
+        }
+
+        .snackbar i {
+            font-size: 20px;
+        }
+
+        .snackbar.success {
+            background: #2e7d32;
+        }
+
+        .snackbar.error {
+            background: #c62828;
+        }
     </style>
 </head>
+
 <body>
     <div class="manage-container">
         <!-- Header -->
@@ -154,7 +707,7 @@
         <div class="content">
             <div class="page-title">Qualification Results</div>
             <div class="page-subtitle">Select athletes for elimination round</div>
-            
+
             <!-- Category Filter -->
             <div class="category-filter">
                 <button class="category-btn active" onclick="filterCategory('recurve')" data-category="recurve">
@@ -170,11 +723,11 @@
                     Barebow Individual
                 </button>
             </div>
-            
+
             <!-- Stats Cards -->
             <div class="stats-cards">
                 <div class="stat-card">
-                    <div class="stat-value" id="totalAthletes">24</div>
+                    <div class="stat-value" id="totalAthletes">0</div>
                     <div class="stat-label">Total Athletes</div>
                 </div>
                 <div class="stat-card">
@@ -186,7 +739,7 @@
                     <div class="stat-label">Target</div>
                 </div>
             </div>
-            
+
             <!-- Results Table -->
             <div class="results-section">
                 <div class="section-title">
@@ -194,22 +747,49 @@
                         <i class="mdi mdi-format-list-numbered"></i>
                         <span>Qualification Rankings</span>
                     </div>
-                    <button class="btn-secondary" style="padding: 6px 12px; font-size: 12px; border-radius: 6px;" onclick="selectTopN(16)">
-                        <i class="mdi mdi-check-all"></i>
-                        Auto Select Top 16
+                </div>
+
+                <!-- Quick Select Controls -->
+                <div class="selection-controls">
+                    <div class="dropdown-container">
+                        <button class="select-btn" onclick="toggleSelectDropdown()">
+                            <i class="mdi mdi-checkbox-multiple-marked-circle-outline"></i>
+                            <span id="selectBtnText">Auto Select</span>
+                            <i class="mdi mdi-chevron-down" style="margin-left: 4px; font-size: 16px;"></i>
+                        </button>
+                        <div class="dropdown-menu" id="selectDropdown">
+                            <div class="dropdown-item" onclick="selectTopN(8)">
+                                <i class="mdi mdi-numeric-8-box-outline"></i> Top 8
+                            </div>
+                            <div class="dropdown-item" onclick="selectTopN(16)">
+                                <i class="mdi mdi-numeric-1-box-outline"></i> Top 16
+                            </div>
+                            <div class="dropdown-item" onclick="selectTopN(32)">
+                                <i class="mdi mdi-numeric-3-box-outline"></i> Top 32
+                            </div>
+                            <div class="dropdown-item" onclick="selectTopN(64)">
+                                <i class="mdi mdi-numeric-6-box-outline"></i> Top 64
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="clear-btn" id="clearBtn" onclick="clearSelection()">
+                        <i class="mdi mdi-close"></i> Clear
                     </button>
                 </div>
-                
+
                 <div class="table-container">
                     <table class="results-table">
                         <thead>
                             <tr>
-                                <th style="width: 50px;">Select</th>
-                                <th style="width: 60px;">Rank</th>
-                                <th>Athlete Name</th>
-                                <th style="width: 80px; text-align: center;">Score</th>
-                                <th style="width: 60px; text-align: center;">Golds</th>
-                                <th style="width: 60px; text-align: center;">Avg</th>
+                                <th style="width: 40px;">Select</th>
+                                <th style="width: 50px;">Rank</th>
+                                <th>Athlete</th>
+                                <th style="width: 60px;">Nation</th>
+                                <th>Team</th>
+                                <th style="width: 70px; text-align: center;">Score</th>
+                                <th style="width: 50px; text-align: center;">Golds</th>
+                                <th style="width: 50px; text-align: center;">Avg</th>
                             </tr>
                         </thead>
                         <tbody id="resultsTableBody">
@@ -219,13 +799,12 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Action Buttons -->
         <div class="action-buttons">
             <div class="button-row">
-                <button class="btn btn-secondary" onclick="clearSelection()">
-                    <i class="mdi mdi-close"></i>
-                    Clear Selection
+                <button class="btn btn-secondary" onclick="window.history.back()">
+                    Cancel
                 </button>
                 <button class="btn btn-primary" id="saveBtn" onclick="saveEliminationList()" disabled>
                     <i class="mdi mdi-content-save"></i>
@@ -236,72 +815,12 @@
     </div>
 
     <script>
-        // Mock data for qualification results
-        const mockResults = {
-            recurve: [
-                { id: 1, rank: 1, name: "Kim Woojin", team: "Blue Arrows", score: 695, golds: 52, avg: "9.65" },
-                { id: 2, rank: 2, name: "Brady Ellison", team: "Red Dragons", score: 690, golds: 48, avg: "9.58" },
-                { id: 3, rank: 3, name: "Lee Seungyun", team: "Blue Arrows", score: 685, golds: 45, avg: "9.51" },
-                { id: 4, rank: 4, name: "Alex Wong", team: "Green Hawks", score: 680, golds: 43, avg: "9.44" },
-                { id: 5, rank: 5, name: "Emily Zhang", team: "Silver Knights", score: 675, golds: 41, avg: "9.38" },
-                { id: 6, rank: 6, name: "Marcus Lee", team: "Yellow Tigers", score: 670, golds: 39, avg: "9.31" },
-                { id: 7, rank: 7, name: "Sofia Rodriguez", team: "Purple Panthers", score: 665, golds: 37, avg: "9.24" },
-                { id: 8, rank: 8, name: "James Park", team: "Orange Lions", score: 660, golds: 35, avg: "9.17" },
-                { id: 9, rank: 9, name: "Lisa Chen", team: "Blue Arrows", score: 655, golds: 33, avg: "9.10" },
-                { id: 10, rank: 10, name: "David Kim", team: "Red Dragons", score: 650, golds: 31, avg: "9.03" },
-                { id: 11, rank: 11, name: "Anna Smith", team: "Green Hawks", score: 645, golds: 29, avg: "8.96" },
-                { id: 12, rank: 12, name: "Michael Brown", team: "Silver Knights", score: 640, golds: 27, avg: "8.89" },
-                { id: 13, rank: 13, name: "Sarah Johnson", team: "Yellow Tigers", score: 635, golds: 25, avg: "8.82" },
-                { id: 14, rank: 14, name: "Tom Wilson", team: "Purple Panthers", score: 630, golds: 23, avg: "8.75" },
-                { id: 15, rank: 15, name: "Emma Davis", team: "Orange Lions", score: 625, golds: 21, avg: "8.68" },
-                { id: 16, rank: 16, name: "Ryan Martinez", team: "Blue Arrows", score: 620, golds: 19, avg: "8.61" },
-                { id: 17, rank: 17, name: "Olivia Garcia", team: "Red Dragons", score: 615, golds: 17, avg: "8.54" },
-                { id: 18, rank: 18, name: "Chris Anderson", team: "Green Hawks", score: 610, golds: 15, avg: "8.47" },
-                { id: 19, rank: 19, name: "Jessica Taylor", team: "Silver Knights", score: 605, golds: 13, avg: "8.40" },
-                { id: 20, rank: 20, name: "Daniel Thomas", team: "Yellow Tigers", score: 600, golds: 11, avg: "8.33" },
-                { id: 21, rank: 21, name: "Laura White", team: "Purple Panthers", score: 595, golds: 9, avg: "8.26" },
-                { id: 22, rank: 22, name: "Kevin Harris", team: "Orange Lions", score: 590, golds: 7, avg: "8.19" },
-                { id: 23, rank: 23, name: "Mia Clark", team: "Blue Arrows", score: 585, golds: 5, avg: "8.13" },
-                { id: 24, rank: 24, name: "John Lewis", team: "Red Dragons", score: 580, golds: 3, avg: "8.06" }
-            ],
-            compound: [
-                { id: 25, rank: 1, name: "Mike Schloesser", team: "Blue Arrows", score: 705, golds: 58, avg: "9.79" },
-                { id: 26, rank: 2, name: "Sara Lopez", team: "Red Dragons", score: 700, golds: 55, avg: "9.72" },
-                { id: 27, rank: 3, name: "Braden Gellenthien", team: "Green Hawks", score: 695, golds: 52, avg: "9.65" },
-                { id: 28, rank: 4, name: "Alexis Ruiz", team: "Silver Knights", score: 690, golds: 49, avg: "9.58" },
-                { id: 29, rank: 5, name: "Stephan Hansen", team: "Yellow Tigers", score: 685, golds: 46, avg: "9.51" },
-                { id: 30, rank: 6, name: "Tanja Jensen", team: "Purple Panthers", score: 680, golds: 43, avg: "9.44" },
-                { id: 31, rank: 7, name: "Chris Perkins", team: "Orange Lions", score: 675, golds: 40, avg: "9.38" },
-                { id: 32, rank: 8, name: "Linda Ochoa", team: "Blue Arrows", score: 670, golds: 37, avg: "9.31" },
-                { id: 33, rank: 9, name: "Reo Wilde", team: "Red Dragons", score: 665, golds: 34, avg: "9.24" },
-                { id: 34, rank: 10, name: "Paige Pearce", team: "Green Hawks", score: 660, golds: 31, avg: "9.17" },
-                { id: 35, rank: 11, name: "Jesse Broadwater", team: "Silver Knights", score: 655, golds: 28, avg: "9.10" },
-                { id: 36, rank: 12, name: "Erika Jones", team: "Yellow Tigers", score: 650, golds: 25, avg: "9.03" },
-                { id: 37, rank: 13, name: "Kris Schaff", team: "Purple Panthers", score: 645, golds: 22, avg: "8.96" },
-                { id: 38, rank: 14, name: "Jamie Van Natta", team: "Orange Lions", score: 640, golds: 19, avg: "8.89" },
-                { id: 39, rank: 15, name: "Rodger Willett", team: "Blue Arrows", score: 635, golds: 16, avg: "8.82" },
-                { id: 40, rank: 16, name: "Cassidy Rash", team: "Red Dragons", score: 630, golds: 13, avg: "8.75" }
-            ],
-            barebow: [
-                { id: 41, rank: 1, name: "Barebow Champion", team: "Blue Arrows", score: 650, golds: 38, avg: "9.03" },
-                { id: 42, rank: 2, name: "Traditional Pro", team: "Red Dragons", score: 645, golds: 35, avg: "8.96" },
-                { id: 43, rank: 3, name: "Classic Master", team: "Green Hawks", score: 640, golds: 32, avg: "8.89" },
-                { id: 44, rank: 4, name: "Natural Archer", team: "Silver Knights", score: 635, golds: 29, avg: "8.82" },
-                { id: 45, rank: 5, name: "Instinctive Shooter", team: "Yellow Tigers", score: 630, golds: 26, avg: "8.75" },
-                { id: 46, rank: 6, name: "Traditional Bow Expert", team: "Purple Panthers", score: 625, golds: 23, avg: "8.68" },
-                { id: 47, rank: 7, name: "Simple Bow Pro", team: "Orange Lions", score: 620, golds: 20, avg: "8.61" },
-                { id: 48, rank: 8, name: "Classic Shooter", team: "Blue Arrows", score: 615, golds: 17, avg: "8.54" },
-                { id: 49, rank: 9, name: "Pure Archer", team: "Red Dragons", score: 610, golds: 14, avg: "8.47" },
-                { id: 50, rank: 10, name: "Natural Style", team: "Green Hawks", score: 605, golds: 11, avg: "8.40" },
-                { id: 51, rank: 11, name: "Traditional Shot", team: "Silver Knights", score: 600, golds: 8, avg: "8.33" },
-                { id: 52, rank: 12, name: "Barebow Ace", team: "Yellow Tigers", score: 595, golds: 5, avg: "8.26" }
-            ]
-        };
-
         // State
         let currentCategory = 'recurve';
         let selectedAthletes = new Set();
         let currentResults = [];
+        let targetSelectionSize = 16; // Default target
+        let activeTopN = null; // Track which Top N is active
 
         // Language selector
         function initLanguageSelector() {
@@ -314,7 +833,7 @@
             const dropdown = document.getElementById('languageDropdown');
             const languages = getSupportedLanguages();
             const currentLang = getCurrentLanguage();
-            
+
             dropdown.innerHTML = languages.map(lang => `<button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')"><span class="language-flag">${lang.flag}</span><span class="language-name">${lang.nativeName}</span></button>`).join('');
         }
 
@@ -329,11 +848,17 @@
             toggleLanguageDropdown();
         }
 
-        document.addEventListener('click', function(event) {
+        document.addEventListener('click', function (event) {
             const languageSelector = document.getElementById('languageSelector');
             const dropdown = document.getElementById('languageDropdown');
             if (!languageSelector.contains(event.target)) {
                 dropdown.classList.remove('show');
+            }
+
+            const selectDropdown = document.getElementById('selectDropdown');
+            const selectBtn = document.querySelector('.select-btn');
+            if (!selectBtn.contains(event.target) && !selectDropdown.contains(event.target)) {
+                selectDropdown.classList.remove('show');
             }
         });
 
@@ -351,7 +876,9 @@
         function filterCategory(category) {
             currentCategory = category;
             selectedAthletes.clear();
-            
+            targetSelectionSize = 16; // Reset to default
+            activeTopN = null;
+
             // Update active button
             document.querySelectorAll('.category-btn').forEach(btn => {
                 btn.classList.remove('active');
@@ -359,14 +886,16 @@
                     btn.classList.add('active');
                 }
             });
-            
+
+            updateSelectBtnText();
             loadResults();
         }
 
         // Load results
         function loadResults() {
-            currentResults = mockResults[currentCategory] || [];
-            
+            // Use data from individual-eliminate.js
+            currentResults = individualEliminationData[currentCategory] || [];
+
             document.getElementById('totalAthletes').textContent = currentResults.length;
             updateStats();
             renderResults();
@@ -375,50 +904,117 @@
         // Render results table
         function renderResults() {
             const tbody = document.getElementById('resultsTableBody');
-            
+
             if (currentResults.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 48px;"><div class="empty-state"><i class="mdi mdi-trophy-outline"></i><div class="empty-state-title">No Results Yet</div><div class="empty-state-text">Qualification results will appear here</div></div></td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" style="text-align: center; padding: 48px;"><div class="empty-state"><i class="mdi mdi-trophy-outline"></i><div class="empty-state-title">No Results Yet</div><div class="empty-state-text">Qualification results will appear here</div></div></td></tr>`;
                 return;
             }
-            
-            tbody.innerHTML = currentResults.map(athlete => {
+
+            tbody.innerHTML = currentResults.map((athlete, index) => {
                 const rankClass = athlete.rank === 1 ? 'gold' : athlete.rank === 2 ? 'silver' : athlete.rank === 3 ? 'bronze' : '';
                 const isSelected = selectedAthletes.has(athlete.id);
                 const teamColor = getTeamColor(athlete.team);
-                
-                return `<tr class="${isSelected ? 'selected' : ''}" onclick="toggleSelection(${athlete.id}, event)"><td class="checkbox-cell"><input type="checkbox" ${isSelected ? 'checked' : ''} onclick="toggleSelection(${athlete.id}, event)"></td><td class="rank-cell ${rankClass}">${athlete.rank}</td><td><span class="athlete-name">${athlete.name}</span><span class="team-badge" style="background-color: ${teamColor};">${athlete.team}</span></td><td class="score-cell">${athlete.score}</td><td class="golds-cell">${athlete.golds}</td><td class="avg-cell">${athlete.avg}</td></tr>`;
+
+                // Check if this row is the cutoff line
+                const isCutoff = targetSelectionSize > 0 && (index + 1) === targetSelectionSize;
+                const cutoffClass = isCutoff ? 'cutoff-line' : '';
+
+                return `
+                    <tr class="${isSelected ? 'selected' : ''} ${cutoffClass}" onclick="toggleSelection(${athlete.id}, event)">
+                        <td class="checkbox-cell">
+                            <input type="checkbox" ${isSelected ? 'checked' : ''} onclick="toggleSelection(${athlete.id}, event)">
+                        </td>
+                        <td class="rank-cell ${rankClass}">${athlete.rank}</td>
+                        <td>
+                            <span class="athlete-name">${athlete.name}</span>
+                        </td>
+                        <td class="nation-cell">${athlete.nation || '-'}</td>
+                        <td>
+                            <span class="team-badge" style="background-color: ${teamColor};">${athlete.team}</span>
+                        </td>
+                        <td class="score-cell">${athlete.score}</td>
+                        <td class="golds-cell">${athlete.golds}</td>
+                        <td class="avg-cell">${athlete.avg}</td>
+                    </tr>
+                `;
             }).join('');
         }
 
         // Toggle selection
         function toggleSelection(athleteId, event) {
             if (event) event.stopPropagation();
-            
+
             if (selectedAthletes.has(athleteId)) {
                 selectedAthletes.delete(athleteId);
             } else {
                 selectedAthletes.add(athleteId);
             }
-            
+
+            // If manual selection changes, check if it still matches a Top N pattern
+            // For now, just keep the target size as reference
+
             updateStats();
             renderResults();
         }
 
-        // Select top N
+        // Select Dropdown
+        function toggleSelectDropdown() {
+            document.getElementById('selectDropdown').classList.toggle('show');
+        }
+
+        // Select Top N
         function selectTopN(n) {
-            selectedAthletes.clear();
-            currentResults.slice(0, n).forEach(athlete => {
-                selectedAthletes.add(athlete.id);
-            });
+            if (activeTopN === n) {
+                // Toggle off / Deselect
+                currentResults.slice(0, n).forEach(athlete => {
+                    selectedAthletes.delete(athlete.id);
+                });
+                activeTopN = null;
+                targetSelectionSize = 0; // Remove cutoff line
+                showSnackbar(`Deselected top ${n} athletes`, 'mdi-minus-circle-outline', 'success');
+            } else {
+                // Select new
+                targetSelectionSize = n;
+                activeTopN = n;
+
+                selectedAthletes.clear();
+                currentResults.slice(0, n).forEach(athlete => {
+                    selectedAthletes.add(athlete.id);
+                });
+                showSnackbar(`Selected top ${n} athletes`, 'mdi-check-circle', 'success');
+            }
+
+            updateSelectBtnText();
+            document.getElementById('selectDropdown').classList.remove('show');
+
             updateStats();
             renderResults();
-            showSnackbar(`Selected top ${n} athletes`, 'mdi-check-circle', 'success');
+        }
+
+        function updateSelectBtnText() {
+            const btnText = document.getElementById('selectBtnText');
+            if (activeTopN) {
+                btnText.textContent = `Top ${activeTopN}`;
+            } else {
+                btnText.textContent = 'Auto Select';
+            }
+
+            // Update dropdown active state
+            document.querySelectorAll('.dropdown-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.includes(`Top ${activeTopN}`)) {
+                    item.classList.add('active');
+                }
+            });
         }
 
         // Clear selection
         function clearSelection() {
             if (selectedAthletes.size === 0) return;
             selectedAthletes.clear();
+            activeTopN = null;
+            targetSelectionSize = 0; // Reset target size to remove cutoff line
+            updateSelectBtnText();
             updateStats();
             renderResults();
             showSnackbar('Selection cleared', 'mdi-information', 'success');
@@ -426,8 +1022,32 @@
 
         // Update stats
         function updateStats() {
-            document.getElementById('selectedCount').textContent = selectedAthletes.size;
-            document.getElementById('saveBtn').disabled = selectedAthletes.size === 0;
+            const count = selectedAthletes.size;
+            const targetDisplay = targetSelectionSize > 0 ? targetSelectionSize : '-';
+
+            document.getElementById('selectedCount').textContent = targetSelectionSize > 0 ? `${count} / ${targetSelectionSize}` : count;
+            document.getElementById('targetCount').textContent = targetDisplay;
+
+            // Toggle Clear button visibility
+            const clearBtn = document.getElementById('clearBtn');
+            if (count > 0) {
+                clearBtn.classList.add('show');
+            } else {
+                clearBtn.classList.remove('show');
+            }
+
+            // Enable save button if we have selections
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = count === 0;
+
+            // Update button text based on state
+            if (targetSelectionSize > 0 && count === targetSelectionSize) {
+                saveBtn.innerHTML = `<i class="mdi mdi-content-save"></i> Save & Continue`;
+            } else if (targetSelectionSize > 0) {
+                saveBtn.innerHTML = `<i class="mdi mdi-alert-circle-outline"></i> Save (${count}/${targetSelectionSize})`;
+            } else {
+                saveBtn.innerHTML = `<i class="mdi mdi-content-save"></i> Save (${count})`;
+            }
         }
 
         // Save elimination list
@@ -436,14 +1056,22 @@
                 showSnackbar('Please select at least one athlete', 'mdi-alert', 'error');
                 return;
             }
-            
+
             const selectedList = currentResults.filter(a => selectedAthletes.has(a.id));
+
+            // Warning if count doesn't match target
+            if (targetSelectionSize > 0 && selectedAthletes.size !== targetSelectionSize) {
+                if (!confirm(`You have selected ${selectedAthletes.size} athletes, but the target is ${targetSelectionSize}. Continue anyway?`)) {
+                    return;
+                }
+            }
+
             console.log('Selected athletes for elimination:', selectedList);
-            
+
             showSnackbar(`Successfully saved ${selectedAthletes.size} athletes for elimination round`, 'mdi-check-circle', 'success');
-            
+
             setTimeout(() => {
-                alert('This would navigate to elimination bracket setup.\n\nSelected athletes:\n' + selectedList.map(a => `#${a.rank} - ${a.name} (${a.score})).join('\n'));
+                alert('This would navigate to elimination bracket setup.\n\nSelected athletes:\n' + selectedList.map(a => `#${a.rank} - ${a.name} (${a.score})`).join('\n'));
             }, 500);
         }
 
@@ -451,11 +1079,11 @@
         function showSnackbar(message, icon = 'mdi-information', type = 'success') {
             const existingSnackbar = document.querySelector('.snackbar');
             if (existingSnackbar) existingSnackbar.remove();
-            
+
             const snackbar = document.createElement('div');
             snackbar.className = `snackbar ${type}`;
             snackbar.innerHTML = `<i class="mdi ${icon}"></i><span>${message}</span>`;
-            
+
             document.body.appendChild(snackbar);
             setTimeout(() => snackbar.classList.add('show'), 10);
             setTimeout(() => {
@@ -469,4 +1097,5 @@
         loadResults();
     </script>
 </body>
+
 </html>
