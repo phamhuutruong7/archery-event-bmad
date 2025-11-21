@@ -1579,6 +1579,12 @@
             window.location.href = `../scoring/competition-scoring.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
         }
 
+        // Open elimination bracket view
+        function openEliminationBracket(eventId, competitionId, category, bowType) {
+            // Navigate to elimination bracket page
+            window.location.href = `elimination-round.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
+        }
+
         function toggleCompetitionStatus(eventId, competitionId) {
             const key = `event_${eventId}_comp_${competitionId}_status`;
             const currentStatus = getCompetitionStatus(eventId, competitionId);
@@ -1869,12 +1875,12 @@
                 const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
                 const statusText = status === 'open' ? 'In Progress' : 'Closed';
 
-                const clickTitle = status === 'open' ? 'Click row to view/enter scores' : 'Click row to view scores (read-only)';
+                const clickTitle = 'Click to view elimination bracket';
                 const categoryEscaped = (comp.category || '').replace(/'/g, "\\'");
                 const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
 
                 return `
-                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, '${competitionId}', '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
+                <tr style="cursor: pointer;" onclick="openEliminationBracket(${eventId}, '${competitionId}', '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
                     <td>
                         <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
                     </td>
