@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Match Details - Elimination</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Responsive container */
+        .match-container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 599px) {
+            .match-container {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 600px) {
+            body {
+                background: #e0e0e0;
+            }
+
+            .match-container {
+                width: 50vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Header */
+        .match-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            gap: 4px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-back {
+            grid-column: 1 / 2;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-back i {
+            font-size: 24px;
+        }
+
+        .header-title {
+            grid-column: 2 / 3;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .header-profile {
+            grid-column: 3 / 4;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+        }
+
+        .header-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile i {
+            font-size: 24px;
+        }
+
+        /* Match Info */
+        .match-info {
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .match-round {
+            font-size: 13px;
+            font-weight: 600;
+            color: #757575;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        .match-category {
+            font-size: 16px;
+            font-weight: 700;
+            color: #212121;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+
+        /* Summary Section */
+        .summary-section {
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1565c0;
+        }
+
+        /* Score Table */
+        .score-table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .score-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 500px;
+        }
+
+        .score-table thead {
+            background: #1565c0;
+            color: white;
+        }
+
+        .score-table th {
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .score-table th:first-child {
+            text-align: left;
+            padding-left: 16px;
+            width: 30%;
+        }
+
+        .score-table th:last-child {
+            border-right: none;
+            background: #0d47a1;
+            font-weight: 700;
+        }
+
+        .score-table tbody tr {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .score-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .score-table td {
+            padding: 14px 8px;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 600;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .score-table td:first-child {
+            text-align: left;
+            padding-left: 16px;
+            font-weight: 700;
+            color: #212121;
+        }
+
+        .score-table td:last-child {
+            border-right: none;
+            font-size: 20px;
+            font-weight: 700;
+            background: #f5f5f5;
+        }
+
+        .score-table .winner-row {
+            background: #e8f5e9;
+        }
+
+        .score-table .winner-row td:first-child {
+            color: #2e7d32;
+        }
+
+        .score-table .winner-row td:last-child {
+            color: #2e7d32;
+            background: #c8e6c9;
+        }
+
+        /* Set Details */
+        .set-details {
+            margin-bottom: 24px;
+        }
+
+        .set-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: #1565c0;
+            color: white;
+            border-radius: 8px 8px 0 0;
+            margin-top: 16px;
+        }
+
+        .set-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .set-winner {
+            font-size: 13px;
+            padding: 4px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+        }
+
+        .set-table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .set-table thead {
+            background: #f5f5f5;
+        }
+
+        .set-table th {
+            padding: 10px 8px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .set-table th:first-child {
+            text-align: left;
+            padding-left: 16px;
+            width: 30%;
+        }
+
+        .set-table th:last-child {
+            border-right: none;
+            font-weight: 700;
+            color: #1565c0;
+        }
+
+        .set-table td {
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border-right: 1px solid #f0f0f0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .set-table td:first-child {
+            text-align: left;
+            padding-left: 16px;
+            font-weight: 700;
+        }
+
+        .set-table td:last-child {
+            border-right: none;
+            background: #f9f9f9;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .set-table .winner-row {
+            background: #e8f5e9;
+        }
+
+        .set-table .winner-row td:first-child {
+            color: #2e7d32;
+        }
+
+        .set-table .winner-row td:last-child {
+            color: #2e7d32;
+            background: #c8e6c9;
+        }
+
+        .set-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Shoot-off */
+        .shootoff-section {
+            background: #fff3e0;
+            border: 3px solid #ff9800;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .shootoff-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shootoff-title i {
+            font-size: 20px;
+        }
+
+        .shootoff-scores {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .shootoff-score {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .shootoff-winner-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 4px;
+        }
+
+        .shootoff-winner {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2e7d32;
+            padding: 8px 12px;
+            background: #e8f5e9;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        /* Arrow Score Badge */
+        .arrow-score {
+            display: inline-block;
+            min-width: 40px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 700;
+        }
+
+        .arrow-score.x-score {
+            background: #ffc107;
+            color: #e65100;
+        }
+
+        /* Winner Badge */
+        .winner-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            background: #2e7d32;
+            color: white;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .winner-badge i {
+            font-size: 16px;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 24px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="match-container">
+        <!-- Header -->
+        <div class="match-header">
+            <div class="header-back" onclick="goBack()">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">Match Details</div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Match Info -->
+        <div class="match-info">
+            <div class="match-round" id="matchRound">Quarter Finals</div>
+            <div class="match-category" id="matchCategory">Men's Individual - Recurve</div>
+        </div>
+
+        <!-- Content -->
+        <div class="content" id="matchContent">
+            <!-- Summary Section -->
+            <div class="summary-section">
+                <div class="section-title">
+                    <i class="mdi mdi-chart-bar"></i>
+                    Match Summary
+                </div>
+                <div class="score-table-container">
+                    <table class="score-table" id="summaryTable">
+                        <thead>
+                            <tr>
+                                <th>Athlete</th>
+                                <th>Set 1</th>
+                                <th>Set 2</th>
+                                <th>Set 3</th>
+                                <th>Set 4</th>
+                                <th>Set 5</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Set Details -->
+            <div class="set-details">
+                <div class="section-title">
+                    <i class="mdi mdi-target"></i>
+                    Set-by-Set Breakdown
+                </div>
+                <div id="setDetailsContainer">
+                </div>
+            </div>
+
+            <!-- Shoot-off (if applicable) -->
+            <div id="shootoffContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId');
+        const matchId = urlParams.get('matchId');
+        const round = urlParams.get('round');
+        const category = urlParams.get('category');
+        const bowType = urlParams.get('bowType');
+
+        // Mock match data
+        const matchData = {
+            'match1': {
+                round: 'Round of 32',
+                athlete1: 'An San',
+                athlete2: 'Kim Woojin',
+                sets: [
+                    { athlete1Arrows: [10, 'X', 9], athlete1Total: 29, athlete2Arrows: [9, 9, 10], athlete2Total: 28, winner: 1 },
+                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [10, 9, 8], athlete2Total: 27, winner: 1 },
+                    { athlete1Arrows: [9, 10, 9], athlete1Total: 28, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 2 },
+                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [9, 10, 9], athlete2Total: 28, winner: 1 },
+                    { athlete1Arrows: [9, 9, 10], athlete1Total: 28, athlete2Arrows: [10, 9, 9], athlete2Total: 28, winner: 0 }
+                ],
+                finalScore: { athlete1: 6, athlete2: 4 }
+            },
+            'match2': {
+                round: 'Quarter Finals',
+                athlete1: 'Brady Ellison',
+                athlete2: 'Marcus D\'Almeida',
+                sets: [
+                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
+                    { athlete1Arrows: [9, 10, 10], athlete1Total: 29, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 2 },
+                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [9, 9, 10], athlete2Total: 28, winner: 1 },
+                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 },
+                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 1 }
+                ],
+                finalScore: { athlete1: 7, athlete2: 3 }
+            },
+            'match3': {
+                round: 'Semi Finals',
+                athlete1: 'An San',
+                athlete2: 'Mauro Nespoli',
+                sets: [
+                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
+                    { athlete1Arrows: [9, 10, 10], athlete1Total: 29, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 2 },
+                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 0 },
+                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 },
+                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 }
+                ],
+                shootoff: {
+                    athlete1Score: { value: 10, closest: true },
+                    athlete2Score: { value: 10, closest: false }
+                },
+                finalScore: { athlete1: 6, athlete2: 5 }
+            },
+            'match4': {
+                round: 'Gold Final',
+                athlete1: 'An San',
+                athlete2: 'Sjef van den Berg',
+                sets: [
+                    { athlete1Arrows: ['X', 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
+                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 0 },
+                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 1 },
+                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 2 },
+                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 9, 10], athlete2Total: 29, winner: 1 }
+                ],
+                finalScore: { athlete1: 7, athlete2: 3 }
+            }
+        };
+
+        function goBack() {
+            if (eventId) {
+                window.location.href = `elimination-round.html?eventId=${eventId}`;
+            } else {
+                window.history.back();
+            }
+        }
+
+        function renderMatchDetails() {
+            const match = matchData[matchId] || matchData['match1'];
+            
+            // Update header info
+            document.getElementById('matchRound').textContent = match.round;
+            document.getElementById('matchCategory').textContent = `${category || "Men's Individual"} - ${bowType || 'Recurve'}`;
+
+            // Render summary table
+            renderSummaryTable(match);
+
+            // Render set details
+            renderSetDetails(match);
+
+            // Render shoot-off if exists
+            if (match.shootoff) {
+                renderShootoff(match);
+            }
+        }
+
+        function renderSummaryTable(match) {
+            const tbody = document.getElementById('summaryTableBody');
+            const athlete1IsWinner = match.finalScore.athlete1 > match.finalScore.athlete2;
+            
+            let athlete1Row = `<tr class="${athlete1IsWinner ? 'winner-row' : ''}">
+                <td>${match.athlete1}</td>`;
+            let athlete2Row = `<tr class="${!athlete1IsWinner ? 'winner-row' : ''}">
+                <td>${match.athlete2}</td>`;
+            
+            // Add set scores
+            match.sets.forEach(set => {
+                athlete1Row += `<td>${set.athlete1Total}</td>`;
+                athlete2Row += `<td>${set.athlete2Total}</td>`;
+            });
+            
+            // Add final scores
+            athlete1Row += `<td>${match.finalScore.athlete1}</td></tr>`;
+            athlete2Row += `<td>${match.finalScore.athlete2}</td></tr>`;
+            
+            tbody.innerHTML = athlete1Row + athlete2Row;
+        }
+
+        function renderSetDetails(match) {
+            const container = document.getElementById('setDetailsContainer');
+            
+            container.innerHTML = match.sets.map((set, index) => {
+                const setNumber = index + 1;
+                const athlete1IsWinner = set.winner === 1;
+                const athlete2IsWinner = set.winner === 2;
+                const isDraw = set.winner === 0;
+                
+                let winnerText = isDraw ? 'Draw' : (athlete1IsWinner ? match.athlete1 : match.athlete2);
+                
+                return `
+                    <div>
+                        <div class="set-header">
+                            <span class="set-title">Set ${setNumber}</span>
+                            <span class="set-winner">${winnerText} ${isDraw ? '(1-1)' : athlete1IsWinner ? '(2-0)' : '(0-2)'}</span>
+                        </div>
+                        <table class="set-table">
+                            <thead>
+                                <tr>
+                                    <th>Athlete</th>
+                                    <th>Arrow 1</th>
+                                    <th>Arrow 2</th>
+                                    <th>Arrow 3</th>
+                                    <th>Total</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="${athlete1IsWinner ? 'winner-row' : ''}">
+                                    <td>${match.athlete1}</td>
+                                    ${set.athlete1Arrows.map(arrow => `<td><span class="arrow-score ${arrow === 'X' ? 'x-score' : ''}">${arrow}</span></td>`).join('')}
+                                    <td>${set.athlete1Total}</td>
+                                    <td>${athlete1IsWinner ? 2 : (isDraw ? 1 : 0)}</td>
+                                </tr>
+                                <tr class="${athlete2IsWinner ? 'winner-row' : ''}">
+                                    <td>${match.athlete2}</td>
+                                    ${set.athlete2Arrows.map(arrow => `<td><span class="arrow-score ${arrow === 'X' ? 'x-score' : ''}">${arrow}</span></td>`).join('')}
+                                    <td>${set.athlete2Total}</td>
+                                    <td>${athlete2IsWinner ? 2 : (isDraw ? 1 : 0)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderShootoff(match) {
+            const container = document.getElementById('shootoffContainer');
+            const winner = match.shootoff.athlete1Score.closest ? match.athlete1 : match.athlete2;
+            
+            container.innerHTML = `
+                <div class="divider"></div>
+                <div class="shootoff-section">
+                    <div class="shootoff-title">
+                        <i class="mdi mdi-target-variant"></i>
+                        Shoot-off (5-5)
+                    </div>
+                    <div class="shootoff-scores">
+                        <div class="shootoff-score">
+                            <span>${match.athlete1}:</span>
+                            <span><strong>${match.shootoff.athlete1Score.value}${match.shootoff.athlete1Score.closest ? '*' : ''}</strong></span>
+                        </div>
+                        <div class="shootoff-score">
+                            <span>${match.athlete2}:</span>
+                            <span><strong>${match.shootoff.athlete2Score.value}${match.shootoff.athlete2Score.closest ? '*' : ''}</strong></span>
+                        </div>
+                    </div>
+                    <div class="shootoff-winner-label">Winner by closest-to-center:</div>
+                    <div class="shootoff-winner">
+                        <i class="mdi mdi-trophy"></i> ${winner}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize
+        renderMatchDetails();
+    </script>
+</body>
+
+</html>

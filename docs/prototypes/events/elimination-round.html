@@ -325,6 +325,14 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match:hover {
+            border-color: #1565c0;
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+            transform: translateX(-2px);
         }
 
         /* Connector lines */
@@ -699,6 +707,62 @@
             }
         }
 
+        // Open match details
+        function openMatchDetails(matchId, roundName) {
+            const params = new URLSearchParams({
+                eventId: eventId || 'default',
+                matchId: matchId,
+                round: roundName,
+                category: category || "Men's Individual",
+                bowType: bowType || 'Recurve'
+            });
+            window.location.href = `elimination-match.html?${params.toString()}`;
+        }
+
+        // Add click handlers to all matches
+        function initializeMatchClicks() {
+            const matches = document.querySelectorAll('.match');
+            const rounds = document.querySelectorAll('.bracket-round');
+            
+            matches.forEach((match, index) => {
+                // Determine which round this match belongs to
+                let roundName = 'Round of 32';
+                let matchId = 'match1';
+                
+                // Find the round title
+                const roundElement = match.closest('.bracket-round');
+                if (roundElement) {
+                    const titleElement = roundElement.querySelector('.round-title');
+                    if (titleElement) {
+                        roundName = titleElement.textContent;
+                    }
+                }
+                
+                // Assign match IDs based on prominent matches
+                const playerNames = match.textContent.toLowerCase();
+                if (playerNames.includes('an san') && playerNames.includes('kim woojin')) {
+                    matchId = 'match1';
+                } else if (playerNames.includes('brady ellison') && playerNames.includes('marcus')) {
+                    matchId = 'match2';
+                } else if (playerNames.includes('an san') && playerNames.includes('mauro nespoli')) {
+                    matchId = 'match3';
+                } else if (playerNames.includes('an san') && playerNames.includes('sjef')) {
+                    matchId = 'match4';
+                } else {
+                    // Default match ID based on index
+                    matchId = `match${(index % 4) + 1}`;
+                }
+                
+                match.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openMatchDetails(matchId, roundName);
+                });
+                
+                // Add title attribute for better UX
+                match.setAttribute('title', 'Click to view match details');
+            });
+        }
+
         // Mobile Navigation System
         let currentView = 0;
         const totalViews = 5; // 0: R32+R16, 1: R16+QF, 2: QF+SF, 3: SF+Finals, 4: Finals+Medals
@@ -815,6 +879,9 @@
 
         updateNavigation();
         window.addEventListener('resize', updateNavigation);
+        
+        // Initialize match click handlers
+        initializeMatchClicks();
     </script>
 </body>
 
