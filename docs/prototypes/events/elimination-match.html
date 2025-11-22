@@ -266,6 +266,7 @@
             width: 100%;
             border-collapse: collapse;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
         }
 
         .set-table thead {
@@ -273,18 +274,19 @@
         }
 
         .set-table th {
-            padding: 10px 8px;
+            padding: 10px 6px;
             text-align: center;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #666;
             border-right: 1px solid #e0e0e0;
+            white-space: nowrap;
         }
 
         .set-table th:first-child {
             text-align: left;
-            padding-left: 16px;
-            width: 30%;
+            padding-left: 12px;
+            width: 25%;
         }
 
         .set-table th:last-child {
@@ -294,9 +296,9 @@
         }
 
         .set-table td {
-            padding: 12px 8px;
+            padding: 10px 4px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
             border-right: 1px solid #f0f0f0;
             border-bottom: 1px solid #e0e0e0;
@@ -304,15 +306,40 @@
 
         .set-table td:first-child {
             text-align: left;
-            padding-left: 16px;
+            padding-left: 12px;
             font-weight: 700;
+            font-size: 12px;
         }
 
         .set-table td:last-child {
             border-right: none;
             background: #f9f9f9;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 700;
+        }
+
+        /* Team Names */
+        .team-name {
+            font-weight: 700;
+            font-size: 13px;
+            color: #212121;
+        }
+
+        .team-athletes {
+            font-size: 10px;
+            color: #757575;
+            margin-top: 2px;
+            line-height: 1.3;
+        }
+
+        .team-athlete {
+            display: block;
+        }
+
+        @media (min-width: 600px) {
+            .team-athletes {
+                font-size: 11px;
+            }
         }
 
         .set-table .winner-row {
@@ -393,12 +420,13 @@
         /* Arrow Score Badge */
         .arrow-score {
             display: inline-block;
-            min-width: 40px;
-            padding: 4px 8px;
+            min-width: 32px;
+            padding: 3px 6px;
             border-radius: 4px;
             background: #e3f2fd;
             color: #1565c0;
             font-weight: 700;
+            font-size: 12px;
         }
 
         .arrow-score.x-score {
@@ -508,27 +536,34 @@
         const matchData = {
             'match1': {
                 round: 'Round of 32',
-                athlete1: 'An San',
-                athlete2: 'Kim Woojin',
+                isTeam: true,
+                athlete1: 'Korea',
+                athlete1Team: ['Kim Woojin', 'Kim Je Deok', 'Oh Jin Hyek'],
+                athlete2: 'USA',
+                athlete2Team: ['Brady Ellison', 'Jack Williams', 'Casey Kaufhold'],
                 sets: [
-                    { athlete1Arrows: [10, 'X', 9], athlete1Total: 29, athlete2Arrows: [9, 9, 10], athlete2Total: 28, winner: 1 },
-                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [10, 9, 8], athlete2Total: 27, winner: 1 },
-                    { athlete1Arrows: [9, 10, 9], athlete1Total: 28, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 2 },
-                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [9, 10, 9], athlete2Total: 28, winner: 1 },
-                    { athlete1Arrows: [9, 9, 10], athlete1Total: 28, athlete2Arrows: [10, 9, 9], athlete2Total: 28, winner: 0 }
+                    { athlete1Arrows: [10, 'X', 9, 10, 9, 10], athlete1Total: 58, athlete2Arrows: [9, 9, 10, 10, 'X', 9], athlete2Total: 57, winner: 1 },
+                    { athlete1Arrows: [10, 10, 9, 'X', 10, 9], athlete1Total: 58, athlete2Arrows: [10, 9, 8, 9, 10, 9], athlete2Total: 55, winner: 1 },
+                    { athlete1Arrows: [9, 10, 9, 10, 9, 10], athlete1Total: 57, athlete2Arrows: [10, 10, 10, 'X', 10, 10], athlete2Total: 60, winner: 2 },
+                    { athlete1Arrows: [10, 'X', 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [9, 10, 9, 10, 9, 10], athlete2Total: 57, winner: 2 },
+                    { athlete1Arrows: [9, 9, 10, 10, 9, 10], athlete1Total: 57, athlete2Arrows: [10, 9, 9, 9, 10, 10], athlete2Total: 57, winner: 0 }
                 ],
-                finalScore: { athlete1: 6, athlete2: 4 }
+                shootoff: {
+                    athlete1Score: { value: 'X', closest: true },
+                    athlete2Score: { value: 10, closest: false }
+                },
+                finalScore: { athlete1: 6, athlete2: 5 }
             },
             'match2': {
                 round: 'Quarter Finals',
                 athlete1: 'Brady Ellison',
                 athlete2: 'Marcus D\'Almeida',
                 sets: [
-                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
-                    { athlete1Arrows: [9, 10, 10], athlete1Total: 29, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 2 },
-                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [9, 9, 10], athlete2Total: 28, winner: 1 },
-                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 },
-                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 1 }
+                    { athlete1Arrows: [10, 'X', 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [10, 10, 9, 10, 10, 10], athlete2Total: 59, winner: 1 },
+                    { athlete1Arrows: [9, 10, 10, 10, 9, 10], athlete1Total: 58, athlete2Arrows: [10, 'X', 10, 10, 'X', 10], athlete2Total: 60, winner: 2 },
+                    { athlete1Arrows: [10, 10, 9, 10, 10, 9], athlete1Total: 58, athlete2Arrows: [9, 9, 10, 9, 10, 10], athlete2Total: 57, winner: 1 },
+                    { athlete1Arrows: ['X', 10, 10, 'X', 10, 10], athlete1Total: 60, athlete2Arrows: [10, 10, 10, 10, 10, 10], athlete2Total: 60, winner: 0 },
+                    { athlete1Arrows: [10, 10, 10, 10, 10, 10], athlete1Total: 60, athlete2Arrows: [9, 10, 10, 10, 9, 10], athlete2Total: 58, winner: 1 }
                 ],
                 finalScore: { athlete1: 7, athlete2: 3 }
             },
@@ -537,11 +572,11 @@
                 athlete1: 'An San',
                 athlete2: 'Mauro Nespoli',
                 sets: [
-                    { athlete1Arrows: [10, 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
-                    { athlete1Arrows: [9, 10, 10], athlete1Total: 29, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 2 },
-                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 0 },
-                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 },
-                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 0 }
+                    { athlete1Arrows: [10, 'X', 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [10, 10, 9, 10, 10, 10], athlete2Total: 59, winner: 1 },
+                    { athlete1Arrows: [9, 10, 10, 10, 9, 10], athlete1Total: 58, athlete2Arrows: [10, 'X', 10, 10, 'X', 10], athlete2Total: 60, winner: 2 },
+                    { athlete1Arrows: [10, 10, 9, 10, 10, 9], athlete1Total: 58, athlete2Arrows: [9, 10, 10, 9, 10, 10], athlete2Total: 58, winner: 0 },
+                    { athlete1Arrows: ['X', 10, 10, 'X', 10, 10], athlete1Total: 60, athlete2Arrows: [10, 10, 10, 10, 10, 10], athlete2Total: 60, winner: 0 },
+                    { athlete1Arrows: [10, 10, 10, 10, 10, 10], athlete1Total: 60, athlete2Arrows: [10, 10, 10, 10, 10, 10], athlete2Total: 60, winner: 0 }
                 ],
                 shootoff: {
                     athlete1Score: { value: 10, closest: true },
@@ -554,13 +589,29 @@
                 athlete1: 'An San',
                 athlete2: 'Sjef van den Berg',
                 sets: [
-                    { athlete1Arrows: ['X', 'X', 10], athlete1Total: 30, athlete2Arrows: [10, 10, 9], athlete2Total: 29, winner: 1 },
-                    { athlete1Arrows: [10, 10, 10], athlete1Total: 30, athlete2Arrows: [10, 'X', 10], athlete2Total: 30, winner: 0 },
-                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [9, 10, 10], athlete2Total: 29, winner: 1 },
-                    { athlete1Arrows: [10, 10, 9], athlete1Total: 29, athlete2Arrows: [10, 10, 10], athlete2Total: 30, winner: 2 },
-                    { athlete1Arrows: ['X', 10, 10], athlete1Total: 30, athlete2Arrows: [10, 9, 10], athlete2Total: 29, winner: 1 }
+                    { athlete1Arrows: ['X', 'X', 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [10, 10, 9, 10, 10, 10], athlete2Total: 59, winner: 1 },
+                    { athlete1Arrows: [10, 10, 10, 10, 10, 10], athlete1Total: 60, athlete2Arrows: [10, 'X', 10, 10, 'X', 10], athlete2Total: 60, winner: 0 },
+                    { athlete1Arrows: ['X', 10, 10, 'X', 10, 10], athlete1Total: 60, athlete2Arrows: [9, 10, 10, 10, 9, 10], athlete2Total: 58, winner: 1 },
+                    { athlete1Arrows: [10, 10, 9, 10, 10, 9], athlete1Total: 58, athlete2Arrows: [10, 10, 10, 10, 10, 10], athlete2Total: 60, winner: 2 },
+                    { athlete1Arrows: ['X', 10, 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [10, 9, 10, 10, 9, 10], athlete2Total: 58, winner: 1 }
                 ],
                 finalScore: { athlete1: 7, athlete2: 3 }
+            },
+            'team1': {
+                round: 'Quarter Finals',
+                isTeam: true,
+                athlete1: 'Korea',
+                athlete1Team: ['Kim Woojin', 'Kim Je Deok', 'Oh Jin Hyek'],
+                athlete2: 'USA',
+                athlete2Team: ['Brady Ellison', 'Jack Williams', 'Casey Kaufhold'],
+                sets: [
+                    { athlete1Arrows: [10, 'X', 9, 10, 10, 'X'], athlete1Total: 59, athlete2Arrows: [10, 10, 10, 9, 10, 10], athlete2Total: 59, winner: 0 },
+                    { athlete1Arrows: ['X', 10, 10, 10, 'X', 10], athlete1Total: 60, athlete2Arrows: [10, 9, 10, 10, 9, 10], athlete2Total: 58, winner: 1 },
+                    { athlete1Arrows: [10, 10, 9, 'X', 10, 10], athlete1Total: 59, athlete2Arrows: ['X', 10, 10, 10, 'X', 10], athlete2Total: 60, winner: 2 },
+                    { athlete1Arrows: ['X', 'X', 10, 10, 10, 10], athlete1Total: 60, athlete2Arrows: [10, 10, 10, 9, 10, 10], athlete2Total: 59, winner: 1 },
+                    { athlete1Arrows: [10, 10, 10, 'X', 10, 10], athlete1Total: 60, athlete2Arrows: [10, 10, 9, 10, 10, 10], athlete2Total: 59, winner: 1 }
+                ],
+                finalScore: { athlete1: 6, athlete2: 3 }
             }
         };
 
@@ -595,10 +646,25 @@
             const tbody = document.getElementById('summaryTableBody');
             const athlete1IsWinner = match.finalScore.athlete1 > match.finalScore.athlete2;
             
+            // Build team display for first column
+            let athlete1Display = match.athlete1;
+            let athlete2Display = match.athlete2;
+            
+            if (match.isTeam && match.athlete1Team && match.athlete2Team) {
+                athlete1Display = `<div class="team-name">${match.athlete1}</div>
+                    <div class="team-athletes">
+                        ${match.athlete1Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+                athlete2Display = `<div class="team-name">${match.athlete2}</div>
+                    <div class="team-athletes">
+                        ${match.athlete2Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+            }
+            
             let athlete1Row = `<tr class="${athlete1IsWinner ? 'winner-row' : ''}">
-                <td>${match.athlete1}</td>`;
+                <td>${athlete1Display}</td>`;
             let athlete2Row = `<tr class="${!athlete1IsWinner ? 'winner-row' : ''}">
-                <td>${match.athlete2}</td>`;
+                <td>${athlete2Display}</td>`;
             
             // Add set scores
             match.sets.forEach(set => {
@@ -615,6 +681,21 @@
 
         function renderSetDetails(match) {
             const container = document.getElementById('setDetailsContainer');
+            
+            // Build team display
+            let athlete1Display = match.athlete1;
+            let athlete2Display = match.athlete2;
+            
+            if (match.isTeam && match.athlete1Team && match.athlete2Team) {
+                athlete1Display = `<div class="team-name">${match.athlete1}</div>
+                    <div class="team-athletes">
+                        ${match.athlete1Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+                athlete2Display = `<div class="team-name">${match.athlete2}</div>
+                    <div class="team-athletes">
+                        ${match.athlete2Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+            }
             
             container.innerHTML = match.sets.map((set, index) => {
                 const setNumber = index + 1;
@@ -633,23 +714,26 @@
                         <table class="set-table">
                             <thead>
                                 <tr>
-                                    <th>Athlete</th>
-                                    <th>Arrow 1</th>
-                                    <th>Arrow 2</th>
-                                    <th>Arrow 3</th>
+                                    <th>${match.isTeam ? 'Team' : 'Athlete'}</th>
+                                    <th>A1</th>
+                                    <th>A2</th>
+                                    <th>A3</th>
+                                    <th>A4</th>
+                                    <th>A5</th>
+                                    <th>A6</th>
                                     <th>Total</th>
                                     <th>Points</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="${athlete1IsWinner ? 'winner-row' : ''}">
-                                    <td>${match.athlete1}</td>
+                                    <td>${athlete1Display}</td>
                                     ${set.athlete1Arrows.map(arrow => `<td><span class="arrow-score ${arrow === 'X' ? 'x-score' : ''}">${arrow}</span></td>`).join('')}
                                     <td>${set.athlete1Total}</td>
                                     <td>${athlete1IsWinner ? 2 : (isDraw ? 1 : 0)}</td>
                                 </tr>
                                 <tr class="${athlete2IsWinner ? 'winner-row' : ''}">
-                                    <td>${match.athlete2}</td>
+                                    <td>${athlete2Display}</td>
                                     ${set.athlete2Arrows.map(arrow => `<td><span class="arrow-score ${arrow === 'X' ? 'x-score' : ''}">${arrow}</span></td>`).join('')}
                                     <td>${set.athlete2Total}</td>
                                     <td>${athlete2IsWinner ? 2 : (isDraw ? 1 : 0)}</td>
@@ -663,28 +747,57 @@
 
         function renderShootoff(match) {
             const container = document.getElementById('shootoffContainer');
-            const winner = match.shootoff.athlete1Score.closest ? match.athlete1 : match.athlete2;
+            const athlete1IsWinner = match.shootoff.athlete1Score.closest;
+            const athlete2IsWinner = match.shootoff.athlete2Score.closest;
+            const winner = athlete1IsWinner ? match.athlete1 : match.athlete2;
+            
+            // Build team display
+            let athlete1Display = match.athlete1;
+            let athlete2Display = match.athlete2;
+            
+            if (match.isTeam && match.athlete1Team && match.athlete2Team) {
+                athlete1Display = `<div class="team-name">${match.athlete1}</div>
+                    <div class="team-athletes">
+                        ${match.athlete1Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+                athlete2Display = `<div class="team-name">${match.athlete2}</div>
+                    <div class="team-athletes">
+                        ${match.athlete2Team.map(name => `<span class="team-athlete">${name}</span>`).join('')}
+                    </div>`;
+            }
             
             container.innerHTML = `
-                <div class="divider"></div>
-                <div class="shootoff-section">
-                    <div class="shootoff-title">
-                        <i class="mdi mdi-target-variant"></i>
-                        Shoot-off (5-5)
+                <div>
+                    <div class="set-header" style="margin-top: 24px; background: #ff9800;">
+                        <span class="set-title">Shoot-off (5-5)</span>
+                        <span class="set-winner">${winner} (Closest)</span>
                     </div>
-                    <div class="shootoff-scores">
-                        <div class="shootoff-score">
-                            <span>${match.athlete1}:</span>
-                            <span><strong>${match.shootoff.athlete1Score.value}${match.shootoff.athlete1Score.closest ? '*' : ''}</strong></span>
-                        </div>
-                        <div class="shootoff-score">
-                            <span>${match.athlete2}:</span>
-                            <span><strong>${match.shootoff.athlete2Score.value}${match.shootoff.athlete2Score.closest ? '*' : ''}</strong></span>
-                        </div>
-                    </div>
-                    <div class="shootoff-winner-label">Winner by closest-to-center:</div>
-                    <div class="shootoff-winner">
-                        <i class="mdi mdi-trophy"></i> ${winner}
+                    <table class="set-table">
+                        <thead>
+                            <tr>
+                                <th>${match.isTeam ? 'Team' : 'Athlete'}</th>
+                                <th>Arrow</th>
+                                <th>Score</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="${athlete1IsWinner ? 'winner-row' : ''}">
+                                <td>${athlete1Display}</td>
+                                <td><span class="arrow-score ${match.shootoff.athlete1Score.value === 'X' ? 'x-score' : ''}">${match.shootoff.athlete1Score.value}</span></td>
+                                <td>${match.shootoff.athlete1Score.value === 'X' ? 10 : match.shootoff.athlete1Score.value}</td>
+                                <td>${athlete1IsWinner ? 'Closest ★' : ''}</td>
+                            </tr>
+                            <tr class="${athlete2IsWinner ? 'winner-row' : ''}">
+                                <td>${athlete2Display}</td>
+                                <td><span class="arrow-score ${match.shootoff.athlete2Score.value === 'X' ? 'x-score' : ''}">${match.shootoff.athlete2Score.value}</span></td>
+                                <td>${match.shootoff.athlete2Score.value === 'X' ? 10 : match.shootoff.athlete2Score.value}</td>
+                                <td>${athlete2IsWinner ? 'Closest ★' : ''}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="shootoff-note" style="margin-top: 12px; padding: 12px; background: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px; font-size: 13px; color: #e65100;">
+                        <strong>Winner determined by closest-to-center:</strong> ${winner}
                     </div>
                 </div>
             `;

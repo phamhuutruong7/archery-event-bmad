@@ -202,41 +202,68 @@
             margin-bottom: 20px;
         }
 
-        /* Category Filter */
-        .category-filter {
-            display: flex;
-            gap: 8px;
+        /* Filter Selects */
+        .filter-selects {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
             margin-bottom: 20px;
-            overflow-x: auto;
-            padding-bottom: 8px;
         }
 
-        .category-btn {
-            padding: 10px 16px;
-            border: 2px solid #e0e0e0;
-            border-radius: 20px;
-            background: white;
-            font-size: 13px;
+        @media (max-width: 599px) {
+            .filter-selects {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .filter-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 12px;
             font-weight: 600;
             color: #666;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .category-btn:hover {
-            border-color: #1565c0;
+        .filter-label i {
+            font-size: 16px;
             color: #1565c0;
         }
 
-        .category-btn.active {
-            background: #1565c0;
-            color: white;
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .filter-select:hover {
             border-color: #1565c0;
         }
 
-        .category-btn i {
-            margin-right: 6px;
+        .filter-select:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
         }
 
         /* Stats Cards */
@@ -708,20 +735,29 @@
             <div class="page-title">Qualification Results</div>
             <div class="page-subtitle">Select athletes for elimination round</div>
 
-            <!-- Category Filter -->
-            <div class="category-filter">
-                <button class="category-btn active" onclick="filterCategory('recurve')" data-category="recurve">
-                    <i class="mdi mdi-bow-arrow"></i>
-                    Recurve Individual
-                </button>
-                <button class="category-btn" onclick="filterCategory('compound')" data-category="compound">
-                    <i class="mdi mdi-bow-arrow"></i>
-                    Compound Individual
-                </button>
-                <button class="category-btn" onclick="filterCategory('barebow')" data-category="barebow">
-                    <i class="mdi mdi-bow-arrow"></i>
-                    Barebow Individual
-                </button>
+            <!-- Filter Selects -->
+            <div class="filter-selects">
+                <div class="filter-select-group">
+                    <label for="bowCategorySelect" class="filter-label">
+                        <i class="mdi mdi-bow-arrow"></i>
+                        Bow Category
+                    </label>
+                    <select id="bowCategorySelect" class="filter-select" onchange="filterByBowCategory()">
+                        <option value="recurve" selected>Recurve Individual</option>
+                        <option value="compound">Compound Individual</option>
+                        <option value="barebow">Barebow Individual</option>
+                    </select>
+                </div>
+                <div class="filter-select-group">
+                    <label for="genderSelect" class="filter-label">
+                        <i class="mdi mdi-human-male-female"></i>
+                        Gender
+                    </label>
+                    <select id="genderSelect" class="filter-select" onchange="filterByGender()">
+                        <option value="male" selected>Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
             </div>
 
             <!-- Stats Cards -->
@@ -816,7 +852,8 @@
 
     <script>
         // State
-        let currentCategory = 'recurve';
+        let currentBowCategory = 'recurve';
+        let currentGender = 'male';
         let selectedAthletes = new Set();
         let currentResults = [];
         let targetSelectionSize = 16; // Default target
@@ -872,29 +909,37 @@
             return `hsl(${hue}, 70%, 50%)`
         }
 
-        // Filter by category
-        function filterCategory(category) {
-            currentCategory = category;
+        // Filter by bow category
+        function filterByBowCategory() {
+            const select = document.getElementById('bowCategorySelect');
+            currentBowCategory = select.value;
             selectedAthletes.clear();
             targetSelectionSize = 16; // Reset to default
             activeTopN = null;
 
-            // Update active button
-            document.querySelectorAll('.category-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.category === category) {
-                    btn.classList.add('active');
-                }
-            });
+            updateSelectBtnText();
+            loadResults();
+            showSnackbar(`Switched to ${select.options[select.selectedIndex].text}`, 'mdi-bow-arrow', 'success');
+        }
+
+        // Filter by gender
+        function filterByGender() {
+            const select = document.getElementById('genderSelect');
+            currentGender = select.value;
+            selectedAthletes.clear();
+            targetSelectionSize = 16; // Reset to default
+            activeTopN = null;
 
             updateSelectBtnText();
             loadResults();
+            showSnackbar(`Switched to ${select.options[select.selectedIndex].text}`, 'mdi-human-male-female', 'success');
         }
 
         // Load results
         function loadResults() {
             // Use data from individual-eliminate.js
-            currentResults = individualEliminationData[currentCategory] || [];
+            const categoryKey = `${currentBowCategory}_${currentGender}`;
+            currentResults = individualEliminationData[categoryKey] || individualEliminationData[currentBowCategory] || [];
 
             document.getElementById('totalAthletes').textContent = currentResults.length;
             updateStats();
