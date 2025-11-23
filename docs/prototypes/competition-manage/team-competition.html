@@ -358,6 +358,12 @@
             overflow-x: auto;
             max-height: 500px;
             overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .table-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .athletes-table {
@@ -447,6 +453,12 @@
             padding: 16px;
             max-height: 500px;
             overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .teams-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
         }
 
         .team-card {
@@ -577,6 +589,78 @@
             font-size: 12px;
             text-align: center;
             font-style: italic;
+        }
+
+        .empty-slot.reserve-slot {
+            border-color: #90caf9;
+            background: #f5f9ff;
+            color: #1565c0;
+            opacity: 0.8;
+        }
+
+        .team-member.reserve-member {
+            border-left: 3px solid #1565c0;
+            background: #f5f9ff;
+        }
+
+        .team-member.reserve-member .member-name {
+            color: #1565c0;
+            font-weight: 700;
+        }
+
+        /* Reserve Button */
+        .reserve-button-container {
+            padding: 8px 0;
+        }
+
+        .btn-reserve {
+            width: 100%;
+            padding: 10px 16px;
+            background: white;
+            border: 2px dashed #90caf9;
+            border-radius: 8px;
+            color: #1565c0;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-reserve:hover {
+            background: #f5f9ff;
+            border-color: #1565c0;
+            border-style: solid;
+        }
+
+        .btn-reserve.selecting {
+            background: #e3f2fd;
+            border-color: #1565c0;
+            border-style: solid;
+            animation: pulse 1.5s infinite;
+        }
+
+        .btn-reserve i {
+            font-size: 16px;
+        }
+
+        /* Team card when selecting reserve */
+        .team-card.selecting-reserve {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        /* Athlete row when selecting reserve */
+        .athletes-table tbody tr.selecting-reserve {
+            background: #e3f2fd;
+            cursor: pointer;
+        }
+
+        .athletes-table tbody tr.selecting-reserve:hover {
+            background: #bbdefb;
         }
 
         /* Empty State */
@@ -850,7 +934,9 @@
         let currentGender = 'male';
         let availableAthletes = [];
         let teams = [];
-        const TEAM_SIZE = 3;
+        let selectingReserveForTeam = null; // Track which team is selecting a reserve
+        const MIN_TEAM_SIZE = 3;
+        const MAX_TEAM_SIZE = 4;
 
         // Language selector
         function initLanguageSelector() {
@@ -963,10 +1049,11 @@
                 return;
             }
 
+            const isSelectingReserve = selectingReserveForTeam !== null;
             tbody.innerHTML = availableAthletes.map(athlete => {
                 const teamColor = getTeamColor(athlete.team);
                 return `
-                    <tr onclick="selectAthlete(${athlete.id})">
+                    <tr onclick="selectAthlete(${athlete.id})" class="${isSelectingReserve ? 'selecting-reserve' : ''}">
                         <td class="rank-cell">${athlete.rank}</td>
                         <td><span class="athlete-name">${athlete.name}</span></td>
                         <td class="nation-cell">${athlete.nation || '-'}</td>
@@ -984,19 +1071,32 @@
             const athlete = availableAthletes.find(a => a.id === athleteId);
             if (!athlete) return;
 
-            // Find the current incomplete team or create a new one
-            let currentTeam = teams.find(t => t.members.length < TEAM_SIZE);
-            
-            if (!currentTeam) {
-                currentTeam = {
-                    id: teams.length + 1,
-                    members: []
-                };
-                teams.push(currentTeam);
-            }
+            let targetTeam;
 
-            // Add athlete to team
-            currentTeam.members.push(athlete);
+            // Check if selecting reserve for specific team
+            if (selectingReserveForTeam !== null) {
+                targetTeam = teams.find(t => t.id === selectingReserveForTeam);
+                if (targetTeam && targetTeam.members.length === MIN_TEAM_SIZE) {
+                    targetTeam.members.push(athlete);
+                    selectingReserveForTeam = null; // Reset selection mode
+                    showSnackbar(`${athlete.name} added as reserve to Team ${targetTeam.id}`, 'mdi-account-plus', 'success');
+                }
+            } else {
+                // Normal selection: find incomplete team or create new one
+                targetTeam = teams.find(t => t.members.length < MIN_TEAM_SIZE);
+                
+                if (!targetTeam) {
+                    // Create new team
+                    targetTeam = {
+                        id: teams.length + 1,
+                        members: []
+                    };
+                    teams.push(targetTeam);
+                }
+
+                targetTeam.members.push(athlete);
+                showSnackbar(`${athlete.name} added to Team ${targetTeam.id}`, 'mdi-account-plus', 'success');
+            }
 
             // Remove from available
             availableAthletes = availableAthletes.filter(a => a.id !== athleteId);
@@ -1004,8 +1104,21 @@
             renderAthletes();
             renderTeams();
             updateStats();
+        }
 
-            showSnackbar(`${athlete.name} added to Team ${currentTeam.id}`, 'mdi-account-plus', 'success');
+        // Start selecting reserve for a team
+        function startSelectingReserve(teamId) {
+            selectingReserveForTeam = teamId;
+            renderAthletes();
+            renderTeams();
+            showSnackbar('Select an athlete from the left table to add as reserve', 'mdi-cursor-pointer', 'success');
+        }
+
+        // Cancel reserve selection
+        function cancelReserveSelection() {
+            selectingReserveForTeam = null;
+            renderAthletes();
+            renderTeams();
         }
 
         // Remove athlete from team
@@ -1058,16 +1171,19 @@
             }
 
             container.innerHTML = teams.map(team => {
-                const isComplete = team.members.length === TEAM_SIZE;
+                const isComplete = team.members.length >= MIN_TEAM_SIZE;
+                const hasReserve = team.members.length === MAX_TEAM_SIZE;
+                const isSelectingForThisTeam = selectingReserveForTeam === team.id;
                 const membersHtml = [];
                 
                 // Add existing members
-                team.members.forEach(member => {
+                team.members.forEach((member, index) => {
+                    const isReserve = index === 3;
                     membersHtml.push(`
-                        <div class="team-member">
+                        <div class="team-member ${isReserve ? 'reserve-member' : ''}">
                             <div class="member-info">
                                 <span class="member-rank">#${member.rank}</span>
-                                <span class="member-name">${member.name}</span>
+                                <span class="member-name">${member.name}${isReserve ? ' (Reserve)' : ''}</span>
                             </div>
                             <div style="display: flex; align-items: center; gap: 8px;">
                                 <span class="member-score">${member.score}</span>
@@ -1079,22 +1195,45 @@
                     `);
                 });
 
-                // Add empty slots
-                for (let i = team.members.length; i < TEAM_SIZE; i++) {
+                // Add empty slots for required members (first 3)
+                for (let i = team.members.length; i < MIN_TEAM_SIZE; i++) {
                     membersHtml.push(`
                         <div class="empty-slot">Empty slot ${i + 1}</div>
                     `);
                 }
 
+                // Add reserve button or selecting indicator if team has exactly 3 members
+                if (team.members.length === MIN_TEAM_SIZE) {
+                    if (isSelectingForThisTeam) {
+                        membersHtml.push(`
+                            <div class="reserve-button-container">
+                                <button class="btn-reserve selecting" onclick="cancelReserveSelection()">
+                                    <i class="mdi mdi-arrow-left"></i>
+                                    Cancel - Select athlete from left
+                                </button>
+                            </div>
+                        `);
+                    } else {
+                        membersHtml.push(`
+                            <div class="reserve-button-container">
+                                <button class="btn-reserve" onclick="startSelectingReserve(${team.id})">
+                                    <i class="mdi mdi-account-plus"></i>
+                                    Add Reserve (Optional)
+                                </button>
+                            </div>
+                        `);
+                    }
+                }
+
                 return `
-                    <div class="team-card ${isComplete ? 'complete' : ''}">
+                    <div class="team-card ${isComplete ? 'complete' : ''} ${isSelectingForThisTeam ? 'selecting-reserve' : ''}">
                         <div class="team-header">
                             <div class="team-name">
                                 <i class="mdi mdi-account-group"></i>
                                 Team ${team.id}
                             </div>
                             <div class="team-status ${isComplete ? 'complete' : ''}">
-                                ${isComplete ? 'Complete' : `${team.members.length}/${TEAM_SIZE}`}
+                                ${isComplete ? (hasReserve ? 'Complete + Reserve' : 'Complete') : `${team.members.length}/${MIN_TEAM_SIZE}`}
                             </div>
                         </div>
                         <div class="team-members">
@@ -1110,7 +1249,7 @@
             const totalAvailable = availableAthletes.length;
             const totalSelected = teams.reduce((sum, team) => sum + team.members.length, 0);
             const totalTeams = teams.length;
-            const completeTeamsCount = teams.filter(t => t.members.length === TEAM_SIZE).length;
+            const completeTeamsCount = teams.filter(t => t.members.length >= MIN_TEAM_SIZE).length;
 
             document.getElementById('totalAthletes').textContent = totalAvailable;
             document.getElementById('selectedCount').textContent = totalSelected;
@@ -1133,22 +1272,22 @@
 
         // Save teams
         function saveTeams() {
-            const completeTeamsCount = teams.filter(t => t.members.length === TEAM_SIZE).length;
+            const completeTeamsCount = teams.filter(t => t.members.length >= MIN_TEAM_SIZE).length;
             
             if (completeTeamsCount === 0) {
-                showSnackbar('Please complete at least one team', 'mdi-alert', 'error');
+                showSnackbar('Please complete at least one team (minimum 3 members)', 'mdi-alert', 'error');
                 return;
             }
 
-            const incompleteCount = teams.filter(t => t.members.length < TEAM_SIZE).length;
+            const incompleteCount = teams.filter(t => t.members.length < MIN_TEAM_SIZE).length;
             
             if (incompleteCount > 0) {
-                if (!confirm(`You have ${incompleteCount} incomplete team(s). Only complete teams will be saved. Continue?`)) {
+                if (!confirm(`You have ${incompleteCount} incomplete team(s). Only complete teams (3+ members) will be saved. Continue?`)) {
                     return;
                 }
             }
 
-            const completeTeams = teams.filter(t => t.members.length === TEAM_SIZE);
+            const completeTeams = teams.filter(t => t.members.length >= MIN_TEAM_SIZE);
 
             console.log('Complete teams to save:', completeTeams);
 
