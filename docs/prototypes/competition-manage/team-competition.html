@@ -387,6 +387,38 @@
             text-transform: uppercase;
             border-bottom: 2px solid #e0e0e0;
             white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .athletes-table th:hover {
+            background: #f0f0f0;
+        }
+
+        .athletes-table th.sortable::after {
+            content: '';
+            margin-left: 6px;
+            opacity: 0.3;
+            font-family: 'Material Design Icons';
+            font-size: 14px;
+        }
+
+        .athletes-table th.sortable:not(.sorted)::after {
+            content: '\F0360'; /* mdi-unfold-more-horizontal */
+        }
+
+        .athletes-table th.sorted.asc::after {
+            content: '\F0143'; /* mdi-arrow-up */
+            opacity: 1;
+            color: #1565c0;
+        }
+
+        .athletes-table th.sorted.desc::after {
+            content: '\F0140'; /* mdi-arrow-down */
+            opacity: 1;
+            color: #1565c0;
         }
 
         .athletes-table tbody tr {
@@ -880,11 +912,11 @@
                         <table class="athletes-table">
                             <thead>
                                 <tr>
-                                    <th style="width: 50px;">Rank</th>
+                                    <th class="sortable" style="width: 50px;" onclick="sortAthletes('rank')">Rank</th>
                                     <th>Name</th>
-                                    <th style="width: 60px;">Nation</th>
-                                    <th>Team</th>
-                                    <th style="width: 70px; text-align: center;">Score</th>
+                                    <th class="sortable" style="width: 60px;" onclick="sortAthletes('nation')">Nation</th>
+                                    <th class="sortable" onclick="sortAthletes('team')">Team</th>
+                                    <th class="sortable" style="width: 70px; text-align: center;" onclick="sortAthletes('score')">Score</th>
                                 </tr>
                             </thead>
                             <tbody id="athletesTableBody">
@@ -935,6 +967,8 @@
         let availableAthletes = [];
         let teams = [];
         let selectingReserveForTeam = null; // Track which team is selecting a reserve
+        let sortColumn = 'rank'; // Current sort column
+        let sortDirection = 'asc'; // Current sort direction
         const MIN_TEAM_SIZE = 3;
         const MAX_TEAM_SIZE = 4;
 
@@ -1027,12 +1061,64 @@
             updateStats();
         }
 
+        // Sort athletes by column
+        function sortAthletes(column) {
+            // Toggle direction if clicking same column, otherwise default to ascending
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            // Sort the athletes array
+            availableAthletes.sort((a, b) => {
+                let aVal, bVal;
+
+                switch(column) {
+                    case 'rank':
+                        aVal = a.rank;
+                        bVal = b.rank;
+                        break;
+                    case 'nation':
+                        aVal = (a.nation || '').toLowerCase();
+                        bVal = (b.nation || '').toLowerCase();
+                        break;
+                    case 'team':
+                        aVal = a.team.toLowerCase();
+                        bVal = b.team.toLowerCase();
+                        break;
+                    case 'score':
+                        aVal = a.score;
+                        bVal = b.score;
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderAthletes();
+        }
+
         // Render available athletes table
         function renderAthletes() {
             const tbody = document.getElementById('athletesTableBody');
             const availableCount = document.getElementById('availableCount');
 
             availableCount.textContent = `${availableAthletes.length} athletes`;
+
+            // Update sort indicators in headers
+            document.querySelectorAll('.athletes-table th.sortable').forEach(th => {
+                th.classList.remove('sorted', 'asc', 'desc');
+            });
+            const sortedHeader = document.querySelector(`.athletes-table th[onclick="sortAthletes('${sortColumn}')"]`);
+            if (sortedHeader) {
+                sortedHeader.classList.add('sorted', sortDirection);
+            }
 
             if (availableAthletes.length === 0) {
                 tbody.innerHTML = `
