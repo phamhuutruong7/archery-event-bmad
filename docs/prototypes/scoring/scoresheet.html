@@ -20,14 +20,36 @@
             position: relative; 
         }
         
-        /* Desktop/Tablet Landscape - 50% width centered */
-        @media (min-width: 600px) {
-            body { background: #e0e0e0; }
-            .device-frame {
-                width: 50vw;
-                box-shadow: 0 0 32px rgba(0,0,0,0.3);
-            }
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .device-frame { width: 100vw; }
+            .scoresheet-header h2 { font-size: 16px; }
         }
+       
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .device-frame { width: 100vw; box-shadow: 0 0 32px rgba(0,0,0,0.3); }
+        }
+       
+        /* Tablet Portrait (768px - 959px) */
+        @media (min-width: 768px) and (max-width: 959px) {
+            body { background: #e0e0e0; }
+            .device-frame { width: 100vw; box-shadow: 0 0 32px rgba(0,0,0,0.3); }
+        }
+       
+        /* Monitor/Desktop - Full Width (960px - 1279px) */
+        @media (min-width: 960px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .device-frame { width: 100vw; box-shadow: 0 0 32px rgba(0,0,0,0.3); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+            .device-frame { width: 35vw; box-shadow: 0 0 32px rgba(0,0,0,0.3); }
+        }
+        
         .scoresheet-header { background: linear-gradient(135deg, #1565c0 0%, #1976d2 100%); color: white; padding: 16px 12px; display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; align-items: center; }
         .back-btn { background: transparent; border: none; color: white; font-size: 24px; cursor: pointer; padding: 8px; display: flex; align-items: center; justify-content: flex-start; border-radius: 8px; transition: background 0.2s; grid-column: 1 / 2; }
         .back-btn:hover { background: rgba(255, 255, 255, 0.15); }

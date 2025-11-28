@@ -32,22 +32,92 @@
             margin: 0 auto;
         }
 
+        /* Mobile Portrait (320px - 599px) */
         @media (max-width: 599px) {
             .event-container {
                 width: 100%;
             }
+           
+            .tab-item {
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+           
+            .tab-item i {
+                font-size: 18px;
+            }
+           
+            .event-title {
+                font-size: 20px;
+            }
+           
+            .competitions-table th,
+            .competitions-table td {
+                font-size: 12px;
+                padding: 8px;
+            }
         }
-
-        @media (min-width: 600px) {
+ 
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
             body {
                 background: #e0e0e0;
             }
-
+ 
+            .event-container {
+                width: 100%;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 100%;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Monitor/Desktop - Full Width (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 100vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 35vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Desktop/Monitor (1280px+) */
+        @media (min-width: 1280px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
             .event-container {
                 width: 50vw;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             }
         }
+ 
 
         /* Header - 8-column grid */
         .event-header {

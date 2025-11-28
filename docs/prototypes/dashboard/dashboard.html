@@ -11,16 +11,46 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
         
-        /* Responsive container - similar to scoresheet */
+        /* Responsive container */
         .dashboard-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
-        
+       
+        /* Mobile Portrait (320px - 599px) */
         @media (max-width: 599px) {
             .dashboard-container { width: 100%; }
+           
+            .header-title { font-size: 16px; }
+            .header-icon { font-size: 24px; }
+           
+            .event-card { padding: 12px; }
+            .event-title { font-size: 14px; }
+            .event-info { flex-direction: column; gap: 8px; }
+           
+            .search-container { flex-direction: column; }
+            .status-filter { width: 100%; }
         }
-        
-        @media (min-width: 600px) {
+       
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
             body { background: #e0e0e0; }
-            .dashboard-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+            .dashboard-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .dashboard-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Monitor/Desktop - Full Width (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .dashboard-container { width: 100vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+            .dashboard-container { width: 35vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
         
         /* Header - 8-column grid like scoresheet */
