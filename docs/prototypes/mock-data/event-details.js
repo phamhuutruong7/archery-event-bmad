@@ -22,7 +22,11 @@ const eventDetails = [
             { id: 3, bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 70m' },
             { id: 4, bowType: 'Recurve', category: "Women's Team", round: 'WA (International)', subround: 'WA 70m' },
             { id: 5, bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m' },
-            { id: 6, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m' }
+            { id: 6, bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 7, bowType: 'Compound', category: "Men's Team", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 8, bowType: 'Compound', category: "Women's Team", round: 'WA (International)', subround: 'WA 50m' },
+            { id: 9, bowType: 'Barebow', category: "Men's Individual", round: 'Traditional', subround: '50m' },
+            { id: 10, bowType: 'Barebow', category: "Women's Individual", round: 'Traditional', subround: '50m' }
         ],
         organizer: {
             name: "Japan Archery Federation",

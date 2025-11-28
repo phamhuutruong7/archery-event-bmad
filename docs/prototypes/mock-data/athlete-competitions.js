@@ -20,11 +20,59 @@ const athleteCompetitionsData = {
         4: [ // Haruka Tanaka
             { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round' }
         ],
-        5: [ // Hiroshi Yamada
-            { id: 11, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        105: [ // Ichiro Suzuki
+            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' }
         ],
-        6: [ // Sakura Suzuki
-            { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        106: [ // Tomoe Yamamoto
+            { id: 4, category: 'Recurve', division: "Women's Team", distance: '70m', format: 'Olympic Round' }
+        ],
+        107: [ // Daichi Nakamura
+            { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' }
+        ],
+        108: [ // Yuki Sato
+            { id: 2, category: 'Recurve', division: "Women's Individual", distance: '70m', format: 'Olympic Round' }
+        ],
+        5: [ // Yuto Suzuki
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        6: [ // Sakura Yamada
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        101: [ // Masaru Fujita
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        102: [ // Aiko Nakamura
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        103: [ // Teruo Yamada
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        104: [ // Minori Tanaka
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        111: [ // Shiro Nakamura
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        112: [ // Kaori Yamamoto
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        113: [ // Takeshi Sato
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        114: [ // Akane Tanaka
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        115: [ // Jiro Suzuki
+            { id: 5, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        116: [ // Hana Yamada
+            { id: 6, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        109: [ // Hideo Tanaka
+            { id: 9, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' }
+        ],
+        110: [ // Haruka Yamada
+            { id: 10, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
         ]
     },
     
@@ -120,7 +168,7 @@ const athleteCompetitionsData = {
             { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' },
             { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', format: 'Olympic Round' }
         ],
-        29: [ // Anna Müller
+        29: [ // Anna MÃ¼ller
             { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' },
             { id: 14, category: 'Compound', division: "Women's Team", distance: '50m', format: 'Compound Round' },
             { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', format: 'Compound Round' }
@@ -241,7 +289,7 @@ const athleteCompetitionsData = {
             { id: 1, category: 'Recurve', division: "Men's Individual", distance: '70m', format: 'Olympic Round' },
             { id: 3, category: 'Recurve', division: "Men's Team", distance: '70m', format: 'Olympic Round' }
         ],
-        58: [ // Anna Müller
+        58: [ // Anna MÃ¼ller
             { id: 12, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' },
             { id: 14, category: 'Compound', division: "Women's Team", distance: '50m', format: 'Compound Round' },
             { id: 15, category: 'Compound', division: "Mixed Team", distance: '50m', format: 'Compound Round' }
