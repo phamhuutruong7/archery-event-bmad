@@ -38,16 +38,16 @@
             .equipment-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
        
-        /* Tablet Landscape (1024px - 1279px) */
+        /* Monitor/Desktop (1024px - 1279px) */
         @media (min-width: 1024px) and (max-width: 1279px) {
             body { background: #e0e0e0; }
-            .equipment-container { width: 100vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+            .equipment-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
        
         /* Wide Screen - Centered Layout (1280px+) */
         @media (min-width: 1280px) {
             body { background: #e0e0e0; }
-            .equipment-container { width: 35vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+            .equipment-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
  
        
@@ -180,6 +180,58 @@
        
         .divider { height: 1px; background: #e0e0e0; margin: 12px 0; }
        
+        /* Submit Button */
+        .submit-btn {
+            padding: 8px 16px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .submit-btn:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        .submit-btn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .submit-btn i {
+            font-size: 16px;
+        }
+        
+        .summary-row-with-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .summary-row-with-button:last-child {
+            margin-bottom: 0;
+        }
+        .summary-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+       
         /* Empty State */
         .no-data { text-align: center; padding: 40px 16px; color: #9e9e9e; }
         .no-data i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; display: block; }
@@ -276,10 +328,23 @@
         // Handle checkbox change
         function toggleEquipmentCheck(athleteId, bowType) {
             const key = `${athleteId}-${bowType}`;
-            equipmentCheckState[key] = !equipmentCheckState[key];
+            const isCurrentlyChecked = equipmentCheckState[key] || false;
+            equipmentCheckState[key] = !isCurrentlyChecked;
            
             // Save to localStorage
             localStorage.setItem(`equipment_check_${eventId}`, JSON.stringify(equipmentCheckState));
+            
+            // Find athlete name for feedback
+            const athletes = allAthletesByBowType[bowType] || [];
+            const athlete = athletes.find(a => a.id === athleteId);
+            
+            if (equipmentCheckState[key]) {
+                // Athlete is now verified and approved for competition
+                console.log(`✓ ${athlete ? athlete.name : 'Athlete'} (${bowType}) approved for competition`);
+            } else {
+                // Athlete verification removed
+                console.log(`✗ ${athlete ? athlete.name : 'Athlete'} (${bowType}) removed from competition`);
+            }
            
             // Update display
             renderTable();

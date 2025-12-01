@@ -128,6 +128,7 @@ const athleteCompetitionsData = {
     
     // Event 4: Spring Open Championship (Sydney, Australia)
     4: {
+        // Recurve Athletes
         19: [ // James Mitchell
             { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', format: 'Qualification Round' },
             { id: 38, category: 'Recurve', division: "Men's Individual", distance: '30m', format: 'Qualification Round' }
@@ -142,10 +143,62 @@ const athleteCompetitionsData = {
         22: [ // Sophie Taylor
             { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', format: 'Qualification Round' }
         ],
-        23: [ // Daniel Harris
+        117: [ // William Johnson
+            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', format: 'Qualification Round' }
+        ],
+        118: [ // Charlotte Davis
+            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', format: 'Qualification Round' }
+        ],
+        119: [ // Liam Thompson
+            { id: 36, category: 'Recurve', division: "Men's Individual", distance: '50m', format: 'Qualification Round' }
+        ],
+        120: [ // Olivia Martin
+            { id: 37, category: 'Recurve', division: "Women's Individual", distance: '50m', format: 'Qualification Round' }
+        ],
+        
+        // Compound Athletes
+        121: [ // Noah Anderson
+            { id: 40, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        122: [ // Ava Wilson
+            { id: 41, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        123: [ // Ethan Smith
+            { id: 40, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        124: [ // Mia Brown
+            { id: 41, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        125: [ // Jackson Lee
+            { id: 40, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        126: [ // Emily White
+            { id: 41, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        127: [ // Mason Harris
+            { id: 40, category: 'Compound', division: "Men's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        128: [ // Amelia Clark
+            { id: 41, category: 'Compound', division: "Women's Individual", distance: '50m', format: 'Compound Round' }
+        ],
+        
+        // Barebow Athletes
+        23: [ // Lucas Anderson
             { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' }
         ],
-        24: [ // Isabella Clark
+        24: [ // Isabella White
+            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
+        ],
+        129: [ // Benjamin Taylor
+            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' }
+        ],
+        130: [ // Sophie Johnson
+            { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
+        ],
+        131: [ // Henry Davis
+            { id: 21, category: 'Barebow', division: "Men's Individual", distance: '50m', format: 'Barebow Round' }
+        ],
+        132: [ // Grace Martin
             { id: 22, category: 'Barebow', division: "Women's Individual", distance: '50m', format: 'Barebow Round' }
         ]
     },

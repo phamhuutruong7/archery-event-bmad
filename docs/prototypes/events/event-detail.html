@@ -82,31 +82,19 @@
             }
         }
  
-        /* Monitor/Desktop - Full Width (1024px - 1279px) */
+        /* Monitor/Desktop (1024px - 1279px) */
         @media (min-width: 1024px) and (max-width: 1279px) {
             body {
                 background: #e0e0e0;
             }
  
             .event-container {
-                width: 100vw;
+                width: 75vw;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             }
         }
  
         /* Wide Screen - Centered Layout (1280px+) */
-        @media (min-width: 1280px) {
-            body {
-                background: #e0e0e0;
-            }
- 
-            .event-container {
-                width: 35vw;
-                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-            }
-        }
- 
-        /* Desktop/Monitor (1280px+) */
         @media (min-width: 1280px) {
             body {
                 background: #e0e0e0;
@@ -287,6 +275,23 @@
             display: block;
             font-size: 20px;
             margin-bottom: 4px;
+        }
+
+        /* Responsive Tab Navigation */
+        @media (max-width: 599px) {
+            .tab-item {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .tab-item i {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .tab-item span {
+                font-size: 11px;
+            }
         }
 
         /* Content */
@@ -636,53 +641,44 @@
         }
 
         /* Competition Status */
-        .status-switch-cell {
+        .status-dropdown-cell {
             text-align: center;
-            min-width: 170px;
+            min-width: 150px;
         }
 
-        .status-switch {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 12px;
+        .status-dropdown {
+            padding: 6px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid;
-            user-select: none;
-            min-width: 140px;
+            transition: all 0.2s;
+            outline: none;
+            min-width: 130px;
         }
 
-        .status-switch.open {
+        .status-dropdown:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        .status-dropdown.not-started {
+            background: #f5f5f5;
+            color: #757575;
+            border-color: #e0e0e0;
+        }
+
+        .status-dropdown.in-process {
             background: #e8f5e9;
             color: #2e7d32;
             border-color: #81c784;
         }
 
-        .status-switch.open:hover {
-            background: #c8e6c9;
-            border-color: #66bb6a;
-            transform: scale(1.05);
-        }
-
-        .status-switch.closed {
-            background: #ffebee;
-            color: #c62828;
-            border-color: #ef9a9a;
-        }
-
-        .status-switch.closed:hover {
-            background: #ffcdd2;
-            border-color: #e57373;
-            transform: scale(1.05);
-        }
-
-        .status-switch i {
-            font-size: 14px;
-            margin-right: 6px;
+        .status-dropdown.done {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-color: #90caf9;
         }
 
         /* Competition row hover effect */
@@ -1108,6 +1104,112 @@
             }
         }
 
+        /* Host Panel */
+        .host-panel {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+        }
+
+        .host-panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .host-panel-header i {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .host-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .host-panel-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 2px;
+        }
+
+        .host-controls-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .host-control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .host-control-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .host-control-btn:active {
+            transform: translateY(0);
+        }
+
+        .host-control-btn i {
+            font-size: 32px;
+            opacity: 0.95;
+        }
+
+        .host-control-btn .btn-label {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .host-control-btn .btn-sublabel {
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 599px) {
+            .host-controls-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .host-control-btn {
+                padding: 14px 10px;
+            }
+            
+            .host-control-btn i {
+                font-size: 28px;
+            }
+            
+            .host-control-btn .btn-label {
+                font-size: 12px;
+            }
+        }
+
         /* Error State */
         .error-state {
             text-align: center;
@@ -1494,6 +1596,10 @@
                 <i class="mdi mdi-whistle"></i>
                 <span>Referees</span>
             </div>
+            <div class="tab-item" onclick="switchTab('host', event)">
+                <i class="mdi mdi-shield-crown"></i>
+                <span>Host Panel</span>
+            </div>
         </div>
 
         <!-- Content -->
@@ -1553,6 +1659,66 @@
                         </thead>
                         <tbody id="refereesList"></tbody>
                     </table>
+                </div>
+            </div>
+
+            <!-- Host Panel Tab -->
+            <div id="hostTab" class="tab-content">
+                <div class="host-panel">
+                    <div class="host-panel-header">
+                        <i class="mdi mdi-shield-crown"></i>
+                        <div>
+                            <div class="host-panel-title">Host Control Panel</div>
+                            <div class="host-panel-subtitle">Manage your event operations</div>
+                        </div>
+                    </div>
+                    <div class="host-controls-grid">
+                        <button class="host-control-btn" onclick="window.location.href='../host-panel/equipment-check.html?eventId=' + eventId" title="Check and approve athlete equipment">
+                            <i class="mdi mdi-shield-check"></i>
+                            <div class="btn-label">Equipment Check</div>
+                            <div class="btn-sublabel">Verify gear</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Target Assignment - Coming Soon')" title="Assign athletes to targets">
+                            <i class="mdi mdi-target"></i>
+                            <div class="btn-label">Target Assignment</div>
+                            <div class="btn-sublabel">Set positions</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Competition Schedule - Coming Soon')" title="Manage competition schedule">
+                            <i class="mdi mdi-calendar-clock"></i>
+                            <div class="btn-label">Schedule</div>
+                            <div class="btn-sublabel">Time slots</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Athlete Management - Coming Soon')" title="Manage registered athletes">
+                            <i class="mdi mdi-account-group"></i>
+                            <div class="btn-label">Athletes</div>
+                            <div class="btn-sublabel">Registrations</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Referee Management - Coming Soon')" title="Manage event referees">
+                            <i class="mdi mdi-whistle"></i>
+                            <div class="btn-label">Referees</div>
+                            <div class="btn-sublabel">Officials</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Event Settings - Coming Soon')" title="Configure event settings">
+                            <i class="mdi mdi-cog"></i>
+                            <div class="btn-label">Settings</div>
+                            <div class="btn-sublabel">Configure</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageIndividualCompetitions()" title="Manage individual competitions">
+                            <i class="mdi mdi-account"></i>
+                            <div class="btn-label">Individual</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageTeamCompetitions()" title="Manage team competitions">
+                            <i class="mdi mdi-account-group"></i>
+                            <div class="btn-label">Teams</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageMixedTeamCompetitions()" title="Manage mixed team competitions">
+                            <i class="mdi mdi-account-multiple"></i>
+                            <div class="btn-label">Mixed Team</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1617,6 +1783,28 @@
         // Get event ID from URL parameter
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = parseInt(urlParams.get('id'));
+        
+        // Mock current user ID (in production, this would come from authentication)
+        const currentUserId = 1; // TODO: Replace with actual authentication
+        
+        // Check if current user is the host of this event
+        function checkIfUserIsHost() {
+            const event = getEventDetail(eventId);
+            // TODO: In production, check if event.hostId === currentUserId
+            // For now, we'll use a flag to simulate host/non-host status
+            // Return true for demonstration (change to false to test non-host view)
+            return true; // Change this to false to test non-host view
+        }
+        
+        // Initialize UI based on host status
+        function initializeHostUI() {
+            const isHost = checkIfUserIsHost();
+            const hostTab = document.querySelector('.tab-item:nth-child(4)'); // Host Panel tab
+            
+            if (!isHost && hostTab) {
+                hostTab.style.display = 'none';
+            }
+        }
 
         // Mock data for athletes and referees
         let allAthletes = [];
@@ -1639,7 +1827,8 @@
         function getCompetitionStatus(eventId, competitionId) {
             const key = `event_${eventId}_comp_${competitionId}_status`;
             const status = localStorage.getItem(key);
-            return status === 'open' ? 'open' : 'closed';
+            // Default to 'not-started' if no status is saved
+            return status || 'not-started';
         }
 
         // Open competition scoring view
@@ -1655,18 +1844,26 @@
             window.location.href = `elimination-round.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
         }
 
-        function toggleCompetitionStatus(eventId, competitionId) {
+        function updateCompetitionStatus(eventId, competitionId, newStatus) {
             const key = `event_${eventId}_comp_${competitionId}_status`;
-            const currentStatus = getCompetitionStatus(eventId, competitionId);
-            const newStatus = currentStatus === 'open' ? 'closed' : 'open';
             localStorage.setItem(key, newStatus);
 
             // Update UI
             renderCompetitionsTable();
 
             // Show feedback
-            const statusText = newStatus === 'open' ? 'In Progress' : 'Closed';
-            const icon = newStatus === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
+            const statusTextMap = {
+                'not-started': 'Not Started',
+                'in-process': 'In Progress',
+                'done': 'Done'
+            };
+            const iconMap = {
+                'not-started': 'mdi-clock-outline',
+                'in-process': 'mdi-play-circle',
+                'done': 'mdi-check-circle'
+            };
+            const statusText = statusTextMap[newStatus] || newStatus;
+            const icon = iconMap[newStatus] || 'mdi-information';
             showSnackbar(`Competition status changed to ${statusText}`, icon, 'success');
         }
 
@@ -1882,10 +2079,8 @@
                 const competitionId = comp.id || index;
                 const status = getCompetitionStatus(eventId, competitionId);
                 const statusClass = status;
-                const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
-                const statusText = status === 'open' ? 'In Progress' : 'Closed';
 
-                const clickTitle = status === 'open' ? 'Click row to view/enter scores' : 'Click row to view scores (read-only)';
+                const clickTitle = 'Click row to view/enter scores';
                 const categoryEscaped = (comp.category || '').replace(/'/g, "\\'");
                 const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
 
@@ -1901,11 +2096,14 @@
                     <td>
                         <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')" title="Click to view round details">${comp.subround || 'N/A'}</span>
                     </td>
-                    <td class="status-switch-cell">
-                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleCompetitionStatus(${eventId}, ${competitionId})" title="Click to toggle: In Progress (scoring allowed) / Closed (read-only)">
-                            <i class="mdi ${statusIcon}"></i>
-                            <span>${statusText}</span>
-                        </div>
+                    <td class="status-dropdown-cell">
+                        <select class="status-dropdown ${statusClass}" 
+                                onclick="event.stopPropagation()" 
+                                onchange="updateCompetitionStatus(${eventId}, ${competitionId}, this.value)">
+                            <option value="not-started" ${status === 'not-started' ? 'selected' : ''}>Not Started</option>
+                            <option value="in-process" ${status === 'in-process' ? 'selected' : ''}>In-process</option>
+                            <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
+                        </select>
                     </td>
                 </tr>
                 `;
@@ -2020,6 +2218,12 @@
 
         // Tab switching
         function switchTab(tabName, clickEvent) {
+            // Check if trying to access Host Panel without being host
+            if (tabName === 'host' && !checkIfUserIsHost()) {
+                alert('Access denied. Only the event host can access this panel.');
+                return;
+            }
+            
             // Remove active class from all tabs
             document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -2193,24 +2397,6 @@
                             <i class="mdi mdi-trophy"></i>
                             Competitions
                         </div>
-                        <button style="padding: 8px 16px; background: #1565c0; color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;" onclick="window.location.href='../equipment-check/equipment-check.html?eventId=${eventId}'" onmouseover="this.style.background='#0d47a1'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#1565c0'; this.style.transform='translateY(0)'" title="Check equipment status">
-                            <i class="mdi mdi-toolbox-outline"></i>
-                            Equipment check
-                        </button>
-                    </div>
-                    <div class="button-row" style="margin-bottom: 16px;">
-                        <button class="btn btn-secondary" onclick="manageIndividualCompetitions()">
-                            <i class="mdi mdi-account"></i>
-                            Individual Competition
-                        </button>
-                        <button class="btn btn-secondary" onclick="manageTeamCompetitions()">
-                            <i class="mdi mdi-account-group"></i>
-                            Teams Competition
-                        </button>
-                        <button class="btn btn-secondary" onclick="manageMixedTeamCompetitions()">
-                            <i class="mdi mdi-account-multiple"></i>
-                            Mixed Team Competition
-                        </button>
                     </div>
                     
                     <!-- View Switcher -->
@@ -2416,17 +2602,32 @@
                         </button>
                     `;
                 } else {
-                    // Not registered yet
-                    registrationButtons = `
-                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
-                            <i class="mdi mdi-run"></i>
-                            Register as Athlete
-                        </button>
-                        <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
-                            <i class="mdi mdi-whistle"></i>
-                            Register as Referee
-                        </button>
-                    `;
+                    // Not registered yet - show registration buttons (unless viewing Host Panel tab)
+                    const currentTab = document.querySelector('.tab-item.active');
+                    const isHostPanelTab = currentTab && currentTab.textContent.includes('Host Panel');
+                    
+                    if (isHostPanelTab) {
+                        // Host Panel tab - show host message
+                        registrationButtons = `
+                            <div style="text-align: center; padding: 16px; color: #666; font-size: 14px;">
+                                <i class="mdi mdi-shield-crown" style="font-size: 24px; color: #1565c0; display: block; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600; color: #1565c0; margin-bottom: 4px;">You are the host of this event</div>
+                                <div>Use the controls above to manage this event</div>
+                            </div>
+                        `;
+                    } else {
+                        // Other tabs - show registration buttons
+                        registrationButtons = `
+                            <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
+                                <i class="mdi mdi-run"></i>
+                                Register as Athlete
+                            </button>
+                            <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
+                                <i class="mdi mdi-whistle"></i>
+                                Register as Referee
+                            </button>
+                        `;
+                    }
                 }
 
                 buttonsDiv.innerHTML = `
@@ -2668,6 +2869,9 @@
 
         // Initialize language selector
         initLanguageSelector();
+        
+        // Initialize host UI (show/hide Host Panel tab based on user role)
+        initializeHostUI();
 
         // Load event on page load
         loadEventDetail();
