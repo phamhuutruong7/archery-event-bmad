@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Host Dashboard - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <a href="#" class="btn btn-primary btn-sm">
+                    <span class="material-icons" style="font-size: 18px; margin-right: 4px;">add</span>
+                    New Event
+                </a>
+                <div class="flex items-center gap-sm">
+                    <img src="https://ui-avatars.com/api/?name=Host+User&background=1565c0&color=fff"
+                        style="width: 32px; height: 32px; border-radius: 50%;">
+                    <span style="font-weight: 500;">Host User</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px; padding-bottom: 40px;">
+        <h1 style="margin-bottom: 32px;">Host Dashboard</h1>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-4 gap-md" style="margin-bottom: 40px;">
+            <div class="card">
+                <div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 8px;">Active Events</div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--primary);">2</div>
+            </div>
+            <div class="card">
+                <div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 8px;">Total Participants
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--text-primary);">152</div>
+            </div>
+            <div class="card">
+                <div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 8px;">Pending Referees
+                </div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--warning);">5</div>
+            </div>
+            <div class="card">
+                <div style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 8px;">Upcoming</div>
+                <div style="font-size: 2rem; font-weight: 700; color: var(--success);">1</div>
+            </div>
+        </div>
+
+        <!-- My Events -->
+        <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+            <h2>My Events</h2>
+            <div class="flex gap-sm">
+                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.875rem;">All</button>
+                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.875rem;">Active</button>
+                <button class="btn btn-outline" style="padding: 8px 16px; font-size: 0.875rem;">Drafts</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-md" id="host-events-list">
+            <!-- Events injected here -->
+        </div>
+    </div>
+
+    <script src="mock-data.js"></script>
+    <script>
+        const list = document.getElementById('host-events-list');
+        api.getEvents().then(events => {
+            events.forEach(evt => {
+                const item = `
+                    <div class="card flex items-center justify-between">
+                        <div class="flex items-center gap-lg">
+                            <div style="width: 60px; height: 60px; background-color: #e3f2fd; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-icons" style="color: var(--primary); font-size: 32px;">event</span>
+                            </div>
+                            <div>
+                                <h3 style="margin-bottom: 4px;">${evt.name}</h3>
+                                <div class="flex gap-md" style="color: var(--text-secondary); font-size: 0.875rem;">
+                                    <span>${evt.date}</span>
+                                    <span>•</span>
+                                    <span>${evt.location}</span>
+                                    <span>•</span>
+                                    <span>${evt.participants} Participants</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-md">
+                            <span class="badge badge-${evt.status === 'Open' ? 'success' : 'warning'}">${evt.status}</span>
+                            <a href="event-config.html?id=${evt.id}" class="btn btn-outline">Manage</a>
+                        </div>
+                    </div>
+                `;
+                list.innerHTML += item;
+            });
+        });
+    </script>
+</body>
+
+</html>

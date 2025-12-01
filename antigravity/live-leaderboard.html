@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Leaderboard - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .rank-cell {
+            font-weight: 800;
+            font-size: 1.25rem;
+            width: 40px;
+            text-align: center;
+        }
+
+        .rank-1 {
+            color: #ffd700;
+        }
+
+        .rank-2 {
+            color: #c0c0c0;
+        }
+
+        .rank-3 {
+            color: #cd7f32;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <span class="badge badge-success animate-pulse">LIVE UPDATES</span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px;">
+        <div class="text-center" style="margin-bottom: 40px;">
+            <h1>National Archery Championship 2025</h1>
+            <p>Recurve - Men's Individual - Qualification Round</p>
+        </div>
+
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead style="background: #f5f7fa; border-bottom: 2px solid var(--border-color);">
+                    <tr>
+                        <th style="padding: 16px; text-align: center;">Rank</th>
+                        <th style="padding: 16px; text-align: left;">Athlete</th>
+                        <th style="padding: 16px; text-align: center;">Target</th>
+                        <th style="padding: 16px; text-align: center;">10s+Xs</th>
+                        <th style="padding: 16px; text-align: center;">Xs</th>
+                        <th style="padding: 16px; text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Rows injected via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const athletes = [
+            { name: 'Kim Woo-jin', country: 'KOR', target: '1A', golds: 24, xs: 10, total: 345 },
+            { name: 'Brady Ellison', country: 'USA', target: '2B', golds: 22, xs: 8, total: 342 },
+            { name: 'Alex Archer', country: 'GBR', target: '1B', golds: 18, xs: 5, total: 338 },
+            { name: 'Mete Gazoz', country: 'TUR', target: '3A', golds: 18, xs: 4, total: 335 },
+            { name: 'Marcus D\'Almeida', country: 'BRA', target: '2A', golds: 16, xs: 6, total: 330 },
+        ];
+
+        function renderLeaderboard() {
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
+
+            athletes.forEach((athlete, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : '';
+
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td class="rank-cell ${rankClass}">${rank}</td>
+                        <td style="padding: 16px;">
+                            <div style="font-weight: 600;">${athlete.name}</div>
+                            <div style="font-size: 0.875rem; color: var(--text-secondary);">${athlete.country}</div>
+                        </td>
+                        <td style="padding: 16px; text-align: center;">${athlete.target}</td>
+                        <td style="padding: 16px; text-align: center;">${athlete.golds}</td>
+                        <td style="padding: 16px; text-align: center;">${athlete.xs}</td>
+                        <td style="padding: 16px; text-align: right; font-weight: 700; font-size: 1.125rem;">${athlete.total}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        renderLeaderboard();
+
+        // Simulate live updates
+        setInterval(() => {
+            // Randomly update a score
+            const idx = Math.floor(Math.random() * athletes.length);
+            athletes[idx].total += Math.floor(Math.random() * 3);
+            athletes.sort((a, b) => b.total - a.total);
+            renderLeaderboard();
+        }, 3000);
+    </script>
+</body>
+
+</html>

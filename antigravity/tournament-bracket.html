@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tournament Bracket - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .bracket-container {
+            display: flex;
+            gap: 40px;
+            overflow-x: auto;
+            padding: 40px 20px;
+            min-height: 600px;
+        }
+
+        .round-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            min-width: 240px;
+        }
+
+        .match-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match-card:hover {
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .match-card::after {
+            content: '';
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            width: 20px;
+            height: 2px;
+            background: #ccc;
+            z-index: -1;
+        }
+
+        .round-column:last-child .match-card::after {
+            display: none;
+        }
+
+        .match-competitor {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .match-competitor:last-child {
+            border-bottom: none;
+        }
+
+        .match-competitor.winner {
+            background-color: #e8f5e9;
+            font-weight: 600;
+        }
+
+        .match-competitor.winner .score {
+            color: var(--success);
+            font-weight: 800;
+        }
+
+        .score {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .match-status {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #eee;
+            border-radius: 8px 8px 0 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <a href="event-config.html" class="btn btn-outline btn-sm">Back to Event</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px;">
+        <div class="text-center" style="margin-bottom: 40px;">
+            <h1>Tournament Bracket</h1>
+            <p>Compound - Women's Individual - Elimination</p>
+        </div>
+
+        <div class="bracket-container">
+            <!-- Quarter Finals -->
+            <div class="round-column">
+                <h3 class="text-center" style="margin-bottom: 20px;">Quarter Finals</h3>
+
+                <div class="match-card">
+                    <div class="match-status">Match 1 • Completed</div>
+                    <div class="match-competitor winner">
+                        <span>1. S. Lopez</span>
+                        <span class="score">148</span>
+                    </div>
+                    <div class="match-competitor">
+                        <span>8. J. Smith</span>
+                        <span class="score">142</span>
+                    </div>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-status">Match 2 • Completed</div>
+                    <div class="match-competitor">
+                        <span>5. A. Ruiz</span>
+                        <span class="score">144</span>
+                    </div>
+                    <div class="match-competitor winner">
+                        <span>4. T. Gibson</span>
+                        <span class="score">146</span>
+                    </div>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-status">Match 3 • Completed</div>
+                    <div class="match-competitor winner">
+                        <span>3. E. Jones</span>
+                        <span class="score">147</span>
+                    </div>
+                    <div class="match-competitor">
+                        <span>6. K. Lee</span>
+                        <span class="score">145</span>
+                    </div>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-status">Match 4 • Completed</div>
+                    <div class="match-competitor">
+                        <span>7. M. Chen</span>
+                        <span class="score">143</span>
+                    </div>
+                    <div class="match-competitor winner">
+                        <span>2. S. Pearce</span>
+                        <span class="score">149</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Semi Finals -->
+            <div class="round-column">
+                <h3 class="text-center" style="margin-bottom: 20px;">Semi Finals</h3>
+
+                <div class="match-card">
+                    <div class="match-status">Match 5 • Completed</div>
+                    <div class="match-competitor winner">
+                        <span>1. S. Lopez</span>
+                        <span class="score">149</span>
+                    </div>
+                    <div class="match-competitor">
+                        <span>4. T. Gibson</span>
+                        <span class="score">147</span>
+                    </div>
+                </div>
+
+                <div class="match-card">
+                    <div class="match-status">Match 6 • Live</div>
+                    <div class="match-competitor">
+                        <span>3. E. Jones</span>
+                        <span class="score">112</span>
+                    </div>
+                    <div class="match-competitor">
+                        <span>2. S. Pearce</span>
+                        <span class="score">114</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Finals -->
+            <div class="round-column">
+                <h3 class="text-center" style="margin-bottom: 20px;">Finals</h3>
+
+                <div class="match-card" style="border: 2px solid var(--accent);">
+                    <div class="match-status" style="background: var(--accent); color: white;">Gold Medal Match</div>
+                    <div class="match-competitor">
+                        <span>1. S. Lopez</span>
+                        <span class="score">-</span>
+                    </div>
+                    <div class="match-competitor">
+                        <span>Winner M6</span>
+                        <span class="score">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

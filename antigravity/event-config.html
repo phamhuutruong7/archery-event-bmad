@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Configuration - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        .tab-nav {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .tab-link {
+            padding: 12px 24px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab-link.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <a href="host-dashboard.html" class="btn btn-outline btn-sm">Back to Dashboard</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px; padding-bottom: 40px;">
+        <div class="flex justify-between items-start" style="margin-bottom: 32px;">
+            <div>
+                <span class="badge badge-success" style="margin-bottom: 8px;">Open for Registration</span>
+                <h1>National Archery Championship 2025</h1>
+                <p style="margin-bottom: 0;">Dec 15-17, 2025 • Olympic Stadium</p>
+            </div>
+            <div class="flex gap-sm">
+                <button class="btn btn-outline">Edit Details</button>
+                <button class="btn btn-primary">Publish</button>
+            </div>
+        </div>
+
+        <div class="tab-nav">
+            <div class="tab-link active">Competitions</div>
+            <div class="tab-link">Participants</div>
+            <div class="tab-link">Referees</div>
+            <div class="tab-link">Settings</div>
+        </div>
+
+        <!-- Competitions Tab -->
+        <div id="tab-competitions">
+            <div class="flex justify-between items-center" style="margin-bottom: 24px;">
+                <h2>Competitions (Games)</h2>
+                <button class="btn btn-primary btn-sm">
+                    <span class="material-icons" style="font-size: 18px; margin-right: 4px;">add</span>
+                    Add Competition
+                </button>
+            </div>
+
+            <div class="grid grid-cols-1 gap-md">
+                <!-- Competition Item -->
+                <div class="card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-sm" style="margin-bottom: 8px;">
+                                <h3 style="margin: 0;">Recurve - Men's Individual</h3>
+                                <span class="badge badge-info">Qualification</span>
+                            </div>
+                            <p style="margin-bottom: 16px;">WA 70m Round • 72 Arrows • 122cm Face</p>
+                            <div class="flex gap-md">
+                                <div class="flex items-center gap-xs">
+                                    <span class="material-icons"
+                                        style="font-size: 18px; color: var(--text-secondary);">people</span>
+                                    <span>64 Athletes</span>
+                                </div>
+                                <div class="flex items-center gap-xs">
+                                    <span class="material-icons"
+                                        style="font-size: 18px; color: var(--text-secondary);">grid_on</span>
+                                    <span>16 Targets</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-sm items-end">
+                            <div class="flex items-center gap-sm">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Status:</span>
+                                <div class="flex gap-xs">
+                                    <button class="btn btn-sm"
+                                        style="padding: 4px 8px; background: var(--success); color: white;"
+                                        title="Set Active"><span class="material-icons"
+                                            style="font-size: 16px;">play_arrow</span></button>
+                                    <button class="btn btn-sm" style="padding: 4px 8px; background: #eee; color: #666;"
+                                        title="Pause"><span class="material-icons"
+                                            style="font-size: 16px;">pause</span></button>
+                                    <button class="btn btn-sm" style="padding: 4px 8px; background: #eee; color: #666;"
+                                        title="Close"><span class="material-icons"
+                                            style="font-size: 16px;">stop</span></button>
+                                </div>
+                            </div>
+                            <div class="flex gap-sm" style="margin-top: 8px;">
+                                <button class="btn btn-outline btn-sm">Assign Targets</button>
+                                <button class="btn btn-outline btn-sm">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competition Item -->
+                <div class="card">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <div class="flex items-center gap-sm" style="margin-bottom: 8px;">
+                                <h3 style="margin: 0;">Compound - Women's Individual</h3>
+                                <span class="badge badge-warning">Elimination</span>
+                            </div>
+                            <p style="margin-bottom: 16px;">Match Play • 50m • 80cm Face (6-ring)</p>
+                            <div class="flex gap-md">
+                                <div class="flex items-center gap-xs">
+                                    <span class="material-icons"
+                                        style="font-size: 18px; color: var(--text-secondary);">people</span>
+                                    <span>32 Athletes</span>
+                                </div>
+                                <div class="flex items-center gap-xs">
+                                    <span class="material-icons"
+                                        style="font-size: 18px; color: var(--text-secondary);">account_tree</span>
+                                    <span>Round of 32</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-sm items-end">
+                            <div class="flex items-center gap-sm">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Status:</span>
+                                <div class="flex gap-xs">
+                                    <button class="btn btn-sm"
+                                        style="padding: 4px 8px; background: #eee; color: #666;"><span
+                                            class="material-icons" style="font-size: 16px;">play_arrow</span></button>
+                                    <button class="btn btn-sm"
+                                        style="padding: 4px 8px; background: #eee; color: #666;"><span
+                                            class="material-icons" style="font-size: 16px;">pause</span></button>
+                                    <button class="btn btn-sm"
+                                        style="padding: 4px 8px; background: #eee; color: #666;"><span
+                                            class="material-icons" style="font-size: 16px;">stop</span></button>
+                                </div>
+                            </div>
+                            <div class="flex gap-sm" style="margin-top: 8px;">
+                                <a href="tournament-bracket.html" class="btn btn-outline btn-sm">View Bracket</a>
+                                <button class="btn btn-outline btn-sm">Edit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

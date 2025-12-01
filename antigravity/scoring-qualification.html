@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Scoring - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /* Mobile-first overrides for scoring */
+        body {
+            background-color: white;
+            padding-bottom: 300px;
+            /* Space for score pad */
+        }
+
+        .scoresheet-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-top: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+
+        .end-index {
+            width: 24px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .end-total {
+            margin-left: auto;
+            font-weight: 700;
+            color: var(--accent);
+            width: 32px;
+            text-align: right;
+        }
+
+        .confirm-btn {
+            margin-left: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+        }
+
+        /* Score Pad Colors */
+        .btn-yellow {
+            background-color: var(--ring-yellow);
+            color: black;
+        }
+
+        .btn-red {
+            background-color: var(--ring-red);
+            color: white;
+        }
+
+        .btn-blue {
+            background-color: var(--ring-blue);
+            color: white;
+        }
+
+        .btn-black {
+            background-color: var(--ring-black);
+            color: white;
+        }
+
+        .btn-white {
+            background-color: var(--ring-white);
+            color: black;
+            border: 1px solid #ddd;
+        }
+
+        .btn-green {
+            background-color: var(--ring-green);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="scoresheet-header">
+        <div class="flex justify-between items-center">
+            <h2 style="font-size: 1.25rem; margin: 0;">Men's 70m Recurve</h2>
+            <a href="athlete-dashboard.html" class="material-icons" style="color: var(--text-secondary);">close</a>
+        </div>
+        <div class="stats-row">
+            <div class="stat-item">
+                <span>Distance</span>
+                <span class="stat-value">70m</span>
+            </div>
+            <div class="stat-item">
+                <span>Golds (10+X)</span>
+                <span class="stat-value" id="golds-count">12</span>
+            </div>
+            <div class="stat-item">
+                <span>Average</span>
+                <span class="stat-value" id="avg-score">9.2</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ends List -->
+    <div class="scoresheet-container" id="ends-list">
+        <!-- Ends injected via JS -->
+    </div>
+
+    <!-- Score Pad -->
+    <div class="score-pad">
+        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
+            <div style="font-weight: 600;">End <span id="current-end-num">4</span></div>
+            <div style="font-weight: 600;">Total: <span id="total-score" style="color: var(--primary);">161</span>/240
+            </div>
+        </div>
+        <div class="score-grid">
+            <button class="score-btn btn-yellow" onclick="addScore('X')">X</button>
+            <button class="score-btn btn-yellow" onclick="addScore('10')">10</button>
+            <button class="score-btn btn-yellow" onclick="addScore('9')">9</button>
+            <button class="score-btn btn-red" onclick="addScore('8')">8</button>
+            <button class="score-btn" style="background: #eee;" onclick="undoScore()"><span
+                    class="material-icons">backspace</span></button>
+
+            <button class="score-btn btn-red" onclick="addScore('7')">7</button>
+            <button class="score-btn btn-blue" onclick="addScore('6')">6</button>
+            <button class="score-btn btn-blue" onclick="addScore('5')">5</button>
+            <button class="score-btn btn-black" onclick="addScore('4')">4</button>
+            <div class="score-btn" style="visibility: hidden;"></div>
+
+            <button class="score-btn btn-black" onclick="addScore('3')">3</button>
+            <button class="score-btn btn-white" onclick="addScore('2')">2</button>
+            <button class="score-btn btn-white" onclick="addScore('1')">1</button>
+            <button class="score-btn btn-green" onclick="addScore('M')">M</button>
+            <div class="score-btn" style="visibility: hidden;"></div>
+        </div>
+    </div>
+
+    <script src="mock-data.js"></script>
+    <script>
+        // State
+        let currentEnd = 4;
+        let currentArrows = [];
+        const endsData = [
+            { num: 1, arrows: ['10', '10', '9', '9', '8', '8'], total: 54, locked: true },
+            { num: 2, arrows: ['X', '10', '10', '9', '9', '7'], total: 55, locked: true },
+            { num: 3, arrows: ['10', '9', '9', '8', '8', '8'], total: 52, locked: true }
+        ];
+
+        function renderEnds() {
+            const container = document.getElementById('ends-list');
+            container.innerHTML = '';
+
+            // Render locked ends
+            endsData.forEach(end => {
+                let arrowsHtml = '';
+                end.arrows.forEach(val => {
+                    arrowsHtml += `<div class="arrow-cell" style="${getArrowStyle(val)}">${val}</div>`;
+                });
+
+                container.innerHTML += `
+                    <div class="end-row">
+                        <div class="end-index">${end.num}</div>
+                        <div class="flex">${arrowsHtml}</div>
+                        <div class="material-icons" style="color: var(--success); margin-left: auto;">check_circle</div>
+                        <div class="end-total" style="color: var(--text-primary);">${end.total}</div>
+                    </div>
+                `;
+            });
+
+            // Render current active end
+            let activeArrowsHtml = '';
+            for (let i = 0; i < 6; i++) {
+                const val = currentArrows[i];
+                if (val) {
+                    activeArrowsHtml += `<div class="arrow-cell" style="${getArrowStyle(val)}">${val}</div>`;
+                } else {
+                    activeArrowsHtml += `<div class="arrow-cell" style="background: #f5f5f5; border: 1px dashed #ccc;"></div>`;
+                }
+            }
+
+            const showConfirm = currentArrows.length === 6;
+
+            container.innerHTML += `
+                <div class="end-row active">
+                    <div class="end-index">${currentEnd}</div>
+                    <div class="flex">${activeArrowsHtml}</div>
+                    ${showConfirm ? `<button class="confirm-btn animate-fade-in" onclick="confirmEnd()"><span class="material-icons">check</span></button>` : ''}
+                    <div class="end-total">${calculateSum(currentArrows)}</div>
+                </div>
+            `;
+        }
+
+        function getArrowStyle(val) {
+            const colors = {
+                'X': 'background: var(--ring-yellow); color: black;',
+                '10': 'background: var(--ring-yellow); color: black;',
+                '9': 'background: var(--ring-yellow); color: black;',
+                '8': 'background: var(--ring-red); color: white;',
+                '7': 'background: var(--ring-red); color: white;',
+                '6': 'background: var(--ring-blue); color: white;',
+                '5': 'background: var(--ring-blue); color: white;',
+                '4': 'background: var(--ring-black); color: white;',
+                '3': 'background: var(--ring-black); color: white;',
+                '2': 'background: var(--ring-white); color: black; border: 1px solid #ddd;',
+                '1': 'background: var(--ring-white); color: black; border: 1px solid #ddd;',
+                'M': 'background: var(--ring-green); color: white;'
+            };
+            return colors[val] || '';
+        }
+
+        function addScore(val) {
+            if (currentArrows.length < 6) {
+                currentArrows.push(val);
+                renderEnds();
+            }
+        }
+
+        function undoScore() {
+            if (currentArrows.length > 0) {
+                currentArrows.pop();
+                renderEnds();
+            }
+        }
+
+        function calculateSum(arrows) {
+            return arrows.reduce((sum, val) => {
+                if (val === 'X' || val === '10') return sum + 10;
+                if (val === 'M') return sum;
+                return sum + parseInt(val);
+            }, 0);
+        }
+
+        function confirmEnd() {
+            const sum = calculateSum(currentArrows);
+            endsData.push({
+                num: currentEnd,
+                arrows: [...currentArrows],
+                total: sum,
+                locked: true
+            });
+            currentEnd++;
+            currentArrows = [];
+
+            // Update stats (mock)
+            document.getElementById('total-score').innerText = parseInt(document.getElementById('total-score').innerText) + sum;
+
+            renderEnds();
+        }
+
+        // Init
+        renderEnds();
+    </script>
+</body>
+
+</html>

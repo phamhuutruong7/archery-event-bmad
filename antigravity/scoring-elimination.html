@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Elimination Scoring - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        body {
+            background-color: white;
+            padding-bottom: 300px;
+        }
+
+        .match-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            padding: 16px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .athlete-card {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            background: #f5f7fa;
+            text-align: center;
+        }
+
+        .athlete-card.winner {
+            background: #e8f5e9;
+            border: 2px solid var(--success);
+        }
+
+        .set-score {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 8px 0;
+        }
+
+        .set-points {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .set-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .set-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+            width: 60px;
+            text-align: center;
+        }
+
+        .arrow-group {
+            display: flex;
+            gap: 4px;
+        }
+
+        .set-total {
+            font-weight: 700;
+            width: 30px;
+            text-align: center;
+        }
+
+        .set-point-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin: 0 8px;
+        }
+
+        .sp-win {
+            background: var(--success);
+            color: white;
+        }
+
+        .sp-draw {
+            background: #e0e0e0;
+            color: #666;
+        }
+
+        .sp-loss {
+            background: transparent;
+            color: #ccc;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="match-header">
+        <div class="flex justify-between items-center" style="margin-bottom: 16px;">
+            <a href="athlete-dashboard.html" class="material-icons" style="color: var(--text-secondary);">arrow_back</a>
+            <h2 style="font-size: 1rem; margin: 0;">1/8 Elimination • Match 4</h2>
+            <span class="material-icons" style="color: var(--text-secondary);">info</span>
+        </div>
+
+        <div class="flex gap-md items-center">
+            <div class="athlete-card">
+                <div style="font-weight: 600;">You</div>
+                <div class="set-score" style="color: var(--primary);">4</div>
+                <div class="set-points">Set Points</div>
+            </div>
+            <div style="font-weight: 700; color: var(--text-secondary);">VS</div>
+            <div class="athlete-card">
+                <div style="font-weight: 600;">Opponent</div>
+                <div class="set-score">2</div>
+                <div class="set-points">Set Points</div>
+            </div>
+        </div>
+        <div style="margin-top: 12px; font-size: 0.875rem; color: var(--text-secondary);">
+            Target 4 • First to 6 points wins
+        </div>
+    </div>
+
+    <!-- Sets List -->
+    <div class="scoresheet-container">
+        <!-- Completed Set 1 -->
+        <div class="set-row" style="background: #f9f9f9;">
+            <div class="flex items-center">
+                <div class="set-total">28</div>
+                <div class="set-point-indicator sp-win">2</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+            <div class="set-label">Set 1</div>
+            <div class="flex items-center flex-row-reverse">
+                <div class="set-total">26</div>
+                <div class="set-point-indicator sp-loss">0</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-red); width: 32px; height: 32px; font-size: 0.875rem; color: white;">
+                        8</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Set 2 -->
+        <div class="set-row" style="background: #f9f9f9;">
+            <div class="flex items-center">
+                <div class="set-total">27</div>
+                <div class="set-point-indicator sp-loss">0</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+            <div class="set-label">Set 2</div>
+            <div class="flex items-center flex-row-reverse">
+                <div class="set-total">29</div>
+                <div class="set-point-indicator sp-win">2</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Completed Set 3 -->
+        <div class="set-row" style="background: #f9f9f9;">
+            <div class="flex items-center">
+                <div class="set-total">29</div>
+                <div class="set-point-indicator sp-win">2</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+            <div class="set-label">Set 3</div>
+            <div class="flex items-center flex-row-reverse">
+                <div class="set-total">27</div>
+                <div class="set-point-indicator sp-loss">0</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Set 4 -->
+        <div class="set-row active" style="border-left: 4px solid var(--primary); background: #f0f7ff;">
+            <div class="flex items-center">
+                <div class="set-total" id="current-set-total">19</div>
+                <div class="set-point-indicator">?</div>
+                <div class="arrow-group" id="current-arrows">
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">10</div>
+                    <div class="arrow-cell"
+                        style="background: var(--ring-yellow); width: 32px; height: 32px; font-size: 0.875rem;">9</div>
+                    <div class="arrow-cell"
+                        style="background: white; border: 1px dashed #ccc; width: 32px; height: 32px;"></div>
+                </div>
+            </div>
+            <div class="set-label">Set 4</div>
+            <div class="flex items-center flex-row-reverse" style="opacity: 0.5;">
+                <div class="set-total">?</div>
+                <div class="set-point-indicator">?</div>
+                <div class="arrow-group">
+                    <div class="arrow-cell" style="background: #eee; width: 32px; height: 32px;"></div>
+                    <div class="arrow-cell" style="background: #eee; width: 32px; height: 32px;"></div>
+                    <div class="arrow-cell" style="background: #eee; width: 32px; height: 32px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Score Pad (Same as Qualification) -->
+    <div class="score-pad">
+        <div class="flex justify-between items-center" style="margin-bottom: 12px;">
+            <div style="font-weight: 600;">Set 4 • Arrow 3</div>
+            <div style="font-weight: 600;">Current: <span style="color: var(--primary);">19</span></div>
+        </div>
+        <div class="score-grid">
+            <button class="score-btn btn-yellow">X</button>
+            <button class="score-btn btn-yellow">10</button>
+            <button class="score-btn btn-yellow">9</button>
+            <button class="score-btn btn-red">8</button>
+            <button class="score-btn" style="background: #eee;"><span class="material-icons">backspace</span></button>
+
+            <button class="score-btn btn-red">7</button>
+            <button class="score-btn btn-blue">6</button>
+            <button class="score-btn btn-blue">5</button>
+            <button class="score-btn btn-black">4</button>
+            <div class="score-btn" style="visibility: hidden;"></div>
+
+            <button class="score-btn btn-black">3</button>
+            <button class="score-btn btn-white">2</button>
+            <button class="score-btn btn-white">1</button>
+            <button class="score-btn btn-green">M</button>
+            <div class="score-btn" style="visibility: hidden;"></div>
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athlete Dashboard - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <a href="#" class="btn btn-outline btn-sm">Find Events</a>
+                <div class="flex items-center gap-sm">
+                    <img src="https://ui-avatars.com/api/?name=Alex+Archer&background=1565c0&color=fff"
+                        style="width: 32px; height: 32px; border-radius: 50%;">
+                    <span style="font-weight: 500;">Alex Archer</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px; padding-bottom: 40px;">
+        <h1 style="margin-bottom: 32px;">Athlete Dashboard</h1>
+
+        <!-- Active Competitions (Happening Now) -->
+        <div class="card"
+            style="background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%); color: white; margin-bottom: 40px;">
+            <div class="flex justify-between items-start">
+                <div>
+                    <div class="badge badge-warning" style="margin-bottom: 12px;">LIVE NOW</div>
+                    <h2 style="color: white; margin-bottom: 8px;">National Archery Championship 2025</h2>
+                    <p style="color: rgba(255,255,255,0.8); margin-bottom: 24px;">Recurve - Men's Individual - WA 70m
+                    </p>
+                    <a href="scoring-qualification.html" class="btn btn-accent">
+                        <span class="material-icons" style="margin-right: 8px;">edit</span>
+                        Enter Scores
+                    </a>
+                </div>
+                <div style="text-align: right;">
+                    <div style="font-size: 3rem; font-weight: 800;">Rank 3</div>
+                    <div style="font-size: 1.25rem; opacity: 0.9;">Score: 161/240</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming Registrations -->
+        <h2 style="margin-bottom: 24px;">My Registrations</h2>
+        <div class="grid grid-cols-1 gap-md">
+            <div class="card flex items-center justify-between">
+                <div>
+                    <h3 style="margin-bottom: 4px;">Winter Club Shoot</h3>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Jan 10, 2026 • Archery Range A</div>
+                </div>
+                <div class="flex items-center gap-md">
+                    <span class="badge badge-success">Registered</span>
+                    <button class="btn btn-outline">View Info</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Results -->
+        <h2 style="margin-top: 40px; margin-bottom: 24px;">Recent Results</h2>
+        <div class="card">
+            <table style="width: 100%; text-align: left; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border-color);">
+                        <th style="padding: 12px;">Event</th>
+                        <th style="padding: 12px;">Category</th>
+                        <th style="padding: 12px;">Score</th>
+                        <th style="padding: 12px;">Rank</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="padding: 12px;">Summer Open 2025</td>
+                        <td style="padding: 12px;">Recurve 70m</td>
+                        <td style="padding: 12px;">645</td>
+                        <td style="padding: 12px;"><span class="badge badge-warning">Gold</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

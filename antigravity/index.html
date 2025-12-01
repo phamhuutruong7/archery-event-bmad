@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archery Event Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="live-leaderboard.html" class="nav-link">Live Results</a>
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="register.html" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container animate-fade-in">
+            <h1>Elevate Your Archery Events</h1>
+            <p>The professional platform for managing archery competitions. Real-time scoring, live leaderboards, and
+                seamless event management.</p>
+            <div class="flex justify-center gap-md">
+                <a href="register.html" class="btn btn-accent">Host an Event</a>
+                <a href="live-leaderboard.html" class="btn btn-outline" style="color: white; border-color: white;">View
+                    Live Scores</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="container" style="padding: 80px 24px;">
+        <div class="grid grid-cols-3 gap-lg">
+            <div class="card">
+                <span class="material-icons"
+                    style="font-size: 48px; color: var(--primary); margin-bottom: 16px;">speed</span>
+                <h3>Real-Time Scoring</h3>
+                <p>Athletes enter scores directly from the target. Leaderboards update instantly for everyone to see.
+                </p>
+            </div>
+            <div class="card">
+                <span class="material-icons"
+                    style="font-size: 48px; color: var(--primary); margin-bottom: 16px;">emoji_events</span>
+                <h3>Professional Brackets</h3>
+                <p>Automatic elimination bracket generation with set-based scoring and shoot-off resolution.</p>
+            </div>
+            <div class="card">
+                <span class="material-icons"
+                    style="font-size: 48px; color: var(--primary); margin-bottom: 16px;">devices</span>
+                <h3>Mobile First</h3>
+                <p>Designed for the field. Works perfectly on phones, tablets, and desktops.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Upcoming Events -->
+    <section style="background-color: white; padding: 80px 0;">
+        <div class="container">
+            <div class="flex justify-between items-center" style="margin-bottom: 40px;">
+                <h2>Upcoming Events</h2>
+                <a href="#" class="btn btn-outline">View All</a>
+            </div>
+            <div class="grid grid-cols-2 gap-lg" id="events-list">
+                <!-- Events will be loaded here via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: #1a1a1a; color: white; padding: 60px 0;">
+        <div class="container">
+            <div class="grid grid-cols-4 gap-lg">
+                <div>
+                    <div class="nav-brand" style="color: white; margin-bottom: 16px;">
+                        <span class="material-icons">gps_fixed</span>
+                        ArcheryEMS
+                    </div>
+                    <p style="color: #999;">Democratizing professional archery competition management.</p>
+                </div>
+                <div>
+                    <h4>Platform</h4>
+                    <ul>
+                        <li><a href="#" style="color: #999;">Features</a></li>
+                        <li><a href="#" style="color: #999;">Pricing</a></li>
+                        <li><a href="#" style="color: #999;">Support</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="#" style="color: #999;">Privacy Policy</a></li>
+                        <li><a href="#" style="color: #999;">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4>Connect</h4>
+                    <div class="flex gap-sm">
+                        <!-- Social icons placeholders -->
+                        <span style="color: #999;">Twitter</span>
+                        <span style="color: #999;">Facebook</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="mock-data.js"></script>
+    <script>
+        // Load events
+        const eventsContainer = document.getElementById('events-list');
+        api.getEvents().then(events => {
+            events.forEach(event => {
+                const eventCard = `
+                    <div class="card flex gap-md" style="padding: 0; overflow: hidden;">
+                        <div style="width: 200px; background-image: url('${event.image}'); background-size: cover; background-position: center;"></div>
+                        <div style="padding: 24px; flex: 1;">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <span class="badge badge-success" style="margin-bottom: 8px;">${event.status}</span>
+                                    <h3>${event.name}</h3>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-sm" style="color: var(--text-secondary); margin-bottom: 8px;">
+                                <span class="material-icons" style="font-size: 18px;">calendar_today</span>
+                                ${event.date}
+                            </div>
+                            <div class="flex items-center gap-sm" style="color: var(--text-secondary); margin-bottom: 16px;">
+                                <span class="material-icons" style="font-size: 18px;">location_on</span>
+                                ${event.location}
+                            </div>
+                            <a href="event-detail.html?id=${event.id}" class="btn btn-outline" style="width: 100%;">View Details</a>
+                        </div>
+                    </div>
+                `;
+                eventsContainer.innerHTML += eventCard;
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Event - ArcheryEMS</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container flex justify-between items-center">
+            <a href="index.html" class="nav-brand">
+                <span class="material-icons">gps_fixed</span>
+                ArcheryEMS
+            </a>
+            <div class="flex items-center gap-md">
+                <a href="host-dashboard.html" class="btn btn-outline btn-sm">Cancel</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="padding-top: 40px; max-width: 800px;">
+        <h1 style="margin-bottom: 32px;">Create New Event</h1>
+
+        <div class="card">
+            <form id="create-event-form">
+                <div class="input-group">
+                    <label class="input-label">Event Name</label>
+                    <input type="text" class="input-field" placeholder="e.g. Summer Championship 2025" required>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Description</label>
+                    <textarea class="input-field" rows="4"
+                        placeholder="Event details, rules, and welcome message..."></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="input-group">
+                        <label class="input-label">Location</label>
+                        <input type="text" class="input-field" placeholder="Venue Name, City" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Visibility</label>
+                        <select class="input-field">
+                            <option value="public">Public (Visible to all)</option>
+                            <option value="private">Private (Invite only)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-md">
+                    <div class="input-group">
+                        <label class="input-label">Start Date</label>
+                        <input type="datetime-local" class="input-field" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">End Date</label>
+                        <input type="datetime-local" class="input-field" required>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Registration Deadline</label>
+                    <input type="datetime-local" class="input-field" required>
+                </div>
+
+                <div class="input-group" style="margin-top: 24px;">
+                    <label class="flex items-center gap-sm" style="cursor: pointer;">
+                        <input type="checkbox" style="width: 18px; height: 18px;">
+                        <span style="font-weight: 500;">Enable Equipment Check</span>
+                    </label>
+                    <p style="font-size: 0.875rem; margin-top: 4px; margin-left: 28px;">
+                        If enabled, athletes must have their equipment approved by a referee before they can be assigned
+                        to a target.
+                    </p>
+                </div>
+
+                <div class="flex justify-between items-center"
+                    style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                    <a href="host-dashboard.html" class="btn btn-outline" style="border: none;">Back</a>
+                    <button type="submit" class="btn btn-primary">Create Event</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('create-event-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Simulate creation
+            window.location.href = 'event-config.html';
+        });
+    </script>
+</body>
+
+</html>
