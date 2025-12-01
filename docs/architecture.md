@@ -37,13 +37,14 @@ Key updates in this architecture document:
 4. [System Architecture](#system-architecture)
 5. [Database Design](#database-design)
 6. [API Architecture](#api-architecture)
-7. [Real-Time Communication](#real-time-communication)
-8. [Security Architecture](#security-architecture)
-9. [Infrastructure Architecture](#infrastructure-architecture)
-10. [Deployment Architecture](#deployment-architecture)
-11. [Monitoring & Observability](#monitoring--observability)
-12. [Technology Stack](#technology-stack)
-13. [Design Decisions](#design-decisions)
+7. [Notification Service Architecture](#notification-service-architecture)
+8. [Real-Time Communication](#real-time-communication)
+9. [Security Architecture](#security-architecture)
+10. [Infrastructure Architecture](#infrastructure-architecture)
+11. [Deployment Architecture](#deployment-architecture)
+12. [Monitoring & Observability](#monitoring--observability)
+13. [Technology Stack](#technology-stack)
+14. [Design Decisions](#design-decisions)
  
 ---
  
@@ -834,6 +835,1180 @@ PUT    /api/v1/brackets/{id}/shoot-off
 - `429 Too Many Requests` - Rate limit exceeded
 - `500 Internal Server Error` - Server error
  
+---
+
+## Notification Service Architecture
+
+### Overview
+
+The **Notification Service** provides timely competition reminders to athletes, leveraging a Facebook-style lightweight approach that minimizes database storage while ensuring reliable delivery across multiple channels (Push, Email, In-App).
+
+**Key Objectives:**
+- ✅ Notify athletes **24 hours** and **1 hour** before their registered competitions start
+- ✅ Minimal database footprint (30-day retention, auto-cleanup)
+- ✅ Multi-channel delivery (Push notifications, Email, In-app)
+- ✅ User preference management (granular control)
+- ✅ Scalable job queue system for high-volume events
+
+### System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                      Notification Flow                               │
+└─────────────────────────────────────────────────────────────────────┘
+
+    ┌──────────────────┐        Every 5 minutes
+    │  Cron Scheduler  │◄──────────────────────────────┐
+    │  (Background)    │                                │
+    └────────┬─────────┘                                │
+             │                                          │
+             │ Query competitions                        │
+             │ starting in 24h/1h                       │
+             ▼                                          │
+    ┌──────────────────┐                                │
+    │ Notification     │                                │
+    │ Jobs Queue       │                                │
+    └────────┬─────────┘                                │
+             │                                          │
+             │ Pending jobs                             │
+             ▼                                          │
+    ┌──────────────────┐                                │
+    │  Job Processor   │                                │
+    │  (Worker)        │                                │
+    └────────┬─────────┘                                │
+             │                                          │
+             │ Get registered athletes                  │
+             │ Check preferences                         │
+             │                                          │
+             ▼                                          │
+    ┌──────────────────────────────────────────┐        │
+    │        Multi-Channel Sender              │        │
+    │  ┌────────────┬────────────┬──────────┐ │        │
+    │  │ Push (FCM) │   Email    │  In-App  │ │        │
+    │  └────────────┴────────────┴──────────┘ │        │
+    └──────────────────┬───────────────────────┘        │
+                       │                                │
+                       │                                │
+                       ▼                                │
+          ┌─────────────────────────┐                  │
+          │   Athlete Devices       │                  │
+          │  📱 Mobile  💻 Web      │                  │
+          └─────────────────────────┘                  │
+                       │                                │
+                       │ Read notification              │
+                       ▼                                │
+          ┌─────────────────────────┐                  │
+          │  Mark as Read (API)     │                  │
+          └─────────────────────────┘                  │
+                                                        │
+    ┌──────────────────┐                               │
+    │  Daily Cleanup   │◄──────────────────────────────┘
+    │  (2 AM Cron)     │   Delete expired (30 days+)
+    └──────────────────┘   Keep last 50 read per user
+```
+
+### Database Schema
+
+```sql
+-- ========================================
+-- NOTIFICATION TABLES
+-- ========================================
+
+-- Notifications Table (Recent notifications only - 30-day retention)
+CREATE TABLE notifications (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    type VARCHAR(50) NOT NULL, -- 'competition_reminder_24h', 'competition_reminder_1h'
+    title VARCHAR(200) NOT NULL,
+    message TEXT NOT NULL,
+    data JSONB, -- {competitionId, eventId, competitionName, startTime}
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    expires_at TIMESTAMP NOT NULL, -- Auto-delete after 30 days
+    INDEX idx_user_unread (user_id, is_read, created_at),
+    INDEX idx_expires (expires_at)
+);
+
+CREATE INDEX idx_notifications_user_unread ON notifications(user_id, is_read, created_at);
+CREATE INDEX idx_notifications_expires ON notifications(expires_at);
+
+-- Notification Preferences (User settings)
+CREATE TABLE notification_preferences (
+    user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
+    enable_competition_reminders BOOLEAN DEFAULT TRUE,
+    reminder_24h BOOLEAN DEFAULT TRUE,
+    reminder_1h BOOLEAN DEFAULT TRUE,
+    push_enabled BOOLEAN DEFAULT TRUE,
+    email_enabled BOOLEAN DEFAULT TRUE,
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Push Notification Device Tokens
+CREATE TABLE device_tokens (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(500) NOT NULL UNIQUE,
+    device_type VARCHAR(20) NOT NULL CHECK (device_type IN ('ios', 'android', 'web')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_used_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE INDEX idx_device_tokens_user ON device_tokens(user_id);
+CREATE INDEX idx_device_tokens_last_used ON device_tokens(last_used_at);
+
+-- Notification Jobs Queue (Temporary processing queue)
+CREATE TABLE notification_jobs (
+    id BIGSERIAL PRIMARY KEY,
+    competition_id UUID NOT NULL REFERENCES competitions(id) ON DELETE CASCADE,
+    event_id UUID NOT NULL REFERENCES events(id) ON DELETE CASCADE,
+    notification_type VARCHAR(50) NOT NULL,
+    scheduled_time TIMESTAMP NOT NULL,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
+    created_at TIMESTAMP DEFAULT NOW(),
+    processed_at TIMESTAMP,
+    error_message TEXT
+);
+
+CREATE INDEX idx_notification_jobs_schedule ON notification_jobs(scheduled_time, status);
+CREATE INDEX idx_notification_jobs_competition ON notification_jobs(competition_id);
+```
+
+### Backend Service Components
+
+#### 1. Notification Scheduler (Cron Job)
+
+**Runs:** Every 5 minutes  
+**Purpose:** Identify competitions requiring notifications and create jobs
+
+```csharp
+public class NotificationSchedulerService : BackgroundService
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<NotificationSchedulerService> _logger;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                var now = DateTime.UtcNow;
+                var check24h = now.AddHours(24);
+                var check1h = now.AddHours(1);
+                var window = TimeSpan.FromMinutes(5); // 5-minute detection window
+
+                // Find competitions starting in 24 hours (±5 min)
+                var competitions24h = await dbContext.Competitions
+                    .Where(c => c.StartTime >= check24h && 
+                                c.StartTime <= check24h.Add(window) &&
+                                c.Status == "Active")
+                    .ToListAsync(stoppingToken);
+
+                // Find competitions starting in 1 hour (±5 min)
+                var competitions1h = await dbContext.Competitions
+                    .Where(c => c.StartTime >= check1h && 
+                                c.StartTime <= check1h.Add(window) &&
+                                c.Status == "Active")
+                    .ToListAsync(stoppingToken);
+
+                // Create notification jobs
+                foreach (var comp in competitions24h)
+                {
+                    await CreateNotificationJobIfNotExists(dbContext, comp, "competition_reminder_24h");
+                }
+
+                foreach (var comp in competitions1h)
+                {
+                    await CreateNotificationJobIfNotExists(dbContext, comp, "competition_reminder_1h");
+                }
+
+                await dbContext.SaveChangesAsync(stoppingToken);
+                
+                _logger.LogInformation(
+                    "Notification Scheduler: Created {Count24h} (24h) + {Count1h} (1h) jobs",
+                    competitions24h.Count, competitions1h.Count);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in NotificationSchedulerService");
+            }
+
+            // Wait 5 minutes before next run
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+        }
+    }
+
+    private async Task CreateNotificationJobIfNotExists(
+        AppDbContext dbContext, Competition competition, string notificationType)
+    {
+        // Check if job already exists
+        var exists = await dbContext.NotificationJobs
+            .AnyAsync(j => j.CompetitionId == competition.Id && 
+                          j.NotificationType == notificationType &&
+                          (j.Status == "pending" || j.Status == "completed"));
+
+        if (exists) return;
+
+        // Create new job
+        dbContext.NotificationJobs.Add(new NotificationJob
+        {
+            CompetitionId = competition.Id,
+            EventId = competition.EventId,
+            NotificationType = notificationType,
+            ScheduledTime = DateTime.UtcNow,
+            Status = "pending"
+        });
+    }
+}
+```
+
+#### 2. Notification Processor (Background Worker)
+
+**Runs:** Continuously (processes pending jobs)  
+**Purpose:** Execute notification jobs and send to athletes
+
+```csharp
+public class NotificationProcessorService : BackgroundService
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<NotificationProcessorService> _logger;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var notificationSender = scope.ServiceProvider.GetRequiredService<INotificationSender>();
+
+                // Get pending jobs (batch of 100)
+                var jobs = await dbContext.NotificationJobs
+                    .Where(j => j.Status == "pending" && j.ScheduledTime <= DateTime.UtcNow)
+                    .Take(100)
+                    .ToListAsync(stoppingToken);
+
+                foreach (var job in jobs)
+                {
+                    try
+                    {
+                        // Mark as processing
+                        job.Status = "processing";
+                        await dbContext.SaveChangesAsync(stoppingToken);
+
+                        // Get registered athletes for this competition
+                        var athletes = await dbContext.AthleteGames
+                            .Where(ag => ag.GameId == job.CompetitionId && ag.IsApproved)
+                            .Include(ag => ag.User)
+                            .Select(ag => ag.User)
+                            .ToListAsync(stoppingToken);
+
+                        // Get competition details
+                        var competition = await dbContext.Competitions
+                            .Include(c => c.Event)
+                            .FirstOrDefaultAsync(c => c.Id == job.CompetitionId, stoppingToken);
+
+                        if (competition == null)
+                        {
+                            job.Status = "failed";
+                            job.ErrorMessage = "Competition not found";
+                            continue;
+                        }
+
+                        // Send notifications to each athlete
+                        foreach (var athlete in athletes)
+                        {
+                            await notificationSender.SendCompetitionReminder(
+                                athlete, competition, job.NotificationType, stoppingToken);
+                        }
+
+                        // Mark as completed
+                        job.Status = "completed";
+                        job.ProcessedAt = DateTime.UtcNow;
+
+                        _logger.LogInformation(
+                            "Processed notification job {JobId} for competition {CompetitionId}, sent to {AthleteCount} athletes",
+                            job.Id, job.CompetitionId, athletes.Count);
+                    }
+                    catch (Exception ex)
+                    {
+                        job.Status = "failed";
+                        job.ErrorMessage = ex.Message;
+                        _logger.LogError(ex, "Failed to process notification job {JobId}", job.Id);
+                    }
+                    finally
+                    {
+                        await dbContext.SaveChangesAsync(stoppingToken);
+                    }
+                }
+
+                // Wait 30 seconds before checking for more jobs
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in NotificationProcessorService");
+                await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken);
+            }
+        }
+    }
+}
+```
+
+#### 3. Notification Sender (Multi-Channel)
+
+**Purpose:** Send notifications via Push, Email, and In-App
+
+```csharp
+public interface INotificationSender
+{
+    Task SendCompetitionReminder(User athlete, Competition competition, 
+        string notificationType, CancellationToken cancellationToken);
+}
+
+public class NotificationSender : INotificationSender
+{
+    private readonly AppDbContext _dbContext;
+    private readonly IFirebaseMessaging _firebaseMessaging;
+    private readonly IEmailService _emailService;
+    private readonly ILogger<NotificationSender> _logger;
+
+    public async Task SendCompetitionReminder(
+        User athlete, Competition competition, string notificationType, 
+        CancellationToken cancellationToken)
+    {
+        // Check user preferences
+        var prefs = await _dbContext.NotificationPreferences
+            .FirstOrDefaultAsync(p => p.UserId == athlete.Id, cancellationToken);
+
+        if (prefs == null || !prefs.EnableCompetitionReminders)
+            return;
+
+        // Check specific reminder type
+        if (notificationType.Contains("24h") && !prefs.Reminder24h) return;
+        if (notificationType.Contains("1h") && !prefs.Reminder1h) return;
+
+        var timeText = notificationType.Contains("24h") ? "24 hours" : "1 hour";
+        
+        var notification = new NotificationDto
+        {
+            Title = "Competition Starting Soon!",
+            Message = $"Your {competition.BowType} {competition.Category} competition " +
+                     $"\"{competition.SubroundName}\" starts in {timeText}",
+            Data = new Dictionary<string, string>
+            {
+                ["competitionId"] = competition.Id.ToString(),
+                ["eventId"] = competition.EventId.ToString(),
+                ["competitionName"] = competition.SubroundName,
+                ["startTime"] = competition.StartTime.ToString("o")
+            }
+        };
+
+        // 1. Save to database (In-app notification)
+        var notificationRecord = new Notification
+        {
+            UserId = athlete.Id,
+            Type = notificationType,
+            Title = notification.Title,
+            Message = notification.Message,
+            Data = JsonSerializer.Serialize(notification.Data),
+            IsRead = false,
+            CreatedAt = DateTime.UtcNow,
+            ExpiresAt = DateTime.UtcNow.AddDays(30) // Auto-expire in 30 days
+        };
+
+        _dbContext.Notifications.Add(notificationRecord);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        // 2. Send Push Notification (if enabled)
+        if (prefs.PushEnabled)
+        {
+            var tokens = await _dbContext.DeviceTokens
+                .Where(t => t.UserId == athlete.Id)
+                .Select(t => t.Token)
+                .ToListAsync(cancellationToken);
+
+            foreach (var token in tokens)
+            {
+                try
+                {
+                    await _firebaseMessaging.SendAsync(new Message
+                    {
+                        Token = token,
+                        Notification = new FirebaseAdmin.Messaging.Notification
+                        {
+                            Title = notification.Title,
+                            Body = notification.Message
+                        },
+                        Data = notification.Data
+                    }, cancellationToken);
+
+                    // Update last_used_at
+                    var deviceToken = await _dbContext.DeviceTokens
+                        .FirstOrDefaultAsync(t => t.Token == token, cancellationToken);
+                    if (deviceToken != null)
+                    {
+                        deviceToken.LastUsedAt = DateTime.UtcNow;
+                    }
+                }
+                catch (FirebaseMessagingException ex)
+                {
+                    // Remove invalid tokens
+                    if (ex.MessagingErrorCode == MessagingErrorCode.InvalidArgument ||
+                        ex.MessagingErrorCode == MessagingErrorCode.Unregistered)
+                    {
+                        var invalidToken = await _dbContext.DeviceTokens
+                            .FirstOrDefaultAsync(t => t.Token == token, cancellationToken);
+                        if (invalidToken != null)
+                        {
+                            _dbContext.DeviceTokens.Remove(invalidToken);
+                        }
+                    }
+                    _logger.LogWarning(ex, "Failed to send push notification to token");
+                }
+            }
+        }
+
+        // 3. Send Email (if enabled)
+        if (prefs.EmailEnabled && !string.IsNullOrEmpty(athlete.Email))
+        {
+            await _emailService.SendCompetitionReminderEmail(
+                athlete.Email, 
+                notification, 
+                competition, 
+                cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+}
+```
+
+#### 4. Data Cleanup Service (Daily Maintenance)
+
+**Runs:** Daily at 2:00 AM  
+**Purpose:** Remove expired notifications and old jobs
+
+```csharp
+public class NotificationCleanupService : BackgroundService
+{
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<NotificationCleanupService> _logger;
+
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            try
+            {
+                // Wait until 2:00 AM
+                var now = DateTime.UtcNow;
+                var next2AM = now.Date.AddDays(1).AddHours(2);
+                if (now.Hour >= 2)
+                    next2AM = now.Date.AddDays(1).AddHours(2);
+                else
+                    next2AM = now.Date.AddHours(2);
+
+                var delay = next2AM - now;
+                await Task.Delay(delay, stoppingToken);
+
+                using var scope = _serviceProvider.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                // 1. Delete expired notifications (older than 30 days)
+                var deletedNotifications = await dbContext.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM notifications WHERE expires_at < NOW()", 
+                    stoppingToken);
+
+                // 2. Keep only last 50 read notifications per user
+                await dbContext.Database.ExecuteSqlRawAsync(@"
+                    DELETE FROM notifications
+                    WHERE id NOT IN (
+                        SELECT id FROM (
+                            SELECT id, ROW_NUMBER() OVER (
+                                PARTITION BY user_id 
+                                ORDER BY created_at DESC
+                            ) as rn
+                            FROM notifications
+                            WHERE is_read = TRUE
+                        ) sub WHERE rn <= 50
+                    ) AND is_read = TRUE", 
+                    stoppingToken);
+
+                // 3. Delete completed jobs older than 7 days
+                var deletedJobs = await dbContext.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM notification_jobs WHERE status = 'completed' AND processed_at < NOW() - INTERVAL '7 days'",
+                    stoppingToken);
+
+                // 4. Delete inactive device tokens (not used in 90 days)
+                var deletedTokens = await dbContext.Database.ExecuteSqlRawAsync(
+                    "DELETE FROM device_tokens WHERE last_used_at < NOW() - INTERVAL '90 days'",
+                    stoppingToken);
+
+                _logger.LogInformation(
+                    "Notification cleanup complete: {Notifications} notifications, {Jobs} jobs, {Tokens} tokens deleted",
+                    deletedNotifications, deletedJobs, deletedTokens);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in NotificationCleanupService");
+            }
+        }
+    }
+}
+```
+
+### API Endpoints
+
+#### Get User Notifications (Paginated)
+
+```
+GET /api/v1/notifications?page=1&limit=20
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "notifications": [
+    {
+      "id": "12345",
+      "type": "competition_reminder_24h",
+      "title": "Competition Starting Soon!",
+      "message": "Your Recurve Men's Individual competition starts in 24 hours",
+      "data": {
+        "competitionId": "uuid",
+        "eventId": "uuid",
+        "competitionName": "WA 1440 (90m)",
+        "startTime": "2025-12-15T09:00:00Z"
+      },
+      "isRead": false,
+      "createdAt": "2025-12-14T09:00:00Z"
+    }
+  ],
+  "unreadCount": 3,
+  "hasMore": true
+}
+```
+
+#### Mark Notification as Read
+
+```
+POST /api/v1/notifications/{id}/read
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "success": true
+}
+```
+
+#### Mark All Notifications as Read
+
+```
+POST /api/v1/notifications/read-all
+Authorization: Bearer {token}
+
+Response: 200 OK
+{
+  "success": true,
+  "count": 5
+}
+```
+
+#### Update Notification Preferences
+
+```
+PUT /api/v1/notifications/preferences
+Authorization: Bearer {token}
+
+Request:
+{
+  "enableCompetitionReminders": true,
+  "reminder24h": true,
+  "reminder1h": true,
+  "pushEnabled": true,
+  "emailEnabled": false
+}
+
+Response: 200 OK
+{
+  "success": true
+}
+```
+
+#### Register Device Token (Push Notifications)
+
+```
+POST /api/v1/notifications/device-token
+Authorization: Bearer {token}
+
+Request:
+{
+  "token": "fcm-token-here...",
+  "deviceType": "android"
+}
+
+Response: 200 OK
+{
+  "success": true
+}
+```
+
+### Real-Time Notification Delivery (Optional)
+
+**WebSocket Integration:**  
+Notifications can be delivered in real-time via SignalR for users actively online.
+
+```csharp
+public class NotificationHub : Hub
+{
+    public async Task JoinUserNotifications(string userId)
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"user:{userId}");
+    }
+
+    public async Task LeaveUserNotifications(string userId)
+    {
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user:{userId}");
+    }
+}
+
+// When sending notification, also broadcast via WebSocket
+public async Task BroadcastNotification(string userId, NotificationDto notification)
+{
+    await _hubContext.Clients.Group($"user:{userId}")
+        .SendAsync("ReceiveNotification", notification);
+}
+```
+
+### Key Features
+
+| Feature | Implementation | Benefit |
+|---------|---------------|---------|
+| **Minimal Storage** | 30-day auto-expiry, keep last 50 read/user | Low database footprint |
+| **Multi-Channel** | Push (FCM), Email, In-app | Reliable delivery |
+| **User Control** | Granular preferences (24h, 1h, push, email) | User satisfaction |
+| **Scalability** | Job queue + batch processing | Handles high volumes |
+| **Reliability** | Retry logic, error tracking | Robust system |
+| **Performance** | Indexed queries, caching | Fast response times |
+| **Monitoring** | Job status tracking, failed job alerts | Operational visibility |
+
+### Performance Considerations
+
+- **Database Indexes:** Ensure fast queries on `user_id`, `created_at`, `is_read`, `expires_at`
+- **Job Processing:** Use queue system (Redis/RabbitMQ) for high volume events
+- **Caching:** Cache user preferences in Redis to reduce database load
+- **Batch Processing:** Send notifications in batches of 100 to prevent overload
+- **Rate Limiting:** Prevent notification spam (max 10 notifications/hour per user)
+
+### Monitoring Metrics
+
+```
+Key Metrics:
+- Notification delivery rate (%)
+- Average processing time (seconds)
+- Failed notification count
+- User engagement rate (read/unread ratio)
+- Database size over time (MB)
+- Job queue depth
+```
+
+### Security Considerations
+
+- ✅ Authenticate all API requests (JWT tokens)
+- ✅ Encrypt device tokens at rest
+- ✅ Validate notification data before sending (prevent XSS)
+- ✅ Rate limit notification API calls (10 req/min per user)
+- ✅ Sanitize notification content
+- ✅ Secure Firebase Cloud Messaging credentials
+
+### Implementation Roadmap
+
+**Phase 1: Database Setup (Week 1)**
+1. Create notification tables (notifications, notification_preferences, device_tokens, notification_jobs)
+2. Add indexes for performance
+3. Set up auto-cleanup triggers
+
+**Phase 2: Backend Services (Week 2-3)**
+1. Implement notification scheduler (cron job)
+2. Implement notification processor (background worker)
+3. Create notification sender with multi-channel support
+4. Add cleanup service
+
+**Phase 3: API Development (Week 3)**
+1. Build REST APIs for fetching/managing notifications
+2. Implement device token management
+3. Add notification preferences endpoints
+
+**Phase 4: Frontend Integration (Week 4)**
+1. Create notification bell UI component
+2. Implement notification list with pagination
+3. Add notification preferences page
+4. Integrate Firebase Cloud Messaging
+
+**Phase 5: Testing & Monitoring (Week 5)**
+1. Load testing for high-volume events
+2. Set up monitoring for failed notifications
+3. Analytics for notification engagement
+4. End-to-end testing
+
+---
+
+## Notification Service: Architecture Decision Analysis
+
+### Comparing Two Approaches
+
+#### Approach 1: Hangfire + RabbitMQ + Quartz.NET (External Dependencies)
+
+**Architecture:**
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    Hangfire Dashboard                            │
+│              (Web UI for job monitoring)                         │
+└────────────────────────┬─────────────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                   Hangfire Server                                │
+│  - Persistent Job Storage (SQL Server/PostgreSQL)               │
+│  - Job Retry Logic                                               │
+│  - Automatic Failure Handling                                    │
+└────────────────────────┬─────────────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────────────┐
+│                      RabbitMQ                                    │
+│  - Message Queue (AMQP Protocol)                                │
+│  - Message Persistence                                           │
+│  - Publish/Subscribe Pattern                                     │
+│  - Dead Letter Queue                                             │
+└────────────────────────┬─────────────────────────────────────────┘
+                         │
+                         ▼
+┌──────────────────────────────────────────────────────────────────┐
+│               Consumer Workers (Multiple)                        │
+│  - Scale horizontally                                            │
+│  - Process notifications                                         │
+│  - Send via FCM/Email                                            │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Key Components:**
+
+1. **Hangfire** (Job Scheduler)
+   - Web-based dashboard for monitoring
+   - Persistent job storage
+   - Automatic retry mechanism
+   - Cron expression support
+   - Job prioritization
+
+2. **RabbitMQ** (Message Broker)
+   - Decouples producer from consumer
+   - Guarantees message delivery
+   - Load balancing across consumers
+   - Message persistence (survives restarts)
+   - Dead letter queue for failed messages
+
+3. **Quartz.NET** (Alternative Scheduler)
+   - Enterprise-grade scheduling
+   - Clustered scheduling support
+   - Job chaining
+   - Calendar-based scheduling
+
+**Implementation Example:**
+
+```csharp
+// Install NuGet packages
+// - Hangfire.Core
+// - Hangfire.PostgreSql
+// - RabbitMQ.Client
+// - MassTransit (RabbitMQ abstraction)
+
+// Program.cs - Configure Hangfire
+builder.Services.AddHangfire(config => config
+    .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+    .UseSimpleAssemblyNameTypeSerializer()
+    .UseRecommendedSerializerSettings()
+    .UsePostgreSqlStorage(builder.Configuration.GetConnectionString("HangfireConnection")));
+
+builder.Services.AddHangfireServer();
+
+// Program.cs - Configure RabbitMQ with MassTransit
+builder.Services.AddMassTransit(x =>
+{
+    x.AddConsumer<NotificationConsumer>();
+    
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host("localhost", "/", h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+        
+        cfg.ReceiveEndpoint("notification-queue", e =>
+        {
+            e.ConfigureConsumer<NotificationConsumer>(context);
+            e.PrefetchCount = 100; // Process 100 messages at a time
+            e.UseMessageRetry(r => r.Intervals(
+                TimeSpan.FromSeconds(5),
+                TimeSpan.FromSeconds(15),
+                TimeSpan.FromSeconds(30)
+            ));
+        });
+    });
+});
+
+// Schedule recurring job
+RecurringJob.AddOrUpdate<NotificationSchedulerService>(
+    "schedule-competition-reminders",
+    service => service.ScheduleReminders(),
+    "*/5 * * * *" // Every 5 minutes
+);
+
+// Notification Scheduler Service
+public class NotificationSchedulerService
+{
+    private readonly IPublishEndpoint _publishEndpoint;
+    private readonly AppDbContext _dbContext;
+    
+    public async Task ScheduleReminders()
+    {
+        var now = DateTime.UtcNow;
+        var check24h = now.AddHours(24);
+        var check1h = now.AddHours(1);
+        
+        var competitions = await _dbContext.Competitions
+            .Where(c => (c.StartTime >= check24h && c.StartTime <= check24h.AddMinutes(5)) ||
+                       (c.StartTime >= check1h && c.StartTime <= check1h.AddMinutes(5)))
+            .ToListAsync();
+        
+        foreach (var competition in competitions)
+        {
+            var reminderType = competition.StartTime - now < TimeSpan.FromHours(2) 
+                ? "1h" : "24h";
+            
+            // Publish to RabbitMQ
+            await _publishEndpoint.Publish(new NotificationJob
+            {
+                CompetitionId = competition.Id,
+                EventId = competition.EventId,
+                NotificationType = $"competition_reminder_{reminderType}",
+                ScheduledTime = DateTime.UtcNow
+            });
+        }
+    }
+}
+
+// RabbitMQ Consumer
+public class NotificationConsumer : IConsumer<NotificationJob>
+{
+    private readonly INotificationSender _notificationSender;
+    private readonly AppDbContext _dbContext;
+    
+    public async Task Consume(ConsumeContext<NotificationJob> context)
+    {
+        var job = context.Message;
+        
+        // Get athletes
+        var athletes = await _dbContext.AthleteGames
+            .Where(ag => ag.GameId == job.CompetitionId)
+            .Include(ag => ag.User)
+            .Select(ag => ag.User)
+            .ToListAsync();
+        
+        // Get competition
+        var competition = await _dbContext.Competitions
+            .FirstOrDefaultAsync(c => c.Id == job.CompetitionId);
+        
+        // Send to each athlete
+        foreach (var athlete in athletes)
+        {
+            await _notificationSender.SendCompetitionReminder(
+                athlete, competition, job.NotificationType, CancellationToken.None);
+        }
+    }
+}
+```
+
+**Pros:**
+- ✅ **Enterprise-grade reliability**: Battle-tested in production environments
+- ✅ **Web dashboard**: Visual monitoring of jobs (Hangfire UI)
+- ✅ **Automatic retries**: Built-in retry logic with exponential backoff
+- ✅ **Horizontal scaling**: Add more workers easily
+- ✅ **Message persistence**: Survives server restarts
+- ✅ **Dead letter queue**: Captures failed messages for analysis
+- ✅ **Better separation of concerns**: Publisher doesn't care about consumers
+- ✅ **Load balancing**: RabbitMQ distributes work across consumers
+- ✅ **Mature ecosystem**: Extensive documentation and community support
+
+**Cons:**
+- ❌ **Additional infrastructure**: Requires RabbitMQ server (extra resource)
+- ❌ **Complexity**: More moving parts to maintain
+- ❌ **Learning curve**: Team needs to understand RabbitMQ, Hangfire, MassTransit
+- ❌ **Cost**: RabbitMQ server needs RAM (500MB-1GB minimum)
+- ❌ **Network overhead**: Messages serialized/deserialized
+- ❌ **Additional dependencies**: 3-4 NuGet packages
+- ❌ **Monitoring complexity**: Need to monitor both Hangfire and RabbitMQ
+
+---
+
+#### Approach 2: Native .NET Background Services (My Recommendation)
+
+**Architecture:**
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                   ASP.NET Core Application                       │
+│                                                                  │
+│  ┌────────────────────────────────────────────────────────────┐ │
+│  │          BackgroundService (IHostedService)                │ │
+│  │                                                            │ │
+│  │  ┌──────────────────────────────────────────────────────┐ │ │
+│  │  │  NotificationSchedulerService                        │ │ │
+│  │  │  - Runs every 5 minutes                              │ │ │
+│  │  │  - Queries database directly                         │ │ │
+│  │  │  - Creates jobs in notification_jobs table           │ │ │
+│  │  └──────────────────────────────────────────────────────┘ │ │
+│  │                                                            │ │
+│  │  ┌──────────────────────────────────────────────────────┐ │ │
+│  │  │  NotificationProcessorService                        │ │ │
+│  │  │  - Polls notification_jobs table                     │ │ │
+│  │  │  - Processes pending jobs                            │ │ │
+│  │  │  - Sends notifications                               │ │ │
+│  │  └──────────────────────────────────────────────────────┘ │ │
+│  │                                                            │ │
+│  │  ┌──────────────────────────────────────────────────────┐ │ │
+│  │  │  NotificationCleanupService                          │ │ │
+│  │  │  - Runs daily at 2 AM                                │ │ │
+│  │  │  - Cleans up old data                                │ │ │
+│  │  └──────────────────────────────────────────────────────┘ │ │
+│  └────────────────────────────────────────────────────────────┘ │
+│                           │                                     │
+│                           ▼                                     │
+│                 ┌──────────────────┐                           │
+│                 │  PostgreSQL DB   │                           │
+│                 │  notification_   │                           │
+│                 │  jobs table      │                           │
+│                 └──────────────────┘                           │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Key Components:**
+
+1. **BackgroundService (Built-in .NET)**
+   - Native to ASP.NET Core
+   - Lifecycle managed by host
+   - No external dependencies
+   - Uses PostgreSQL as job queue
+
+2. **Database as Queue**
+   - `notification_jobs` table serves as queue
+   - ACID guarantees
+   - Simple to implement
+   - No additional infrastructure
+
+**Implementation Example:**
+
+```csharp
+// Program.cs - Register background services
+builder.Services.AddHostedService<NotificationSchedulerService>();
+builder.Services.AddHostedService<NotificationProcessorService>();
+builder.Services.AddHostedService<NotificationCleanupService>();
+builder.Services.AddScoped<INotificationSender, NotificationSender>();
+
+// No additional packages needed - all built-in!
+```
+
+**Pros:**
+- ✅ **Zero external dependencies**: Uses built-in .NET features
+- ✅ **Simple architecture**: Easy to understand and maintain
+- ✅ **No additional infrastructure**: No RabbitMQ, Redis, or external services
+- ✅ **Cost-effective**: No extra server resources needed
+- ✅ **Fast development**: Less code, faster to implement
+- ✅ **Database guarantees**: ACID compliance for job queue
+- ✅ **Easy debugging**: All in one application
+- ✅ **Suitable for MVP**: Perfect for initial launch
+
+**Cons:**
+- ❌ **Scaling limitations**: Harder to scale horizontally (need distributed locking)
+- ❌ **No built-in dashboard**: Need to build custom monitoring
+- ❌ **Manual retry logic**: Have to implement yourself
+- ❌ **Database polling**: Can increase DB load (mitigated by indexes)
+- ❌ **Single point of failure**: If app crashes, jobs pause
+- ❌ **Less flexibility**: Tightly coupled to main application
+
+---
+
+### Decision Matrix: Which Approach to Choose?
+
+| Criteria | Hangfire + RabbitMQ | Background Services | Winner |
+|----------|-------------------|---------------------|--------|
+| **Initial Development Speed** | Slower (3-5 days setup) | Faster (1-2 days) | ✅ Background Services |
+| **Infrastructure Cost** | Higher (+$20-50/mo) | Lower ($0 extra) | ✅ Background Services |
+| **Complexity** | High | Low | ✅ Background Services |
+| **Scalability** | Excellent (10k+ jobs/min) | Good (1k jobs/min) | ✅ Hangfire + RabbitMQ |
+| **Reliability** | Excellent (5 nines) | Good (3-4 nines) | ✅ Hangfire + RabbitMQ |
+| **Monitoring** | Built-in dashboard | Custom needed | ✅ Hangfire + RabbitMQ |
+| **Learning Curve** | Steep | Gentle | ✅ Background Services |
+| **Maintenance** | Higher | Lower | ✅ Background Services |
+| **Suitable for MVP** | Overkill | Perfect | ✅ Background Services |
+| **Enterprise Ready** | Yes | With modifications | ✅ Hangfire + RabbitMQ |
+
+---
+
+### Recommendation Based on Your Context
+
+#### ✅ **Start with Background Services (Approach 2)**
+
+**Why?**
+
+1. **You're building an MVP**: Your system is designed for 100+ concurrent events, not 10,000+
+2. **Notification volume is predictable**: Max ~200 notifications per event (if 200 athletes × 2 reminders)
+3. **You already have PostgreSQL**: No need to add RabbitMQ infrastructure
+4. **Team velocity**: Faster to implement, easier to debug
+5. **Cost optimization**: No additional server resources
+6. **Monolithic architecture**: You chose monolith for simplicity - stay consistent
+
+**When to migrate to Hangfire + RabbitMQ?**
+
+Upgrade when you hit these thresholds:
+
+- ✅ **>500 concurrent events**: Need better horizontal scaling
+- ✅ **>10,000 notifications/hour**: Database queue becomes bottleneck
+- ✅ **24/7 operations critical**: Need message persistence guarantees
+- ✅ **Multiple notification types**: Need complex routing (email only, push only, etc.)
+- ✅ **Enterprise customers**: They require SLA guarantees
+- ✅ **Team grows >5 devs**: Can handle the complexity
+
+---
+
+### Hybrid Approach (Best of Both Worlds)
+
+**Phase 1 (MVP - Month 1-3):** Background Services
+```csharp
+// Simple, fast, working solution
+builder.Services.AddHostedService<NotificationSchedulerService>();
+builder.Services.AddHostedService<NotificationProcessorService>();
+```
+
+**Phase 2 (Scale - Month 6-12):** Add Hangfire (Keep RabbitMQ for later)
+```csharp
+// Add Hangfire for better monitoring and reliability
+builder.Services.AddHangfire(config => config.UsePostgreSqlStorage(...));
+builder.Services.AddHangfireServer();
+
+// Replace BackgroundService with Hangfire jobs
+RecurringJob.AddOrUpdate<NotificationSchedulerService>(
+    "schedule-reminders", 
+    s => s.ScheduleReminders(), 
+    "*/5 * * * *"
+);
+```
+
+**Phase 3 (Enterprise - Month 12+):** Add RabbitMQ
+```csharp
+// Add RabbitMQ when scaling demands it
+builder.Services.AddMassTransit(x =>
+{
+    x.UsingRabbitMq((context, cfg) => { /* config */ });
+});
+```
+
+---
+
+### Migration Path: Background Services → Hangfire + RabbitMQ
+
+**Step 1: Add Hangfire (Zero downtime)**
+```csharp
+// Keep existing BackgroundService running
+// Add Hangfire in parallel
+builder.Services.AddHostedService<NotificationSchedulerService>(); // Old
+builder.Services.AddHangfire(config => config.UsePostgreSqlStorage(...)); // New
+```
+
+**Step 2: Gradually migrate jobs**
+```csharp
+// Move one job at a time to Hangfire
+RecurringJob.AddOrUpdate<NotificationSchedulerService>(
+    "schedule-reminders",
+    service => service.ScheduleReminders(),
+    "*/5 * * * *"
+);
+
+// Remove old BackgroundService after validation
+// builder.Services.AddHostedService<NotificationSchedulerService>(); // Commented out
+```
+
+**Step 3: Add RabbitMQ (when needed)**
+```csharp
+// Hangfire → RabbitMQ → Consumer
+// Hangfire schedules jobs
+// RabbitMQ queues messages
+// Consumers process notifications
+```
+
+---
+
+### Practical Recommendation for Your Project
+
+**Implement Background Services now because:**
+
+1. ✅ **Your architecture document already uses monolithic approach** - stay consistent
+2. ✅ **Your event scale (100+ events)** doesn't require enterprise message queue yet
+3. ✅ **Development speed matters** - you're building prototypes
+4. ✅ **Team familiarity** - standard .NET patterns, no new tools to learn
+5. ✅ **Infrastructure simplicity** - one less thing to deploy/monitor/secure
+
+**Add this to your backlog for Phase 2:**
+
+> "When we reach 500+ concurrent events or 10,000+ notifications/hour, evaluate migration to Hangfire + RabbitMQ for improved scalability and reliability. Estimated: Q3 2026."
+
+---
+
+### Code Comparison: Same Feature, Two Approaches
+
+**Background Service (Simple):**
+```csharp
+// 50 lines of code, zero dependencies
+public class NotificationSchedulerService : BackgroundService
+{
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    {
+        while (!stoppingToken.IsCancellationRequested)
+        {
+            // Query database, create jobs
+            await Task.Delay(TimeSpan.FromMinutes(5), stoppingToken);
+        }
+    }
+}
+```
+
+**Hangfire + RabbitMQ (Complex):**
+```csharp
+// 200+ lines of code, 3 NuGet packages, RabbitMQ server setup
+// Configure Hangfire
+builder.Services.AddHangfire(config => { /* 20 lines */ });
+
+// Configure RabbitMQ
+builder.Services.AddMassTransit(x => { /* 30 lines */ });
+
+// Scheduler
+RecurringJob.AddOrUpdate<NotificationSchedulerService>(/* ... */);
+
+// Consumer
+public class NotificationConsumer : IConsumer<NotificationJob> { /* 50 lines */ }
+
+// Message contracts
+public record NotificationJob { /* 10 lines */ }
+```
+
+**Both achieve the same goal** - the question is: do you need the extra power now or later?
+
+**Answer: Start simple, scale smart.**
+
 ---
  
 ## Real-Time Communication

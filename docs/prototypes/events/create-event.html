@@ -276,6 +276,19 @@
                     <span class="helper-text">Leave empty for unlimited participants</span>
                 </div>
 
+                <!-- Equipment Check -->
+                <div class="form-group">
+                    <label class="form-label">Event Options</label>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 2px solid #e0e0e0;">
+                        <input type="checkbox" id="equipmentCheck" name="equipmentCheck" style="width: 20px; height: 20px; cursor: pointer; accent-color: #1565c0;">
+                        <label for="equipmentCheck" style="cursor: pointer; font-size: 14px; color: #424242; font-weight: 500; flex: 1; user-select: none;">
+                            <i class="mdi mdi-shield-check" style="color: #1565c0; font-size: 18px; vertical-align: middle; margin-right: 4px;"></i>
+                            Require Equipment Check
+                        </label>
+                    </div>
+                    <span class="helper-text">Athletes must complete equipment inspection before competing</span>
+                </div>
+
                 <!-- Competitions -->
                 <div class="form-group">
                     <!-- Add Competition Button -->
@@ -724,6 +737,7 @@
                 endDate: document.getElementById('endDate').value,
                 registrationDeadline: document.getElementById('registrationDeadline').value,
                 maxParticipants: document.getElementById('maxParticipants').value || null,
+                equipmentCheck: document.getElementById('equipmentCheck').checked,
                 competitions: selectedCompetitions,
                 status: 'upcoming'
             };
