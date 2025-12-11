@@ -57,12 +57,33 @@ const athletesData = {
     
     // Event ID 4 - Spring Open Championship
     4: [
+        // Recurve Athletes
         { id: 19, name: 'James Mitchell', team: 'Melbourne Arrows', category: 'Recurve', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-001' },
         { id: 20, name: 'Emma Wilson', team: 'Sydney Archers', category: 'Recurve', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-002' },
         { id: 21, name: 'Oliver Brown', team: 'Brisbane Archery Club', category: 'Recurve', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-003' },
         { id: 22, name: 'Sophie Taylor', team: 'Perth Archers', category: 'Recurve', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-004' },
+        { id: 117, name: 'William Johnson', team: 'Adelaide Archery Club', category: 'Recurve', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-017' },
+        { id: 118, name: 'Charlotte Davis', team: 'Canberra Archers', category: 'Recurve', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-018' },
+        { id: 119, name: 'Liam Thompson', team: 'Melbourne Arrows', category: 'Recurve', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-019' },
+        { id: 120, name: 'Olivia Martin', team: 'Sydney Archers', category: 'Recurve', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-020' },
+        
+        // Compound Athletes
+        { id: 121, name: 'Noah Anderson', team: 'Brisbane Archery Club', category: 'Compound', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-021' },
+        { id: 122, name: 'Ava Wilson', team: 'Perth Archers', category: 'Compound', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-022' },
+        { id: 123, name: 'Ethan Smith', team: 'Melbourne Arrows', category: 'Compound', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-023' },
+        { id: 124, name: 'Mia Brown', team: 'Sydney Archers', category: 'Compound', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-024' },
+        { id: 125, name: 'Jackson Lee', team: 'Adelaide Archery Club', category: 'Compound', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-025' },
+        { id: 126, name: 'Emily White', team: 'Canberra Archers', category: 'Compound', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-026' },
+        { id: 127, name: 'Mason Harris', team: 'Brisbane Archery Club', category: 'Compound', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-027' },
+        { id: 128, name: 'Amelia Clark', team: 'Perth Archers', category: 'Compound', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-028' },
+        
+        // Barebow Athletes
         { id: 23, name: 'Lucas Anderson', team: 'Melbourne Arrows', category: 'Barebow', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-005' },
-        { id: 24, name: 'Isabella White', team: 'Sydney Archers', category: 'Barebow', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-006' }
+        { id: 24, name: 'Isabella White', team: 'Sydney Archers', category: 'Barebow', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-006' },
+        { id: 129, name: 'Benjamin Taylor', team: 'Brisbane Archery Club', category: 'Barebow', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-029' },
+        { id: 130, name: 'Sophie Johnson', team: 'Adelaide Archery Club', category: 'Barebow', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-030' },
+        { id: 131, name: 'Henry Davis', team: 'Perth Archers', category: 'Barebow', division: "Men's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-031' },
+        { id: 132, name: 'Grace Martin', team: 'Canberra Archers', category: 'Barebow', division: "Women's Individual", country: 'Australia', flag: 'ðŸ‡¦ðŸ‡º', bib: 'AUS-032' }
     ],
     
     // Event ID 5 - International Archery Cup

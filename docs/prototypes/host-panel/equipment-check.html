@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equipment Check</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/event-details.js"></script>
+    <script src="../mock-data/athletes.js"></script>
+    <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/athlete-competitions.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; background: #f5f5f5; }
+       
+        /* Responsive container */
+        .equipment-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+       
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .equipment-container { width: 100%; }
+           
+            .header-title { font-size: 16px; }
+           
+            .data-table th,
+            .data-table td { padding: 10px 8px; font-size: 13px; }
+        }
+       
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .equipment-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .equipment-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Monitor/Desktop (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .equipment-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+            .equipment-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+ 
+       
+        /* Header */
+        .equipment-header { display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+       
+        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-back i { font-size: 24px; }
+       
+        .header-title { grid-column: 2 / 7; font-size: 18px; font-weight: 700; }
+       
+        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
+        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
+       
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+       
+        /* Language Dropdown */
+        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
+        .language-dropdown.show { display: block; }
+        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
+        .language-item:hover { background: #f5f5f5; }
+        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .language-flag { font-size: 20px; }
+        .language-name { flex: 1; }
+       
+        /* Content */
+        .content { padding: 20px; }
+       
+        /* Event Info */
+        .event-info { background: #f5f5f5; border-radius: 8px; padding: 16px; margin-bottom: 24px; }
+        .event-info-title { font-size: 16px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .event-info-title i { color: #1565c0; font-size: 20px; }
+        .event-name { font-size: 15px; color: #424242; margin-bottom: 4px; }
+        .event-location { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px; }
+        .event-location i { font-size: 14px; }
+       
+        /* Bow Type Section */
+        .bow-section { margin-bottom: 24px; }
+        .bow-section-title { font-size: 18px; font-weight: 700; color: white; background: #1565c0; padding: 12px 16px; border-radius: 8px 8px 0 0; display: flex; align-items: center; gap: 8px; }
+        .bow-section-title i { font-size: 22px; }
+       
+        .athletes-list { background: white; border-radius: 0 0 8px 8px; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); overflow: hidden; margin-bottom: 12px; }
+       
+        .athlete-item { padding: 16px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        .athlete-item:hover { background: #f9f9f9; }
+        .athlete-item:last-child { border-bottom: none; }
+       
+        .athlete-info { flex: 1; }
+        .athlete-name { font-size: 16px; font-weight: 600; color: #212121; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+        .athlete-flag { font-size: 20px; }
+        .athlete-detail { font-size: 13px; color: #666; display: flex; align-items: center; gap: 6px; }
+        .athlete-detail i { font-size: 14px; color: #1565c0; }
+       
+        .check-actions { display: flex; gap: 12px; align-items: center; }
+       
+        .equipment-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: #2e7d32; }
+       
+        .status-badge { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; display: inline-block; }
+        .status-badge.checked { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.unchecked { background: #f5f5f5; color: #757575; }
+       
+        /* Bow Type Badges */
+        .bow-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; margin-left: 8px; }
+        .bow-badge.recurve { background: #e3f2fd; color: #1565c0; }
+        .bow-badge.compound { background: #e8f5e9; color: #2e7d32; }
+        .bow-badge.barebow { background: #fff3e0; color: #e65100; }
+       
+        /* Empty State */
+        .empty-state { text-align: center; padding: 48px 16px; }
+        .empty-state i { font-size: 64px; color: #e0e0e0; margin-bottom: 16px; }
+        .empty-state-title { font-size: 18px; font-weight: 700; color: #757575; margin-bottom: 8px; }
+        .empty-state-text { font-size: 14px; color: #9e9e9e; }
+       
+        /* Loading State */
+        .loading { text-align: center; padding: 48px 16px; }
+        .loading i { font-size: 48px; color: #1565c0; animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+       
+        /* Filter Section */
+        .filter-section { margin-bottom: 20px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+        .filter-label { font-size: 14px; font-weight: 600; color: #424242; }
+        .filter-select { padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: white; cursor: pointer; color: #424242; font-weight: 500; min-width: 150px; }
+        .filter-select:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+       
+        /* Search Box */
+        .search-wrapper { flex: 1; min-width: 250px; position: relative; display: grid; grid-template-columns: 40px 1fr; align-items: center; }
+        .search-icon { grid-column: 1; grid-row: 1; justify-self: center; align-self: center; color: #666; font-size: 18px; z-index: 1; pointer-events: none; }
+        .search-input { grid-column: 1 / 3; grid-row: 1; width: 100%; padding: 10px 12px 10px 40px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; }
+        .search-input:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .search-input:focus ~ .search-icon { color: #1565c0; }
+       
+        /* Table Styles */
+        .table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .athletes-table { width: 100%; border-collapse: collapse; }
+        .athletes-table thead { background: #f5f5f5; }
+        .athletes-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; }
+        .athletes-table tbody tr { transition: background 0.2s; border-bottom: 1px solid #e0e0e0; }
+        .athletes-table tbody tr:hover { background: #f9f9f9; }
+        .athletes-table td { padding: 12px; font-size: 14px; color: #424242; }
+        .athletes-table td:nth-child(1) { font-weight: 600; }
+       
+        .athlete-name-cell { display: flex; align-items: center; gap: 8px; }
+        .athlete-flag { font-size: 18px; }
+       
+        .team-cell { font-size: 13px; color: #666; }
+        .team-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+        .country-cell { font-size: 13px; color: #666; display: flex; align-items: center; gap: 4px; }
+        .country-cell i { font-size: 14px; color: #1565c0; }
+       
+        .bow-type-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+       
+        .check-cell { text-align: center; }
+        .check-checkbox { width: 18px; height: 18px; cursor: pointer; accent-color: #2e7d32; }
+       
+        .status-cell { text-align: center; }
+        .status-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .status-badge.checked { background: #e8f5e9; color: #2e7d32; }
+        .status-badge.unchecked { background: #f5f5f5; color: #757575; }
+       
+        /* Summary Section */
+        .summary-section { background: #f9f9f9; border-radius: 8px; padding: 16px; margin-top: 24px; position: sticky; bottom: 0; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08); }
+        .summary-title { font-size: 14px; font-weight: 700; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .summary-title i { color: #2e7d32; font-size: 18px; }
+        .summary-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-size: 14px; color: #424242; }
+        .summary-row:last-child { margin-bottom: 0; }
+        .summary-value { font-weight: 700; color: #2e7d32; font-size: 16px; }
+       
+        .divider { height: 1px; background: #e0e0e0; margin: 12px 0; }
+       
+        /* Submit Button */
+        .submit-btn {
+            padding: 8px 16px;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .submit-btn:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(46, 125, 50, 0.3);
+        }
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        .submit-btn:disabled {
+            background: #bdbdbd;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .submit-btn i {
+            font-size: 16px;
+        }
+        
+        .summary-row-with-button {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .summary-row-with-button:last-child {
+            margin-bottom: 0;
+        }
+        .summary-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+       
+        /* Empty State */
+        .no-data { text-align: center; padding: 40px 16px; color: #9e9e9e; }
+        .no-data i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="equipment-container">
+        <!-- Header -->
+        <div class="equipment-header">
+            <div class="header-back" onclick="history.back()">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">Equipment Check</div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇺🇸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+ 
+        <!-- Content -->
+        <div class="content" id="content">
+            <div class="loading">
+                <i class="mdi mdi-loading"></i>
+            </div>
+        </div>
+    </div>
+ 
+    <script>
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+ 
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+           
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+ 
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+ 
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+ 
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+ 
+        // Initialize language selector
+        initLanguageSelector();
+ 
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = parseInt(urlParams.get('eventId'));
+ 
+        // Equipment check state
+        let equipmentCheckState = {};
+        let allAthletesByBowType = {};
+        let selectedBowType = 'all';
+        let searchTerm = '';
+ 
+        // Get bow type icon
+        function getBowTypeIcon(bowType) {
+            const type = (bowType || 'Recurve').toLowerCase();
+            if (type === 'compound') return 'mdi-bow-tie';
+            if (type === 'barebow') return 'mdi-target-variant';
+            return 'mdi-bow-arrow'; // Recurve
+        }
+ 
+        // Handle checkbox change
+        function toggleEquipmentCheck(athleteId, bowType) {
+            const key = `${athleteId}-${bowType}`;
+            const isCurrentlyChecked = equipmentCheckState[key] || false;
+            equipmentCheckState[key] = !isCurrentlyChecked;
+           
+            // Save to localStorage
+            localStorage.setItem(`equipment_check_${eventId}`, JSON.stringify(equipmentCheckState));
+            
+            // Find athlete name for feedback
+            const athletes = allAthletesByBowType[bowType] || [];
+            const athlete = athletes.find(a => a.id === athleteId);
+            
+            if (equipmentCheckState[key]) {
+                // Athlete is now verified and approved for competition
+                console.log(`✓ ${athlete ? athlete.name : 'Athlete'} (${bowType}) approved for competition`);
+            } else {
+                // Athlete verification removed
+                console.log(`✗ ${athlete ? athlete.name : 'Athlete'} (${bowType}) removed from competition`);
+            }
+           
+            // Update display
+            renderTable();
+        }
+ 
+        // Handle bow type filter change
+        function filterByBowType(bowType) {
+            selectedBowType = bowType;
+            renderTable();
+        }
+ 
+        // Handle search input
+        function handleSearch(value) {
+            searchTerm = value.toLowerCase();
+            renderTable();
+        }
+ 
+        // Load equipment check data
+        function loadEquipmentCheck() {
+            const content = document.getElementById('content');
+           
+            // Get event data
+            const event = getEventDetail(eventId);
+            if (!event) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <i class="mdi mdi-alert-circle-outline"></i>
+                        <div class="empty-state-title">Event not found</div>
+                        <div class="empty-state-text">Unable to load event information</div>
+                    </div>
+                `;
+                return;
+            }
+ 
+            // Get all athletes competing in this event
+            const allEventAthletes = getAthletesByEvent(eventId);
+           
+            if (!allEventAthletes || allEventAthletes.length === 0) {
+                content.innerHTML = `
+                    <div class="empty-state">
+                        <i class="mdi mdi-account-multiple-outline"></i>
+                        <div class="empty-state-title">No athletes registered</div>
+                        <div class="empty-state-text">No athletes have registered for this event yet</div>
+                    </div>
+                `;
+                return;
+            }
+ 
+            // Load saved state
+            const savedState = localStorage.getItem(`equipment_check_${eventId}`);
+            if (savedState) {
+                equipmentCheckState = JSON.parse(savedState);
+            }
+ 
+            // Group athletes by bow type
+            allAthletesByBowType = {};
+           
+            allEventAthletes.forEach(athlete => {
+                // Get competitions for this athlete
+                const athleteComps = getAthleteCompetitions(eventId, athlete.id);
+               
+                athleteComps.forEach(comp => {
+                    const bowType = comp.category || 'Recurve';
+                    if (!allAthletesByBowType[bowType]) {
+                        allAthletesByBowType[bowType] = [];
+                    }
+                   
+                    // Check if athlete already added for this bow type
+                    if (!allAthletesByBowType[bowType].find(a => a.id === athlete.id)) {
+                        allAthletesByBowType[bowType].push(athlete);
+                    }
+                });
+            });
+ 
+            // Render content
+            let html = `
+                <!-- Event Info -->
+                <div class="event-info">
+                    <div class="event-info-title">
+                        <i class="mdi mdi-calendar-check"></i>
+                        Event Information
+                    </div>
+                    <div class="event-name">${event.title}</div>
+                    <div class="event-location">
+                        <i class="mdi mdi-map-marker"></i>
+                        ${event.location} • ${event.dateDisplay}
+                    </div>
+                </div>
+ 
+                <!-- Filter Section -->
+                <div class="filter-section">
+                    <select class="filter-select" onchange="filterByBowType(this.value)">
+                        <option value="all">All Bow Types</option>
+            `;
+ 
+            // Add bow type options
+            const bowTypes = Object.keys(allAthletesByBowType).sort();
+            bowTypes.forEach(bowType => {
+                html += `<option value="${bowType}">${bowType}</option>`;
+            });
+ 
+            html += `
+                    </select>
+                    <div class="search-wrapper">
+                        <i class="mdi mdi-magnify search-icon"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search athlete, team, country, bow type..." oninput="handleSearch(this.value)">
+                    </div>
+                </div>
+ 
+                <!-- Athletes Table -->
+                <div id="tableContainer"></div>
+ 
+                <!-- Summary Section -->
+                <div class="summary-section">
+                    <div class="summary-title">
+                        <i class="mdi mdi-checkbox-marked-circle"></i> Equipment Verified by Bow Type
+                    </div>
+                    <div id="summaryContent"></div>
+                </div>
+            `;
+ 
+            content.innerHTML = html;
+            renderTable();
+        }
+ 
+        // Render table based on selected bow type and search term
+        function renderTable() {
+            const tableContainer = document.getElementById('tableContainer');
+            const bowTypes = selectedBowType === 'all' ? Object.keys(allAthletesByBowType).sort() : [selectedBowType];
+           
+            let allAthletes = [];
+           
+            // Collect all athletes from selected bow types
+            bowTypes.forEach(bowType => {
+                const athletes = allAthletesByBowType[bowType] || [];
+                athletes.forEach(athlete => {
+                    allAthletes.push({
+                        ...athlete,
+                        bowType: bowType
+                    });
+                });
+            });
+ 
+            // Filter by search term
+            let filteredAthletes = allAthletes.filter(athlete => {
+                const searchLower = searchTerm.toLowerCase();
+                return (
+                    athlete.name.toLowerCase().includes(searchLower) ||
+                    athlete.team.toLowerCase().includes(searchLower) ||
+                    athlete.country.toLowerCase().includes(searchLower) ||
+                    athlete.bowType.toLowerCase().includes(searchLower)
+                );
+            });
+ 
+            let tableHtml = '';
+            let totalAthletes = filteredAthletes.length;
+            let checkedAthletes = 0;
+ 
+            if (totalAthletes === 0) {
+                tableHtml = `
+                    <div class="no-data">
+                        <i class="mdi mdi-table-search"></i>
+                        <div>No athletes found</div>
+                    </div>
+                `;
+            } else {
+                tableHtml = `
+                    <div class="table-container">
+                        <table class="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th>Athlete Name</th>
+                                    <th style="text-align: center; width: 120px;">Bow Type</th>
+                                    <th style="text-align: center; width: 100px;">Status</th>
+                                    <th style="text-align: center; width: 80px;">Verified</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                `;
+ 
+                filteredAthletes.forEach(athlete => {
+                    const key = `${athlete.id}-${athlete.bowType}`;
+                    const isChecked = equipmentCheckState[key] || false;
+                    if (isChecked) checkedAthletes++;
+ 
+                    tableHtml += `
+                        <tr>
+                            <td>
+                                <div class="athlete-name-cell">
+                                    <span class="athlete-flag">${athlete.flag}</span>
+                                    ${athlete.name}
+                                </div>
+                            </td>
+                            <td style="text-align: center;">
+                                <span class="bow-type-badge" style="background: ${getBowTypeBadgeColor(athlete.bowType)[0]}; color: ${getBowTypeBadgeColor(athlete.bowType)[1]};">
+                                    ${athlete.bowType}
+                                </span>
+                            </td>
+                            <td class="status-cell">
+                                <span class="status-badge ${isChecked ? 'checked' : 'unchecked'}">
+                                    ${isChecked ? '✓ OK' : 'Pending'}
+                                </span>
+                            </td>
+                            <td class="check-cell">
+                                <input type="checkbox" class="check-checkbox" ${isChecked ? 'checked' : ''} onchange="toggleEquipmentCheck(${athlete.id}, '${athlete.bowType}')">
+                            </td>
+                        </tr>
+                    `;
+                });
+ 
+                tableHtml += `
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+ 
+            tableContainer.innerHTML = tableHtml;
+ 
+            // Update summary by bow type
+            const summaryContent = document.getElementById('summaryContent');
+            let summaryHtml = '';
+           
+            const summaryBowTypes = Object.keys(allAthletesByBowType).sort();
+            summaryBowTypes.forEach((bowType, index) => {
+                const athletes = allAthletesByBowType[bowType] || [];
+                let verifiedCount = 0;
+               
+                athletes.forEach(athlete => {
+                    const key = `${athlete.id}-${bowType}`;
+                    if (equipmentCheckState[key]) verifiedCount++;
+                });
+               
+                const [bgColor, textColor] = getBowTypeBadgeColor(bowType);
+               
+                summaryHtml += `
+                    <div class="summary-row">
+                        <span style="display: flex; align-items: center; gap: 8px;">
+                            <span class="bow-type-badge" style="background: ${bgColor}; color: ${textColor};">
+                                ${bowType}
+                            </span>
+                        </span>
+                        <span class="summary-value">${verifiedCount}</span>
+                    </div>
+                `;
+               
+                if (index < summaryBowTypes.length - 1) {
+                    summaryHtml += '<div class="divider"></div>';
+                }
+            });
+           
+            summaryContent.innerHTML = summaryHtml;
+        }
+ 
+        // Get bow type badge color
+        function getBowTypeBadgeColor(bowType) {
+            const type = (bowType || 'Recurve').toLowerCase();
+            if (type === 'compound') return ['#e8f5e9', '#2e7d32'];
+            if (type === 'barebow') return ['#fff3e0', '#e65100'];
+            return ['#e3f2fd', '#1565c0']; // Recurve
+        }
+ 
+        // Get team badge color - consistent color per team
+        function getTeamBadgeColor(teamName) {
+            const colors = [
+                { bg: '#e3f2fd', text: '#1565c0' },
+                { bg: '#f3e5f5', text: '#7b1fa2' },
+                { bg: '#e8f5e9', text: '#2e7d32' },
+                { bg: '#fff3e0', text: '#e65100' },
+                { bg: '#fce4ec', text: '#c2185b' },
+                { bg: '#e0f2f1', text: '#00796b' },
+                { bg: '#f1f8e9', text: '#558b2f' },
+                { bg: '#ede7f6', text: '#512da8' }
+            ];
+           
+            // Create hash code for consistent color assignment
+            let hash = 0;
+            for (let i = 0; i < teamName.length; i++) {
+                const char = teamName.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+           
+            const colorIndex = Math.abs(hash) % colors.length;
+            return colors[colorIndex];
+        }
+ 
+        // Load on page load
+        loadEquipmentCheck();
+    </script>
+</body>
+</html>

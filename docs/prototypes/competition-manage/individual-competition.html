@@ -44,10 +44,10 @@
             .manage-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
        
-        /* Tablet Landscape (1024px - 1279px) */
+        /* Monitor/Desktop (1024px - 1279px) */
         @media (min-width: 1024px) and (max-width: 1279px) {
             body { background: #e0e0e0; }
-            .manage-container { width: 100vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+            .manage-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
         }
        
         /* Wide Screen - Centered Layout (1280px+) */
@@ -55,7 +55,7 @@
             body { background: #e0e0e0; }
  
             .manage-container {
-                width: 35vw;
+                width: 50vw;
                 box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
             }
         }
@@ -225,7 +225,7 @@
             margin-bottom: 20px;
         }
 
-        @media (max-width: 599px) {
+        @media (max-width: 767px) {
             .filter-selects {
                 grid-template-columns: 1fr;
             }
@@ -835,45 +835,43 @@
             <!-- Filter Selects -->
             <div class="filter-selects">
                 <div class="filter-select-group">
-                    <label for="bowCategorySelect" class="filter-label">
+                    <label for="bowTypeSelect" class="filter-label">
                         <i class="mdi mdi-bow-arrow"></i>
-                        Bow Category
+                        Bow Type
                     </label>
-                    <select id="bowCategorySelect" class="filter-select" onchange="filterByBowCategory()">
-                        <option value="recurve" selected>Recurve Individual</option>
-                        <option value="compound">Compound Individual</option>
-                        <option value="barebow">Barebow Individual</option>
+                    <select id="bowTypeSelect" class="filter-select" onchange="handleBowTypeChange()">
+                        <option value="">-- Select Bow Type --</option>
+                        <option value="recurve">Recurve</option>
+                        <option value="compound">Compound</option>
+                        <option value="barebow">Barebow</option>
                     </select>
                 </div>
                 <div class="filter-select-group">
-                    <label for="genderSelect" class="filter-label">
+                    <label for="categorySelect" class="filter-label">
                         <i class="mdi mdi-human-male-female"></i>
-                        Gender
+                        Category
                     </label>
-                    <select id="genderSelect" class="filter-select" onchange="filterByGender()">
-                        <option value="male" selected>Male</option>
-                        <option value="female">Female</option>
+                    <select id="categorySelect" class="filter-select" onchange="handleCategoryChange()" disabled>
+                        <option value="">-- Select Bow Type First --</option>
                     </select>
                 </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="stats-cards">
-                <div class="stat-card">
-                    <div class="stat-value" id="totalAthletes">0</div>
-                    <div class="stat-label">Available</div>
+                <div class="filter-select-group">
+                    <label for="roundSelect" class="filter-label">
+                        <i class="mdi mdi-trophy"></i>
+                        Round
+                    </label>
+                    <select id="roundSelect" class="filter-select" onchange="handleRoundChange()" disabled>
+                        <option value="">-- Select Category First --</option>
+                    </select>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="selectedCount">0</div>
-                    <div class="stat-label">Selected</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="matchesCount">0</div>
-                    <div class="stat-label">Matches</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="completeMatches">0</div>
-                    <div class="stat-label">Complete</div>
+                <div class="filter-select-group">
+                    <label for="subroundSelect" class="filter-label">
+                        <i class="mdi mdi-target"></i>
+                        Subround / Custom
+                    </label>
+                    <select id="subroundSelect" class="filter-select" onchange="handleSubroundChange()" disabled>
+                        <option value="">-- Select Round First --</option>
+                    </select>
                 </div>
             </div>
 
@@ -942,13 +940,176 @@
 
     <script>
         // State
-        let currentBowCategory = 'recurve';
-        let currentGender = 'male';
+        let currentBowType = '';
+        let currentCategory = '';
+        let currentRound = '';
+        let currentSubround = '';
         let availableAthletes = [];
         let matches = [];
         let selectingForMatch = null; // {matchId, slotIndex}
         let sortColumn = 'rank'; // Current sort column
         let sortDirection = 'asc'; // Current sort direction
+
+        // Competition configuration data
+        const competitionConfig = {
+            recurve: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['WA (International)', 'National Round', 'FITA 900', 'Custom Round'],
+                    'Women': ['WA (International)', 'National Round', 'FITA 900', 'Custom Round']
+                },
+                subrounds: {
+                    'WA (International)': ['WA 70m Qualification', 'WA 70m Elimination', 'WA 50m Mixed'],
+                    'National Round': ['60m Qualification', '50m Elimination'],
+                    'FITA 900': ['90m-70m-50m-30m Combined'],
+                    'Custom Round': ['90m', '70m', '60m', '50m', '40m', '30m', '20m', '18m', '10m']
+                }
+            },
+            compound: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['WA (International)', 'National Round', 'Custom Round'],
+                    'Women': ['WA (International)', 'National Round', 'Custom Round']
+                },
+                subrounds: {
+                    'WA (International)': ['WA 50m Qualification', 'WA 50m Elimination'],
+                    'National Round': ['50m Qualification', '40m Elimination'],
+                    'Custom Round': ['60m', '50m', '40m', '30m', '20m', '18m', '10m']
+                }
+            },
+            barebow: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['Traditional Round', 'Field Round', 'Custom Round'],
+                    'Women': ['Traditional Round', 'Field Round', 'Custom Round']
+                },
+                subrounds: {
+                    'Traditional Round': ['50m-30m Combined', '40m-20m Combined'],
+                    'Field Round': ['Multi-distance Field'],
+                    'Custom Round': ['50m', '40m', '30m', '20m', '18m', '15m', '10m']
+                }
+            }
+        };
+
+        // Handle Bow Type change
+        function handleBowTypeChange() {
+            const bowTypeSelect = document.getElementById('bowTypeSelect');
+            const categorySelect = document.getElementById('categorySelect');
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentBowType = bowTypeSelect.value;
+            
+            // Reset dependent dropdowns
+            currentCategory = '';
+            currentRound = '';
+            currentSubround = '';
+            
+            if (currentBowType) {
+                // Populate categories
+                const categories = competitionConfig[currentBowType].categories;
+                categorySelect.innerHTML = '<option value="">-- Select Category --</option>' +
+                    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                categorySelect.disabled = false;
+                
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            } else {
+                categorySelect.innerHTML = '<option value="">-- Select Bow Type First --</option>';
+                categorySelect.disabled = true;
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Category change
+        function handleCategoryChange() {
+            const categorySelect = document.getElementById('categorySelect');
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentCategory = categorySelect.value;
+            currentRound = '';
+            currentSubround = '';
+            
+            if (currentCategory) {
+                // Populate rounds
+                const rounds = competitionConfig[currentBowType].rounds[currentCategory];
+                roundSelect.innerHTML = '<option value="">-- Select Round --</option>' +
+                    rounds.map(round => `<option value="${round}">${round}</option>`).join('');
+                roundSelect.disabled = false;
+                
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            } else {
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Round change
+        function handleRoundChange() {
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentRound = roundSelect.value;
+            currentSubround = '';
+            
+            if (currentRound) {
+                // Populate subrounds
+                const subrounds = competitionConfig[currentBowType].subrounds[currentRound];
+                if (currentRound === 'Custom Round') {
+                    subroundSelect.innerHTML = '<option value="">-- Select Distance --</option>' +
+                        subrounds.map(subround => `<option value="${subround}">${subround}</option>`).join('');
+                } else {
+                    subroundSelect.innerHTML = '<option value="">-- Select Subround --</option>' +
+                        subrounds.map(subround => `<option value="${subround}">${subround}</option>`).join('');
+                }
+                subroundSelect.disabled = false;
+            } else {
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Subround change
+        function handleSubroundChange() {
+            const subroundSelect = document.getElementById('subroundSelect');
+            currentSubround = subroundSelect.value;
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Update competition display
+        function updateCompetitionDisplay() {
+            const subtitle = document.querySelector('.page-subtitle');
+            if (currentBowType && currentCategory && currentRound && currentSubround) {
+                subtitle.textContent = `${currentBowType} - ${currentCategory} - ${currentRound} - ${currentSubround}`;
+            } else if (currentBowType && currentCategory) {
+                subtitle.textContent = `${currentBowType} - ${currentCategory} (Select round to continue)`;
+            } else if (currentBowType) {
+                subtitle.textContent = `${currentBowType} (Select category to continue)`;
+            } else {
+                subtitle.textContent = 'Select bow type, category, round, and subround to arrange matches';
+            }
+        }
+
         const MATCH_SIZE = 2;
 
         // Language selector
@@ -1072,9 +1233,18 @@
 
         // Load athletes from mock data
         function loadAthletes() {
-            const categoryKey = `${currentBowCategory}_${currentGender}`;
+            // Only load athletes if all required selections are made
+            if (!currentBowType || !currentCategory || !currentRound || !currentSubround) {
+                availableAthletes = [];
+                renderAthletes();
+                updateStats();
+                return;
+            }
+            
+            // Build the key based on selections (in real app, would query database)
+            const categoryKey = `${currentBowType}_${currentCategory.toLowerCase().replace(' ', '_')}`;
             const allAthletes = individualEliminationData[categoryKey] || 
-                               individualEliminationData[currentBowCategory] || [];
+                               individualEliminationData[currentBowType] || [];
             
             // Filter out athletes already in matches
             const selectedIds = matches.flatMap(match => 
