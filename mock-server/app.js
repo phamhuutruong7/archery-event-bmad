@@ -1,5 +1,4 @@
 import express from 'express'
-import cors from 'cors'
 import authRoutes from './routes/auth.js'
 import eventRoutes from './routes/events.js'
 import competitionRoutes from './routes/competitions.js'
@@ -9,7 +8,23 @@ import athleteRoutes from './routes/athletes.js'
 import refereeRoutes from './routes/referees.js'
 
 const app = express()
-app.use(cors())
+
+// Manual CORS middleware - must be first
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*')
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS')
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization')
+    res.setHeader('Access-Control-Allow-Credentials', 'true')
+    res.setHeader('Access-Control-Max-Age', '86400')
+
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+        return res.status(204).end()
+    }
+
+    next()
+})
+
 app.use(express.json())
 
 // Add delay middleware
