@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs'
+import { readFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 
@@ -7,21 +7,25 @@ const __dirname = dirname(__filename)
 // Go up one level from 'utils' to find 'db.json'
 const dbPath = join(__dirname, '..', 'db.json')
 
+// Load initial data from file (read-only in serverless)
+let initialData = null
+try {
+    initialData = JSON.parse(readFileSync(dbPath, 'utf-8'))
+} catch (error) {
+    console.error('Error loading initial DB:', error)
+    initialData = { users: [], events: [], competitions: [], scores: [] }
+}
+
+// In-memory storage for serverless environment
+let dbCache = JSON.parse(JSON.stringify(initialData))
+
 export const getDb = () => {
-    try {
-        return JSON.parse(readFileSync(dbPath, 'utf-8'))
-    } catch (error) {
-        console.error('Error reading DB:', error)
-        return { users: [], events: [], competitions: [], scores: [] }
-    }
+    // Return a fresh copy of the data
+    return JSON.parse(JSON.stringify(dbCache))
 }
 
 export const saveDb = (data) => {
-    try {
-        writeFileSync(dbPath, JSON.stringify(data, null, 2))
-        return true
-    } catch (error) {
-        console.error('Error saving DB:', error)
-        return false
-    }
+    // Save to in-memory cache (persists only during function lifetime)
+    dbCache = JSON.parse(JSON.stringify(data))
+    return true
 }
