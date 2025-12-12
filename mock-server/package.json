@@ -1,0 +1,22 @@
+{
+  "name": "archery-event-mock-server",
+  "version": "1.0.0",
+  "description": "JSON Server Mock API for Archery Event Management",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "mock",
+    "api",
+    "json-server"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.2.1",
+    "json-server": "^1.0.0-beta.3"
+  }
+}
