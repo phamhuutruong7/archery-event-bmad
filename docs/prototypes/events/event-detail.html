@@ -1,0 +1,2881 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Event Detail - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/event-details.js"></script>
+    <script src="../mock-data/athletes.js"></script>
+    <script src="../mock-data/referees.js"></script>
+    <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/rounds.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Responsive container */
+        .event-container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            margin: 0 auto;
+        }
+
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .event-container {
+                width: 100%;
+            }
+           
+            .tab-item {
+                font-size: 12px;
+                padding: 12px 8px;
+            }
+           
+            .tab-item i {
+                font-size: 18px;
+            }
+           
+            .event-title {
+                font-size: 20px;
+            }
+           
+            .competitions-table th,
+            .competitions-table td {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
+ 
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 100%;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 100%;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Monitor/Desktop (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 75vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body {
+                background: #e0e0e0;
+            }
+ 
+            .event-container {
+                width: 50vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+ 
+
+        /* Header - 8-column grid */
+        .event-header {
+            display: grid;
+            grid-template-columns: 40px repeat(5, 1fr) 40px 40px;
+            gap: 4px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-back {
+            grid-column: 1 / 2;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-back i {
+            font-size: 24px;
+        }
+
+        .header-title {
+            grid-column: 2 / 7;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .header-language {
+            grid-column: 7 / 8;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .header-language:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile {
+            grid-column: 8 / 9;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+        }
+
+        .header-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile i {
+            font-size: 24px;
+        }
+
+        /* Language Dropdown */
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #424242;
+            font-size: 14px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: white;
+        }
+
+        .language-item:hover {
+            background: #f5f5f5;
+        }
+
+        .language-item.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .language-flag {
+            font-size: 20px;
+        }
+
+        .language-name {
+            flex: 1;
+        }
+
+        /* Tab Navigation */
+        .tab-navigation {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            background: white;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+        }
+
+        .tab-item {
+            flex: 1;
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #757575;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-item:hover {
+            color: #1565c0;
+            background: #f5f5f5;
+        }
+
+        .tab-item.active {
+            color: #1565c0;
+            border-bottom-color: #1565c0;
+        }
+
+        .tab-item i {
+            display: block;
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Responsive Tab Navigation */
+        @media (max-width: 599px) {
+            .tab-item {
+                padding: 12px 8px;
+                font-size: 12px;
+            }
+
+            .tab-item i {
+                font-size: 18px;
+                margin-bottom: 2px;
+            }
+
+            .tab-item span {
+                font-size: 11px;
+            }
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .status-badge.upcoming {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .status-badge.live {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.completed {
+            background: #f5f5f5;
+            color: #757575;
+        }
+
+        .status-badge.cancelled {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Event Title */
+        .event-title-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .event-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #212121;
+            line-height: 1.3;
+            flex: 1;
+        }
+
+        .edit-btn-host {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #1565c0;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .edit-btn-host:hover {
+            background: #0d47a1;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
+        }
+
+        .edit-btn-host i {
+            font-size: 16px;
+        }
+
+        .host-only-label {
+            display: block;
+            font-size: 10px;
+            opacity: 0.9;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Info Section */
+        .info-section {
+            margin-bottom: 24px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #757575;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 15px;
+            color: #424242;
+            line-height: 1.5;
+        }
+
+        .info-value i {
+            color: #1565c0;
+            margin-right: 8px;
+            font-size: 18px;
+            vertical-align: middle;
+        }
+
+        /* Description */
+        .description {
+            font-size: 15px;
+            color: #424242;
+            line-height: 1.6;
+        }
+
+        /* Competitions Section */
+        .competitions-section {
+            margin-bottom: 24px;
+        }
+
+        .competitions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .competitions-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212121;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .competitions-title i {
+            color: #1565c0;
+        }
+
+        .competitions-count {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            background: #f5f5f5;
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .competitions-table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .competitions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .competitions-table thead {
+            background: #f5f5f5;
+        }
+
+        .competitions-table th {
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 700;
+            color: #424242;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .competitions-table th:hover {
+            background: #eeeeee;
+        }
+
+        .competitions-table th.active {
+            color: #1565c0;
+        }
+
+        .competitions-table th .sort-icon {
+            font-size: 16px;
+            margin-left: 4px;
+            vertical-align: middle;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .competitions-table th.desc .sort-icon {
+            transform: rotate(180deg);
+        }
+
+        .competitions-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .competitions-table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        .competitions-table td {
+            padding: 12px;
+            font-size: 14px;
+            color: #424242;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .competition-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-recurve {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-compound {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-barebow {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .badge-men-individual {
+            background: #b3e5fc;
+            color: #01579b;
+        }
+
+        .badge-women-individual {
+            background: #ffccbc;
+            color: #bf360c;
+        }
+
+        .badge-men-team {
+            background: #c5cae9;
+            color: #283593;
+        }
+
+        .badge-women-team {
+            background: #f8bbd0;
+            color: #880e4f;
+        }
+
+        .badge-mixed {
+            background: #c8e6c9;
+            color: #1b5e20;
+        }
+
+        .competitions-empty {
+            text-align: center;
+            padding: 48px 16px;
+            color: #9e9e9e;
+        }
+
+        .competitions-empty i {
+            font-size: 48px;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+        }
+
+        .subround-clickable {
+            cursor: pointer;
+            color: #1565c0;
+            transition: all 0.2s;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 3px;
+        }
+
+        /* Competition View Tabs */
+        .competition-view-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .competition-view-tab {
+            flex: 1;
+            padding: 12px 16px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #757575;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .competition-view-tab:hover {
+            color: #1565c0;
+            background: #f5f5f5;
+        }
+
+        .competition-view-tab.active {
+            color: #1565c0;
+            border-bottom-color: #1565c0;
+        }
+
+        .competition-view-content {
+            display: none;
+        }
+
+        .competition-view-content.active {
+            display: block;
+        }
+
+
+        .subround-clickable:hover {
+            color: #0d47a1;
+            background: #e3f2fd;
+            padding: 4px 8px;
+            margin: -4px -8px;
+            border-radius: 4px;
+        }
+
+        /* Competition Status */
+        .status-dropdown-cell {
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .status-dropdown {
+            padding: 6px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+            min-width: 130px;
+        }
+
+        .status-dropdown:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        .status-dropdown.not-started {
+            background: #f5f5f5;
+            color: #757575;
+            border-color: #e0e0e0;
+        }
+
+        .status-dropdown.in-process {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border-color: #81c784;
+        }
+
+        .status-dropdown.done {
+            background: #e3f2fd;
+            color: #1565c0;
+            border-color: #90caf9;
+        }
+
+        /* Competition row hover effect */
+        .competitions-table tbody tr {
+            cursor: pointer;
+        }
+
+        .competitions-table tbody tr:hover {
+            background: #e3f2fd !important;
+        }
+
+        /* Snackbar Notification */
+        .snackbar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            transition: bottom 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        .snackbar.show {
+            bottom: 30px;
+        }
+
+        .snackbar i {
+            font-size: 20px;
+        }
+
+        .snackbar.success {
+            background: #2e7d32;
+        }
+
+        .snackbar.error {
+            background: #c62828;
+        }
+
+        /* Subround Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-container {
+            background: white;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212121;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #757575;
+            padding: 4px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: #f5f5f5;
+            color: #212121;
+        }
+
+        .modal-close-btn i {
+            font-size: 24px;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .phase-card {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #1565c0;
+        }
+
+        .phase-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .phase-header {
+            font-size: 16px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 12px;
+        }
+
+        .phase-header .phase-target-size {
+            font-size: 13px;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .phase-details {
+            font-size: 14px;
+            color: #424242;
+        }
+
+        .phase-details span {
+            font-weight: 600;
+            color: #212121;
+        }
+
+        .modal-empty {
+            text-align: center;
+            padding: 32px 16px;
+            color: #9e9e9e;
+        }
+
+        .modal-empty i {
+            font-size: 48px;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        /* Organizer Section */
+        .organizer-section {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .organizer-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .organizer-title i {
+            color: #1565c0;
+        }
+
+        .organizer-item {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #424242;
+        }
+
+        .organizer-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .organizer-item i {
+            color: #757575;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+
+        /* Registration Info */
+        .registration-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .registration-card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .registration-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 4px;
+        }
+
+        .registration-card-label {
+            font-size: 12px;
+            color: #757575;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Results Section (for completed events) */
+        .results-section {
+            margin-bottom: 24px;
+        }
+
+        .results-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .results-title i {
+            color: #ffc107;
+        }
+
+        .result-item {
+            background: #f9f9f9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-info {
+            flex: 1;
+        }
+
+        .result-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #212121;
+            margin-bottom: 2px;
+        }
+
+        .result-category {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .result-score {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1565c0;
+        }
+
+        /* Cancellation Notice */
+        .cancellation-notice {
+            background: #ffebee;
+            border-left: 4px solid #c62828;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+        }
+
+        .cancellation-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #c62828;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .cancellation-title i {
+            font-size: 20px;
+        }
+
+        .cancellation-text {
+            font-size: 14px;
+            color: #c62828;
+            line-height: 1.5;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            position: sticky;
+            bottom: 0;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1565c0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d47a1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #424242;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-success {
+            background: #2e7d32;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1b5e20;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #b71c1c;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(211, 47, 47, 0.3);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Divider */
+        .divider {
+            height: 1px;
+            background: #e0e0e0;
+            margin: 24px 0;
+        }
+
+        /* Loading State */
+        .loading {
+            text-align: center;
+            padding: 48px 16px;
+        }
+
+        .loading i {
+            font-size: 48px;
+            color: #1565c0;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Host Panel */
+        .host-panel {
+            background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+        }
+
+        .host-panel-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .host-panel-header i {
+            font-size: 28px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .host-panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .host-panel-subtitle {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 2px;
+        }
+
+        .host-controls-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .host-control-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .host-control-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .host-control-btn:active {
+            transform: translateY(0);
+        }
+
+        .host-control-btn i {
+            font-size: 32px;
+            opacity: 0.95;
+        }
+
+        .host-control-btn .btn-label {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .host-control-btn .btn-sublabel {
+            font-size: 11px;
+            opacity: 0.8;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        @media (max-width: 599px) {
+            .host-controls-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .host-control-btn {
+                padding: 14px 10px;
+            }
+            
+            .host-control-btn i {
+                font-size: 28px;
+            }
+            
+            .host-control-btn .btn-label {
+                font-size: 12px;
+            }
+        }
+
+        /* Error State */
+        .error-state {
+            text-align: center;
+            padding: 48px 16px;
+        }
+
+        .error-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 16px;
+        }
+
+        .error-state-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #757575;
+            margin-bottom: 8px;
+        }
+
+        .error-state-text {
+            font-size: 14px;
+            color: #9e9e9e;
+            margin-bottom: 24px;
+        }
+
+        /* Search and Sort Controls */
+        .controls {
+            margin-bottom: 16px;
+            display: flex;
+            gap: 8px;
+            flex-direction: column;
+        }
+
+        .search-wrapper {
+            position: relative;
+            display: grid;
+            grid-template-columns: 40px 1fr;
+            align-items: center;
+        }
+
+        .search-icon {
+            grid-column: 1;
+            grid-row: 1;
+            justify-self: center;
+            align-self: center;
+            color: #666;
+            font-size: 20px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .search-input {
+            grid-column: 1 / 3;
+            grid-row: 1;
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        .sort-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .sort-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            color: #424242;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .sort-btn:hover {
+            border-color: #1565c0;
+            color: #1565c0;
+            background: #e3f2fd;
+        }
+
+        .sort-btn.active {
+            border-color: #1565c0;
+            background: #1565c0;
+            color: white;
+        }
+
+        .sort-btn i {
+            font-size: 16px;
+        }
+
+        /* Athlete/Referee List */
+        .list-item {
+            background: white;
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid #1565c0;
+        }
+
+        .list-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .list-item-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #212121;
+        }
+
+        .list-item-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .list-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .list-item-detail {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .list-item-detail i {
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        /* Empty List State */
+        .empty-list {
+            text-align: center;
+            padding: 48px 16px;
+        }
+
+        .empty-list i {
+            font-size: 48px;
+            color: #e0e0e0;
+            margin-bottom: 12px;
+        }
+
+        .empty-list-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #757575;
+            margin-bottom: 4px;
+        }
+
+        .empty-list-text {
+            font-size: 13px;
+            color: #9e9e9e;
+        }
+
+        /* Table Styles */
+        .table-container {
+            margin-top: 16px;
+            overflow-x: auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table thead {
+            background: #f5f5f5;
+        }
+
+        .data-table th {
+            padding: 14px 12px;
+            text-align: left;
+            font-size: 13px;
+            font-weight: 700;
+            color: #424242;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+        }
+
+        .data-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+        }
+
+        .data-table th.sortable:hover {
+            background: #eeeeee;
+        }
+
+        .data-table th.sortable .sort-icon {
+            font-size: 14px;
+            margin-left: 4px;
+            color: #9e9e9e;
+            transition: color 0.2s;
+        }
+
+        .data-table th.sortable.active .sort-icon {
+            color: #1565c0;
+        }
+
+        .data-table th.sortable.desc .sort-icon {
+            transform: rotate(180deg);
+        }
+
+        .data-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+        }
+
+        .data-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .data-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .data-table td {
+            padding: 14px 12px;
+            font-size: 14px;
+            color: #212121;
+        }
+
+        .data-table td:first-child {
+            font-weight: 600;
+            color: #1565c0;
+        }
+
+        .table-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .table-badge.compound {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .table-badge.barebow {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .table-country {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-flag {
+            font-size: 18px;
+        }
+
+        .athlete-link {
+            color: #1565c0;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .athlete-link:hover {
+            color: #0d47a1;
+            text-decoration: underline;
+        }
+
+        .team-tag {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Athlete Name Cell with Profile Picture */
+        .athlete-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .athlete-profile-pic {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #e0e0e0;
+            flex-shrink: 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .data-table {
+                min-width: 600px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 8px;
+                font-size: 13px;
+            }
+        }
+
+        /* Hide Round column in mobile portrait mode */
+        @media (max-width: 599px) {
+
+            .competitions-table th:nth-child(3),
+            .competitions-table td:nth-child(3) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="event-container">
+        <!-- Header -->
+        <div class="event-header">
+            <div class="header-back" onclick="window.location.href='../dashboard/dashboard.html'">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">Event Details</div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">ðŸ‡ºðŸ‡¸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="tab-navigation">
+            <div class="tab-item active" onclick="switchTab('details', event)">
+                <i class="mdi mdi-information-outline"></i>
+                <span>Details</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('athletes', event)">
+                <i class="mdi mdi-account-multiple"></i>
+                <span>Athletes</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('referees', event)">
+                <i class="mdi mdi-whistle"></i>
+                <span>Referees</span>
+            </div>
+            <div class="tab-item" onclick="switchTab('host', event)">
+                <i class="mdi mdi-shield-crown"></i>
+                <span>Host Panel</span>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Details Tab -->
+            <div id="detailsTab" class="tab-content active">
+                <div class="loading">
+                    <i class="mdi mdi-loading"></i>
+                </div>
+            </div>
+
+            <!-- Athletes Tab -->
+            <div id="athletesTab" class="tab-content">
+                <div class="search-wrapper">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="text" id="athleteSearch" class="search-input"
+                        placeholder="Search by athlete or team name..." oninput="filterAthletes()">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="athletesTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="sortAthletes('name')">
+                                    Name <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortAthletes('team')">
+                                    Team <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortAthletes('country')">
+                                    Country <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="athletesList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Referees Tab -->
+            <div id="refereesTab" class="tab-content">
+                <div class="search-wrapper">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="text" id="refereeSearch" class="search-input" placeholder="Search by referee name..."
+                        oninput="filterReferees()">
+                </div>
+                <div class="table-container">
+                    <table class="data-table" id="refereesTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" onclick="sortReferees('name')">
+                                    Name <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortReferees('country')">
+                                    Country <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="refereesList"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Host Panel Tab -->
+            <div id="hostTab" class="tab-content">
+                <div class="host-panel">
+                    <div class="host-panel-header">
+                        <i class="mdi mdi-shield-crown"></i>
+                        <div>
+                            <div class="host-panel-title">Host Control Panel</div>
+                            <div class="host-panel-subtitle">Manage your event operations</div>
+                        </div>
+                    </div>
+                    <div class="host-controls-grid">
+                        <button class="host-control-btn" onclick="window.location.href='../host-panel/equipment-check.html?eventId=' + eventId" title="Check and approve athlete equipment">
+                            <i class="mdi mdi-shield-check"></i>
+                            <div class="btn-label">Equipment Check</div>
+                            <div class="btn-sublabel">Verify gear</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Target Assignment - Coming Soon')" title="Assign athletes to targets">
+                            <i class="mdi mdi-target"></i>
+                            <div class="btn-label">Target Assignment</div>
+                            <div class="btn-sublabel">Set positions</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Competition Schedule - Coming Soon')" title="Manage competition schedule">
+                            <i class="mdi mdi-calendar-clock"></i>
+                            <div class="btn-label">Schedule</div>
+                            <div class="btn-sublabel">Time slots</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Athlete Management - Coming Soon')" title="Manage registered athletes">
+                            <i class="mdi mdi-account-group"></i>
+                            <div class="btn-label">Athletes</div>
+                            <div class="btn-sublabel">Registrations</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Referee Management - Coming Soon')" title="Manage event referees">
+                            <i class="mdi mdi-whistle"></i>
+                            <div class="btn-label">Referees</div>
+                            <div class="btn-sublabel">Officials</div>
+                        </button>
+                        <button class="host-control-btn" onclick="alert('Event Settings - Coming Soon')" title="Configure event settings">
+                            <i class="mdi mdi-cog"></i>
+                            <div class="btn-label">Settings</div>
+                            <div class="btn-sublabel">Configure</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageIndividualCompetitions()" title="Manage individual competitions">
+                            <i class="mdi mdi-account"></i>
+                            <div class="btn-label">Individual</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageTeamCompetitions()" title="Manage team competitions">
+                            <i class="mdi mdi-account-group"></i>
+                            <div class="btn-label">Teams</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                        <button class="host-control-btn" onclick="manageMixedTeamCompetitions()" title="Manage mixed team competitions">
+                            <i class="mdi mdi-account-multiple"></i>
+                            <div class="btn-label">Mixed Team</div>
+                            <div class="btn-sublabel">Competition</div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subround Details Modal -->
+    <div id="subroundModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <div class="modal-title" id="modalSubroundTitle"></div>
+                <button class="modal-close-btn" onclick="closeSubroundModal()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="modalSubroundBody">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function (event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Get event ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = parseInt(urlParams.get('id'));
+        
+        // Mock current user ID (in production, this would come from authentication)
+        const currentUserId = 1; // TODO: Replace with actual authentication
+        
+        // Check if current user is the host of this event
+        function checkIfUserIsHost() {
+            const event = getEventDetail(eventId);
+            // TODO: In production, check if event.hostId === currentUserId
+            // For now, we'll use a flag to simulate host/non-host status
+            // Return true for demonstration (change to false to test non-host view)
+            return true; // Change this to false to test non-host view
+        }
+        
+        // Initialize UI based on host status
+        function initializeHostUI() {
+            const isHost = checkIfUserIsHost();
+            const hostTab = document.querySelector('.tab-item:nth-child(4)'); // Host Panel tab
+            
+            if (!isHost && hostTab) {
+                hostTab.style.display = 'none';
+            }
+        }
+
+        // Mock data for athletes and referees
+        let allAthletes = [];
+        let filteredAthletes = [];
+        let currentAthleteSort = 'name';
+
+        let allReferees = [];
+        let filteredReferees = [];
+        let currentRefereeSort = 'name';
+
+        // Competitions sorting state
+        let competitionsSortField = null;
+        let competitionsSortOrder = 'asc';
+        let competitionsData = [];
+        
+        // Elimination data (separate from ranking competitions)
+        let eliminationData = [];
+
+        // Competition status management
+        function getCompetitionStatus(eventId, competitionId) {
+            const key = `event_${eventId}_comp_${competitionId}_status`;
+            const status = localStorage.getItem(key);
+            // Default to 'not-started' if no status is saved
+            return status || 'not-started';
+        }
+
+        // Open competition scoring view
+        function openCompetitionScoring(eventId, competitionId, category, bowType) {
+            // Navigate to scoring page - status check will be done there
+            // Users can always view, but editing requires "open" status
+            window.location.href = `../scoring/competition-scoring.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
+        }
+
+        // Open elimination bracket view
+        function openEliminationBracket(eventId, competitionId, category, bowType) {
+            // Navigate to elimination bracket page
+            window.location.href = `elimination-round.html?eventId=${eventId}&competitionId=${competitionId}&category=${encodeURIComponent(category)}&bowType=${encodeURIComponent(bowType)}`;
+        }
+
+        function updateCompetitionStatus(eventId, competitionId, newStatus) {
+            const key = `event_${eventId}_comp_${competitionId}_status`;
+            localStorage.setItem(key, newStatus);
+
+            // Update UI
+            renderCompetitionsTable();
+
+            // Show feedback
+            const statusTextMap = {
+                'not-started': 'Not Started',
+                'in-process': 'In Progress',
+                'done': 'Done'
+            };
+            const iconMap = {
+                'not-started': 'mdi-clock-outline',
+                'in-process': 'mdi-play-circle',
+                'done': 'mdi-check-circle'
+            };
+            const statusText = statusTextMap[newStatus] || newStatus;
+            const icon = iconMap[newStatus] || 'mdi-information';
+            showSnackbar(`Competition status changed to ${statusText}`, icon, 'success');
+        }
+
+        function toggleEliminationStatus(eventId, competitionId) {
+            const key = `event_${eventId}_elim_${competitionId}_status`;
+            const currentStatus = localStorage.getItem(key) || 'closed';
+            const newStatus = currentStatus === 'open' ? 'closed' : 'open';
+            localStorage.setItem(key, newStatus);
+
+            // Update UI
+            renderEliminationTable();
+
+            // Show feedback
+            const statusText = newStatus === 'open' ? 'In Progress' : 'Closed';
+            const icon = newStatus === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
+            showSnackbar(`Match status changed to ${statusText}`, icon, 'success');
+        }
+
+        // Snackbar notification function
+        function showSnackbar(message, icon = 'mdi-information', type = 'success') {
+            // Remove existing snackbar if any
+            const existingSnackbar = document.querySelector('.snackbar');
+            if (existingSnackbar) {
+                existingSnackbar.remove();
+            }
+
+            // Create snackbar
+            const snackbar = document.createElement('div');
+            snackbar.className = `snackbar ${type}`;
+            snackbar.innerHTML = `
+                <i class="mdi ${icon}"></i>
+                <span>${message}</span>
+            `;
+
+            document.body.appendChild(snackbar);
+
+            // Show snackbar
+            setTimeout(() => {
+                snackbar.classList.add('show');
+            }, 10);
+
+            // Hide and remove after 3 seconds
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+                setTimeout(() => {
+                    snackbar.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        // Registration state management (stored in localStorage)
+        function getRegistrationState(eventId) {
+            const state = localStorage.getItem(`event_${eventId}_registration`);
+            return state || null; // returns 'athlete', 'referee', or null
+        }
+
+        function setRegistrationState(eventId, type) {
+            if (type) {
+                localStorage.setItem(`event_${eventId}_registration`, type);
+            } else {
+                localStorage.removeItem(`event_${eventId}_registration`);
+            }
+        }
+
+        function handleRegistration(eventId, type) {
+            // Only athletes need to select competitions
+            if (type === 'athlete') {
+                window.location.href = `competition-selection.html?eventId=${eventId}`;
+            } else {
+                // Referees just register directly
+                setRegistrationState(eventId, type);
+                alert('Successfully registered as referee!');
+                location.reload();
+            }
+        }
+
+        function showRegistrationOptions(eventId, currentType) {
+            const otherType = currentType === 'athlete' ? 'referee' : 'athlete';
+            const action = confirm(`You are registered as ${currentType}.\n\nOK = Change to ${otherType}\nCancel = Unregister/Not participate`);
+
+            if (action) {
+                // User wants to switch
+                setRegistrationState(eventId, otherType);
+                alert(`Changed registration to ${otherType}!`);
+            } else {
+                // User wants to unregister
+                if (confirm('Are you sure you want to unregister?')) {
+                    setRegistrationState(eventId, null);
+                    alert('Successfully unregistered.');
+                }
+            }
+            location.reload();
+        }
+
+        function cancelRegistration(eventId) {
+            if (confirm('Are you sure you want to cancel your registration and forfeit participation in this event?')) {
+                setRegistrationState(eventId, null);
+                alert('Registration cancelled successfully.');
+                location.reload();
+            }
+        }
+
+        // View switcher for competitions
+        function switchCompetitionView(viewName) {
+            // Remove active class from all tabs and contents
+            document.querySelectorAll('.competition-view-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.competition-view-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected tab and content
+            event.target.closest('.competition-view-tab').classList.add('active');
+            
+            if (viewName === 'ranking') {
+                document.getElementById('rankingView').classList.add('active');
+            } else if (viewName === 'elimination') {
+                document.getElementById('eliminationView').classList.add('active');
+            }
+        }
+
+        // Competitions table sorting and rendering
+        function sortCompetitionsTable(field) {
+            if (competitionsSortField === field) {
+                competitionsSortOrder = competitionsSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                competitionsSortField = field;
+                competitionsSortOrder = 'asc';
+            }
+
+            document.querySelectorAll('#rankingView .competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+
+            const activeHeader = document.querySelector(`#rankingView [onclick*="sortCompetitionsTable('${field}')"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (competitionsSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+
+            competitionsData.sort((a, b) => {
+                let aVal = a[field] ? a[field].toString().toLowerCase() : '';
+                let bVal = b[field] ? b[field].toString().toLowerCase() : '';
+                if (competitionsSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+
+            renderCompetitionsTable();
+        }
+
+        // Elimination table sorting (separate from ranking)
+        let eliminationSortField = null;
+        let eliminationSortOrder = 'asc';
+        
+        function sortEliminationTable(field) {
+            if (eliminationSortField === field) {
+                eliminationSortOrder = eliminationSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                eliminationSortField = field;
+                eliminationSortOrder = 'asc';
+            }
+
+            document.querySelectorAll('#eliminationView .competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+
+            const activeHeader = document.querySelector(`#eliminationView [onclick*="sortEliminationTable('${field}')"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (eliminationSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+
+            const sortedData = [...eliminationData].sort((a, b) => {
+                let aVal = a[field] ? a[field].toString().toLowerCase() : '';
+                let bVal = b[field] ? b[field].toString().toLowerCase() : '';
+                if (eliminationSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+
+            renderEliminationTable(sortedData);
+        }
+
+        function renderCompetitionsTable() {
+            const tbody = document.getElementById('competitionsTableBody');
+            if (!tbody || !competitionsData || competitionsData.length === 0) return;
+
+            tbody.innerHTML = competitionsData.map((comp, index) => {
+                let categoryClass = 'badge-mixed';
+                const catLower = comp.category ? comp.category.toLowerCase() : '';
+
+                if (catLower === "men's individual") {
+                    categoryClass = 'badge-men-individual';
+                } else if (catLower === "women's individual") {
+                    categoryClass = 'badge-women-individual';
+                } else if (catLower === "men's team") {
+                    categoryClass = 'badge-men-team';
+                } else if (catLower === "women's team") {
+                    categoryClass = 'badge-women-team';
+                } else if (catLower === "mixed team") {
+                    categoryClass = 'badge-mixed';
+                }
+
+                const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
+
+                // Get competition status
+                const competitionId = comp.id || index;
+                const status = getCompetitionStatus(eventId, competitionId);
+                const statusClass = status;
+
+                const clickTitle = 'Click row to view/enter scores';
+                const categoryEscaped = (comp.category || '').replace(/'/g, "\\'");
+                const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
+
+                return `
+                <tr style="cursor: pointer;" onclick="openCompetitionScoring(${eventId}, ${competitionId}, '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
+                    <td>
+                        <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
+                    </td>
+                    <td>
+                        <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
+                    </td>
+                    <td>${comp.round || 'N/A'}</td>
+                    <td>
+                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')" title="Click to view round details">${comp.subround || 'N/A'}</span>
+                    </td>
+                    <td class="status-dropdown-cell">
+                        <select class="status-dropdown ${statusClass}" 
+                                onclick="event.stopPropagation()" 
+                                onchange="updateCompetitionStatus(${eventId}, ${competitionId}, this.value)">
+                            <option value="not-started" ${status === 'not-started' ? 'selected' : ''}>Not Started</option>
+                            <option value="in-process" ${status === 'in-process' ? 'selected' : ''}>In-process</option>
+                            <option value="done" ${status === 'done' ? 'selected' : ''}>Done</option>
+                        </select>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderEliminationTable(dataToRender) {
+            const tbody = document.getElementById('eliminationTableBody');
+            if (!tbody) return;
+            
+            const data = dataToRender || eliminationData;
+            if (!data || data.length === 0) return;
+
+            tbody.innerHTML = data.map((comp, index) => {
+                let categoryClass = 'badge-mixed';
+                const catLower = comp.category ? comp.category.toLowerCase() : '';
+
+                if (catLower === "men's individual") {
+                    categoryClass = 'badge-men-individual';
+                } else if (catLower === "women's individual") {
+                    categoryClass = 'badge-women-individual';
+                } else if (catLower === "men's team") {
+                    categoryClass = 'badge-men-team';
+                } else if (catLower === "women's team") {
+                    categoryClass = 'badge-women-team';
+                } else if (catLower === "mixed team") {
+                    categoryClass = 'badge-mixed';
+                }
+
+                const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
+
+                // Get elimination match status
+                const competitionId = comp.id || index;
+                const key = `event_${eventId}_elim_${competitionId}_status`;
+                const status = localStorage.getItem(key) || 'closed';
+                const statusClass = status;
+                const statusIcon = status === 'open' ? 'mdi-play-circle' : 'mdi-close-circle';
+                const statusText = status === 'open' ? 'In Progress' : 'Closed';
+
+                const clickTitle = 'Click to view elimination bracket';
+                const categoryEscaped = (comp.category || '').replace(/'/g, "\\'");
+                const bowTypeEscaped = (comp.bowType || '').replace(/'/g, "\\'");
+
+                return `
+                <tr style="cursor: pointer;" onclick="openEliminationBracket(${eventId}, '${competitionId}', '${categoryEscaped}', '${bowTypeEscaped}')" title="${clickTitle}">
+                    <td>
+                        <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
+                    </td>
+                    <td>
+                        <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
+                    </td>
+                    <td>${comp.round || 'N/A'}</td>
+                    <td>
+                        <span class="subround-clickable" onclick="event.stopPropagation(); showSubroundDetails('${comp.subround}')" title="Click to view round details">${comp.subround || 'N/A'}</span>
+                    </td>
+                    <td class="status-switch-cell">
+                        <div class="status-switch ${statusClass}" onclick="event.stopPropagation(); toggleEliminationStatus(${eventId}, '${competitionId}')" title="Click to toggle: In Progress (scoring allowed) / Closed (read-only)">
+                            <i class="mdi ${statusIcon}"></i>
+                            <span>${statusText}</span>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        // Show subround details modal
+        function showSubroundDetails(subroundName) {
+            const modal = document.getElementById('subroundModal');
+            const modalTitle = document.getElementById('modalSubroundTitle');
+            const modalBody = document.getElementById('modalSubroundBody');
+
+            modalTitle.textContent = subroundName;
+
+            const details = getSubroundDetails(subroundName);
+
+            if (!details || details.length === 0) {
+                modalBody.innerHTML = `
+                    <div class="modal-empty">
+                        <i class="mdi mdi-information-outline"></i>
+                        <div>No detailed information available for this subround</div>
+                    </div>
+                `;
+            } else {
+                modalBody.innerHTML = details.map((phase, index) => `
+                    <div class="phase-card">
+                        <div class="phase-header">
+                            Distance: ${phase.distance} <span class="phase-target-size">(Target Size: ${phase.targetSize})</span>
+                        </div>
+                        <div class="phase-details">
+                            Ends: <span>${phase.ends}</span> - ${phase.target} - Arrows: <span>${phase.arrows}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            modal.classList.add('show');
+        }
+
+        function closeSubroundModal() {
+            const modal = document.getElementById('subroundModal');
+            modal.classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function (event) {
+            const modal = document.getElementById('subroundModal');
+            if (event.target === modal) {
+                closeSubroundModal();
+            }
+        });
+
+        // Tab switching
+        function switchTab(tabName, clickEvent) {
+            // Check if trying to access Host Panel without being host
+            if (tabName === 'host' && !checkIfUserIsHost()) {
+                alert('Access denied. Only the event host can access this panel.');
+                return;
+            }
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            // Add active class to selected tab
+            if (clickEvent && clickEvent.target) {
+                clickEvent.target.closest('.tab-item').classList.add('active');
+            } else {
+                // Fallback: find tab by matching tabName
+                const tabs = document.querySelectorAll('.tab-item');
+                tabs.forEach(tab => {
+                    const onclick = tab.getAttribute('onclick');
+                    if (onclick && onclick.includes(tabName)) {
+                        tab.classList.add('active');
+                    }
+                });
+            }
+            document.getElementById(tabName + 'Tab').classList.add('active');
+
+            // Load data for the tab
+            if (tabName === 'athletes' && allAthletes.length === 0) {
+                loadAthletes();
+            } else if (tabName === 'referees' && allReferees.length === 0) {
+                loadReferees();
+            }
+        }
+
+        // Edit event (Host only)
+        function editEvent(eventId) {
+            // In production, this would check if current user is the host
+            // For now, navigate to edit page
+            console.log('Edit event:', eventId);
+            window.location.href = `event-edit.html?id=${eventId}`;
+        }
+
+        // Load event details
+        function loadEventDetail() {
+            const eventContent = document.getElementById('detailsTab');
+
+            if (!eventId) {
+                eventContent.innerHTML = `
+                    <div class="error-state">
+                        <i class="mdi mdi-calendar-alert"></i>
+                        <div class="error-state-title">Event not found</div>
+                        <div class="error-state-text">The event you're looking for doesn't exist.</div>
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            const event = getEventDetail(eventId);
+
+            if (!event) {
+                eventContent.innerHTML = `
+                    <div class="error-state">
+                        <i class="mdi mdi-calendar-alert"></i>
+                        <div class="error-state-title">Event not found</div>
+                        <div class="error-state-text">The event you're looking for doesn't exist.</div>
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
+            // Render event details
+            let html = `
+                <span class="status-badge ${event.status}">${event.status.charAt(0).toUpperCase() + event.status.slice(1)}</span>
+                <div class="event-title-section">
+                    <h1 class="event-title">${event.title}</h1>
+                    <button class="edit-btn-host" onclick="editEvent(${event.id})" title="Edit event (Host only)">
+                        <i class="mdi mdi-pencil"></i>
+                        <span>Edit<span class="host-only-label">Host only</span></span>
+                    </button>
+                </div>
+            `;
+
+            // Show cancellation notice if cancelled
+            if (event.status === 'cancelled' && event.cancellationReason) {
+                html += `
+                    <div class="cancellation-notice">
+                        <div class="cancellation-title">
+                            <i class="mdi mdi-alert-circle"></i>
+                            Event Cancelled
+                        </div>
+                        <div class="cancellation-text">${event.cancellationReason}</div>
+                    </div>
+                `;
+            }
+
+            // Basic Information
+            html += `
+                <div class="info-section">
+                    <div class="info-label">Date & Time</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-calendar-range"></i>
+                        ${event.dateDisplay}
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Location</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-map-marker"></i>
+                        ${event.location}
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-label">Registration Deadline</div>
+                    <div class="info-value">
+                        <i class="mdi mdi-clock-outline"></i>
+                        ${new Date(event.registrationDeadline).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+                    </div>
+                </div>
+            `;
+
+            // Registration Info (not for cancelled events)
+            if (event.status !== 'cancelled') {
+                html += `
+                    <div class="registration-info">
+                        <div class="registration-card">
+                            <div class="registration-card-value">${event.currentParticipants}</div>
+                            <div class="registration-card-label">Registered</div>
+                        </div>
+                        <div class="registration-card">
+                            <div class="registration-card-value">${event.maxParticipants}</div>
+                            <div class="registration-card-label">Max Capacity</div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Description
+            html += `
+                <div class="info-section">
+                    <div class="info-label">About This Event</div>
+                    <div class="description">${event.description}</div>
+                </div>
+
+                <div class="divider"></div>
+            `;
+
+            // Competitions - store data and render table
+            if (event.competitions && event.competitions.length > 0) {
+                competitionsData = [...event.competitions];
+                
+                // Generate mock elimination data (bracket matches)
+                eliminationData = [
+                    { id: 'e1', bowType: 'Recurve', category: "Men's Individual", round: 'WA (International)', subround: 'WA 70m Elimination' },
+                    { id: 'e2', bowType: 'Recurve', category: "Women's Individual", round: 'WA (International)', subround: 'WA 70m Elimination' },
+                    { id: 'e3', bowType: 'Compound', category: "Men's Individual", round: 'WA (International)', subround: 'WA 50m Elimination' },
+                    { id: 'e4', bowType: 'Compound', category: "Women's Individual", round: 'WA (International)', subround: 'WA 50m Elimination' },
+                    { id: 'e5', bowType: 'Recurve', category: "Mixed Team", round: 'WA (International)', subround: 'WA 70m Mixed Elimination' },
+                    { id: 'e6', bowType: 'Barebow', category: "Men's Individual", round: 'National Round', subround: 'Half WA' },
+                    { id: 'e7', bowType: 'Recurve', category: "Men's Team", round: 'WA (International)', subround: 'WA 70m Team Elimination' },
+                    { id: 'e8', bowType: 'Compound', category: "Women's Team", round: 'WA (International)', subround: 'WA 50m Team Elimination' }
+                ];
+            }
+
+            html += `
+                <div class="competitions-section">
+                    <div class="competitions-header">
+                        <div class="competitions-title">
+                            <i class="mdi mdi-trophy"></i>
+                            Competitions
+                        </div>
+                    </div>
+                    
+                    <!-- View Switcher -->
+                    <div class="competition-view-tabs">
+                        <button class="competition-view-tab active" onclick="switchCompetitionView('ranking')">
+                            <i class="mdi mdi-format-list-numbered"></i>
+                            Ranking
+                        </button>
+                        <button class="competition-view-tab" onclick="switchCompetitionView('elimination')">
+                            <i class="mdi mdi-tournament"></i>
+                            Elimination
+                        </button>
+                    </div>
+            `;
+
+            if (event.competitions && event.competitions.length > 0) {
+                html += `
+                    <!-- Ranking View -->
+                    <div class="competition-view-content active" id="rankingView">
+                        <div class="competitions-table-container">
+                            <table class="competitions-table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortCompetitionsTable('bowType')">
+                                            Bow Type
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortCompetitionsTable('category')">
+                                            Category
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortCompetitionsTable('round')">
+                                            Round
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortCompetitionsTable('subround')">
+                                            Subround
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th>
+                                            Competition Status
+                                            <i class="mdi mdi-information-outline" title="Toggle competition status"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="competitionsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Elimination View -->
+                    <div class="competition-view-content" id="eliminationView">
+                        <div class="competitions-table-container">
+                            <table class="competitions-table">
+                                <thead>
+                                    <tr>
+                                        <th onclick="sortEliminationTable('bowType')">
+                                            Bow Type
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortEliminationTable('category')">
+                                            Category
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortEliminationTable('round')">
+                                            Round
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th onclick="sortEliminationTable('subround')">
+                                            Subround
+                                            <i class="mdi mdi-arrow-up sort-icon"></i>
+                                        </th>
+                                        <th>
+                                            Match Status
+                                            <i class="mdi mdi-information-outline" title="Toggle match status"></i>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eliminationTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="competitions-empty">
+                        <i class="mdi mdi-trophy"></i>
+                        <div>No competitions available</div>
+                    </div>
+                `;
+            }
+
+            html += `</div><div class="divider"></div>`;
+
+            // Organizer
+            html += `
+                <div class="organizer-section">
+                    <div class="organizer-title">
+                        <i class="mdi mdi-account-group"></i>
+                        Organizer
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-office-building"></i>
+                        <span>${event.organizer.name}</span>
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-email"></i>
+                        <span>${event.organizer.email}</span>
+                    </div>
+                    <div class="organizer-item">
+                        <i class="mdi mdi-phone"></i>
+                        <span>${event.organizer.phone}</span>
+                    </div>
+                </div>
+            `;
+
+            // Results (for completed events)
+            if (event.status === 'completed' && event.results) {
+                html += `
+                    <div class="results-section">
+                        <div class="results-title">
+                            <i class="mdi mdi-medal"></i>
+                            Top Scorers
+                        </div>
+                `;
+
+                event.results.topScorers.forEach((scorer, index) => {
+                    html += `
+                        <div class="result-item">
+                            <div class="result-info">
+                                <div class="result-name">${index + 1}. ${scorer.name}</div>
+                                <div class="result-category">${scorer.category}</div>
+                            </div>
+                            <div class="result-score">${scorer.score}</div>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+            }
+
+            eventContent.innerHTML = html;
+
+            // Render competitions table if data exists
+            if (competitionsData.length > 0) {
+                renderCompetitionsTable();
+                renderEliminationTable();
+            }
+
+            // Add action buttons based on status
+            renderActionButtons(event);
+        }
+
+        function renderActionButtons(event) {
+            const existingButtons = document.querySelector('.action-buttons');
+            if (existingButtons) {
+                existingButtons.remove();
+            }
+
+            const container = document.querySelector('.event-container');
+            const buttonsDiv = document.createElement('div');
+            buttonsDiv.className = 'action-buttons';
+
+            if (event.status === 'upcoming') {
+                const isRegistrationOpen = new Date() < new Date(event.registrationDeadline);
+                const isFull = event.currentParticipants >= event.maxParticipants;
+                const registrationState = getRegistrationState(event.id);
+
+                let registrationButtons = '';
+
+                if (!isRegistrationOpen || isFull) {
+                    // Registration closed or event full
+                    registrationButtons = `
+                        <button class="btn btn-secondary" disabled>
+                            <i class="mdi mdi-close-circle"></i>
+                            ${isFull ? 'Event Full' : 'Registration Closed'}
+                        </button>
+                    `;
+                } else if (registrationState === 'athlete') {
+                    // Already registered as athlete
+                    registrationButtons = `
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'athlete')" title="Click to view/edit your competition selections">
+                            <i class="mdi mdi-pencil"></i>
+                            Registered as Athlete - Edit
+                        </button>
+                        <button class="btn btn-danger" onclick="cancelRegistration(${event.id})">
+                            <i class="mdi mdi-close-circle"></i>
+                            Cancel Registration
+                        </button>
+                    `;
+                } else if (registrationState === 'referee') {
+                    // Already registered as referee
+                    registrationButtons = `
+                        <button class="btn btn-success" onclick="handleRegistration(${event.id}, 'referee')" title="Click to view/edit your competition selections">
+                            <i class="mdi mdi-pencil"></i>
+                            Registered as Referee - Edit
+                        </button>
+                        <button class="btn btn-danger" onclick="cancelRegistration(${event.id})">
+                            <i class="mdi mdi-close-circle"></i>
+                            Cancel Registration
+                        </button>
+                    `;
+                } else {
+                    // Not registered yet - show registration buttons (unless viewing Host Panel tab)
+                    const currentTab = document.querySelector('.tab-item.active');
+                    const isHostPanelTab = currentTab && currentTab.textContent.includes('Host Panel');
+                    
+                    if (isHostPanelTab) {
+                        // Host Panel tab - show host message
+                        registrationButtons = `
+                            <div style="text-align: center; padding: 16px; color: #666; font-size: 14px;">
+                                <i class="mdi mdi-shield-crown" style="font-size: 24px; color: #1565c0; display: block; margin-bottom: 8px;"></i>
+                                <div style="font-weight: 600; color: #1565c0; margin-bottom: 4px;">You are the host of this event</div>
+                                <div>Use the controls above to manage this event</div>
+                            </div>
+                        `;
+                    } else {
+                        // Other tabs - show registration buttons
+                        registrationButtons = `
+                            <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'athlete')">
+                                <i class="mdi mdi-run"></i>
+                                Register as Athlete
+                            </button>
+                            <button class="btn btn-primary" onclick="handleRegistration(${event.id}, 'referee')">
+                                <i class="mdi mdi-whistle"></i>
+                                Register as Referee
+                            </button>
+                        `;
+                    }
+                }
+
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        ${registrationButtons}
+                    </div>
+                `;
+            } else if (event.status === 'live') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="alert('View live scores')">
+                            <i class="mdi mdi-trophy"></i>
+                            View Live Scores
+                        </button>
+                    </div>
+                `;
+            } else if (event.status === 'completed') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="alert('View full results')">
+                            <i class="mdi mdi-medal"></i>
+                            View Full Results
+                        </button>
+                    </div>
+                `;
+            } else if (event.status === 'cancelled') {
+                buttonsDiv.innerHTML = `
+                    <div class="button-row">
+                        <button class="btn btn-primary" onclick="window.location.href='../dashboard/dashboard.html'" style="flex: 1;">
+                            <i class="mdi mdi-arrow-left"></i>
+                            Back to Dashboard
+                        </button>
+                    </div>
+                `;
+            }
+
+            container.appendChild(buttonsDiv);
+        }
+
+        // Load athletes data
+        function loadAthletes() {
+            // Get athletes for this event from mock data
+            allAthletes = getAthletesByEvent(eventId);
+            filteredAthletes = [...allAthletes];
+            currentAthleteSort = 'name';
+            sortAthletes('name');
+        }
+
+        // Filter athletes
+        function filterAthletes() {
+            const searchTerm = document.getElementById('athleteSearch').value.toLowerCase();
+            filteredAthletes = allAthletes.filter(athlete =>
+                athlete.name.toLowerCase().includes(searchTerm) ||
+                athlete.team.toLowerCase().includes(searchTerm)
+            );
+            renderAthletes();
+        }
+
+        // Sort athletes
+        function sortAthletes(sortBy) {
+            currentAthleteSort = sortBy;
+
+            // Update header states
+            const headers = document.querySelectorAll('#athletesTable th.sortable');
+            headers.forEach(th => th.classList.remove('active'));
+
+            if (sortBy === 'name') {
+                filteredAthletes.sort((a, b) => a.name.localeCompare(b.name));
+                headers[0].classList.add('active');
+            } else if (sortBy === 'team') {
+                filteredAthletes.sort((a, b) => a.team.localeCompare(b.team));
+                headers[1].classList.add('active');
+            } else if (sortBy === 'country') {
+                filteredAthletes.sort((a, b) => a.country.localeCompare(b.country));
+                headers[2].classList.add('active');
+            }
+
+            renderAthletes();
+        }
+
+        // Generate consistent color for team name
+        function getTeamColor(teamName) {
+            // Hash function to generate consistent color from team name
+            let hash = 0;
+            for (let i = 0; i < teamName.length; i++) {
+                hash = teamName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+
+            // Generate HSL color with good saturation and lightness
+            const hue = Math.abs(hash % 360);
+            const saturation = 65 + (Math.abs(hash) % 20); // 65-85%
+            const lightness = 85 + (Math.abs(hash >> 8) % 10); // 85-95%
+
+            const backgroundColor = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+            const textColor = `hsl(${hue}, ${saturation + 10}%, ${lightness - 55}%)`; // Darker for text
+
+            return { backgroundColor, textColor };
+        }
+
+        // Render athletes
+        function renderAthletes() {
+            const athletesList = document.getElementById('athletesList');
+
+            if (filteredAthletes.length === 0) {
+                athletesList.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="text-align: center; padding: 48px 16px;">
+                            <div class="empty-list">
+                                <i class="mdi mdi-account-off"></i>
+                                <div class="empty-list-title">No athletes found</div>
+                                <div class="empty-list-text">Try adjusting your search</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            athletesList.innerHTML = filteredAthletes.map(athlete => {
+                const teamColor = getTeamColor(athlete.team);
+                return `
+                    <tr>
+                        <td>
+                            <div class="athlete-name-cell">
+                                <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(athlete.name)}&background=1565c0&color=fff&size=36" 
+                                     alt="${athlete.name}" 
+                                     class="athlete-profile-pic">
+                                <a href="athlete-participation.html?eventId=${eventId}&athleteId=${athlete.id}" class="athlete-link">
+                                    ${athlete.name}
+                                </a>
+                            </div>
+                        </td>
+                        <td>
+                            <span class="team-tag" style="background-color: ${teamColor.backgroundColor}; color: ${teamColor.textColor};">
+                                ${athlete.team}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="table-country">
+                                <span class="table-flag">${athlete.flag}</span>
+                                <span>${athlete.country}</span>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Load referees data
+        function loadReferees() {
+            // Get referees for this event from mock data
+            allReferees = getRefereesByEvent(eventId);
+            filteredReferees = [...allReferees];
+            currentRefereeSort = 'name';
+            sortReferees('name');
+        }
+
+        // Filter referees
+        function filterReferees() {
+            const searchTerm = document.getElementById('refereeSearch').value.toLowerCase();
+            filteredReferees = allReferees.filter(referee =>
+                referee.name.toLowerCase().includes(searchTerm)
+            );
+            renderReferees();
+        }
+
+        // Sort referees
+        function sortReferees(sortBy) {
+            currentRefereeSort = sortBy;
+
+            // Update header states
+            const headers = document.querySelectorAll('#refereesTable th.sortable');
+            headers.forEach(th => th.classList.remove('active'));
+
+            if (sortBy === 'name') {
+                filteredReferees.sort((a, b) => a.name.localeCompare(b.name));
+                headers[0].classList.add('active');
+            } else if (sortBy === 'country') {
+                filteredReferees.sort((a, b) => a.country.localeCompare(b.country));
+                headers[1].classList.add('active');
+            }
+
+            renderReferees();
+        }
+
+        // Render referees
+        function renderReferees() {
+            const refereesList = document.getElementById('refereesList');
+
+            if (filteredReferees.length === 0) {
+                refereesList.innerHTML = `
+                    <tr>
+                        <td colspan="2" style="text-align: center; padding: 48px 16px;">
+                            <div class="empty-list">
+                                <i class="mdi mdi-whistle"></i>
+                                <div class="empty-list-title">No referees found</div>
+                                <div class="empty-list-text">Try adjusting your search</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            refereesList.innerHTML = filteredReferees.map(referee => `
+                <tr>
+                    <td>
+                        <div class="athlete-name-cell">
+                            <img src="https://ui-avatars.com/api/?name=${encodeURIComponent(referee.name)}&background=2e7d32&color=fff&size=36" 
+                                 alt="${referee.name}" 
+                                 class="athlete-profile-pic">
+                            <span>${referee.name}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="table-country">
+                            <span class="table-flag">${referee.flag}</span>
+                            <span>${referee.country}</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Individual Competition Management
+        function manageIndividualCompetitions() {
+            window.location.href = `../competition-manage/individual-competition.html?eventId=${eventId}`;
+        }
+
+        // Team Competitions Management
+        function manageTeamCompetitions() {
+            window.location.href = `../competition-manage/team-competition.html?eventId=${eventId}`;
+        }
+
+        // Mixed Team Competitions Management
+        function manageMixedTeamCompetitions() {
+            alert('Mixed Team Competition management will be implemented here.\n\nThis feature will allow:\n- Creating mixed team competitions (1 man + 1 woman per team)\n- Pairing athletes from same team or organization\n- Calculating combined scores\n- Managing mixed team rankings');
+        }
+
+        // Initialize language selector
+        initLanguageSelector();
+        
+        // Initialize host UI (show/hide Host Panel tab based on user role)
+        initializeHostUI();
+
+        // Load event on page load
+        loadEventDetail();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,886 @@
+{
+  "athletes": [
+    { "id": "ath-001", "fullName": "John Smith", "team": "Team Alpha", "bowType": "Recurve", "national": "United States", "nationalCode": "us" },
+    { "id": "ath-002", "fullName": "Sarah Johnson", "team": "Team Beta", "bowType": "Recurve", "national": "Canada", "nationalCode": "ca" },
+    { "id": "ath-003", "fullName": "Michael Brown", "team": "Team Alpha", "bowType": "Compound", "national": "United Kingdom", "nationalCode": "gb" },
+    { "id": "ath-004", "fullName": "Emily Davis", "team": "Team Gamma", "bowType": "Recurve", "national": "Australia", "nationalCode": "au" },
+    { "id": "ath-005", "fullName": "David Wilson", "team": "Team Beta", "bowType": "Compound", "national": "Germany", "nationalCode": "de" },
+    { "id": "ath-006", "fullName": "Jessica Martinez", "team": "Team Delta", "bowType": "Barebow", "national": "Spain", "nationalCode": "es" },
+    { "id": "ath-007", "fullName": "James Anderson", "team": "Team Gamma", "bowType": "Recurve", "national": "France", "nationalCode": "fr" },
+    { "id": "ath-008", "fullName": "Maria Garcia", "team": "Team Alpha", "bowType": "Compound", "national": "Mexico", "nationalCode": "mx" },
+    { "id": "ath-009", "fullName": "Robert Taylor", "team": "Team Epsilon", "bowType": "Barebow", "national": "Italy", "nationalCode": "it" },
+    { "id": "ath-010", "fullName": "Linda Thomas", "team": "Team Beta", "bowType": "Recurve", "national": "Netherlands", "nationalCode": "nl" },
+    { "id": "ath-011", "fullName": "William Moore", "team": "Team Delta", "bowType": "Compound", "national": "Japan", "nationalCode": "jp" },
+    { "id": "ath-012", "fullName": "Patricia Jackson", "team": "Team Gamma", "bowType": "Barebow", "national": "South Korea", "nationalCode": "kr" },
+    { "id": "ath-013", "fullName": "Richard White", "team": "Team Alpha", "bowType": "Recurve", "national": "Sweden", "nationalCode": "se" },
+    { "id": "ath-014", "fullName": "Barbara Harris", "team": "Team Epsilon", "bowType": "Compound", "national": "Norway", "nationalCode": "no" },
+    { "id": "ath-015", "fullName": "Joseph Martin", "team": "Team Beta", "bowType": "Barebow", "national": "Denmark", "nationalCode": "dk" },
+    { "id": "ath-016", "fullName": "Susan Thompson", "team": "Team Delta", "bowType": "Recurve", "national": "Finland", "nationalCode": "fi" },
+    { "id": "ath-017", "fullName": "Thomas Lee", "team": "Team Gamma", "bowType": "Compound", "national": "China", "nationalCode": "cn" },
+    { "id": "ath-018", "fullName": "Nancy Walker", "team": "Team Alpha", "bowType": "Barebow", "national": "India", "nationalCode": "in" },
+    { "id": "ath-019", "fullName": "Daniel Hall", "team": "Team Epsilon", "bowType": "Recurve", "national": "Brazil", "nationalCode": "br" },
+    { "id": "ath-020", "fullName": "Karen Allen", "team": "Team Beta", "bowType": "Compound", "national": "Argentina", "nationalCode": "ar" },
+    { "id": "ath-021", "fullName": "Christopher Lee", "team": "Team Alpha", "bowType": "Recurve", "national": "Singapore", "nationalCode": "sg" },
+    { "id": "ath-022", "fullName": "Michelle Wong", "team": "Team Beta", "bowType": "Recurve", "national": "Malaysia", "nationalCode": "my" },
+    { "id": "ath-023", "fullName": "Alexander Petrov", "team": "Team Gamma", "bowType": "Compound", "national": "Russia", "nationalCode": "ru" },
+    { "id": "ath-024", "fullName": "Isabella Romano", "team": "Team Delta", "bowType": "Recurve", "national": "Italy", "nationalCode": "it" },
+    { "id": "ath-025", "fullName": "Henrik Larsson", "team": "Team Epsilon", "bowType": "Compound", "national": "Sweden", "nationalCode": "se" },
+    { "id": "ath-026", "fullName": "Sophie Dubois", "team": "Team Alpha", "bowType": "Barebow", "national": "France", "nationalCode": "fr" },
+    { "id": "ath-027", "fullName": "Lucas Silva", "team": "Team Beta", "bowType": "Recurve", "national": "Portugal", "nationalCode": "pt" },
+    { "id": "ath-028", "fullName": "Emma Schmidt", "team": "Team Gamma", "bowType": "Compound", "national": "Austria", "nationalCode": "at" },
+    { "id": "ath-029", "fullName": "Oliver Nielsen", "team": "Team Delta", "bowType": "Barebow", "national": "Denmark", "nationalCode": "dk" },
+    { "id": "ath-030", "fullName": "Sophia Kowalski", "team": "Team Epsilon", "bowType": "Recurve", "national": "Poland", "nationalCode": "pl" }
+  ],
+  "competitionAthletes": {},
+  "targetAssignments": [],
+  "users": [
+    {
+      "id": "user-001",
+      "email": "admin@archery.com",
+      "password": "password123",
+      "firstName": "Admin",
+      "lastName": "User",
+      "role": "Host",
+      "phoneNumber": "+1234567890",
+      "createdAt": "2024-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-002",
+      "email": "athlete@archery.com",
+      "password": "password123",
+      "firstName": "John",
+      "lastName": "Archer",
+      "role": "Athlete",
+      "phoneNumber": "+1234567891",
+      "createdAt": "2024-01-02T00:00:00Z"
+    },
+    {
+      "id": "user-003",
+      "email": "referee@archery.com",
+      "password": "password123",
+      "firstName": "Jane",
+      "lastName": "Judge",
+      "role": "Referee",
+      "phoneNumber": "+1234567892",
+      "createdAt": "2024-01-03T00:00:00Z"
+    },
+    {
+      "id": "user-004",
+      "email": "kim@archery.com",
+      "password": "password123",
+      "firstName": "Kim",
+      "lastName": "Min-jun",
+      "role": "Athlete",
+      "phoneNumber": "+821012345678",
+      "createdAt": "2024-01-04T00:00:00Z"
+    },
+    {
+      "id": "user-005",
+      "email": "takeshi@archery.com",
+      "password": "password123",
+      "firstName": "Takeshi",
+      "lastName": "Yamamoto",
+      "role": "Athlete",
+      "phoneNumber": "+819012345678",
+      "createdAt": "2024-01-05T00:00:00Z"
+    },
+    {
+      "id": "user-006",
+      "email": "sarah@archery.com",
+      "password": "password123",
+      "firstName": "Sarah",
+      "lastName": "Connor",
+      "role": "Athlete",
+      "phoneNumber": "+15551234567",
+      "createdAt": "2024-01-06T00:00:00Z"
+    },
+    {
+      "id": "user-007",
+      "email": "david@archery.com",
+      "password": "password123",
+      "firstName": "David",
+      "lastName": "Beckham",
+      "role": "Host",
+      "phoneNumber": "+447700900000",
+      "createdAt": "2024-01-07T00:00:00Z"
+    },
+    {
+      "id": "user-008",
+      "email": "alice@archery.com",
+      "password": "password123",
+      "firstName": "Alice",
+      "lastName": "Wonder",
+      "role": "Referee",
+      "phoneNumber": "+1987654321",
+      "createdAt": "2024-01-08T00:00:00Z"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-001",
+      "name": "National Championship 2025",
+      "description": "Annual national archery championship with all categories",
+      "location": "National Archery Center, Tokyo",
+      "startDate": "2025-06-15T09:00:00Z",
+      "endDate": "2025-06-17T18:00:00Z",
+      "registrationDeadline": "2025-06-01T23:59:59Z",
+      "status": "Registration Open",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2024-12-01T10:00:00Z",
+      "updatedAt": "2025-12-07T09:35:29.904Z"
+    },
+    {
+      "id": "event-002",
+      "name": "Spring Indoor Tournament",
+      "description": "Indoor competition for recurve and compound divisions",
+      "location": "City Sports Complex, Hanoi",
+      "startDate": "2025-03-20T08:00:00Z",
+      "endDate": "2025-03-20T17:00:00Z",
+      "registrationDeadline": "2025-03-10T23:59:59Z",
+      "status": "Live",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2024-11-15T10:00:00Z",
+      "updatedAt": "2024-12-01T08:00:00Z"
+    },
+    {
+      "id": "event-003",
+      "name": "Youth Development Camp 2025",
+      "description": "Training and competition for junior archers",
+      "location": "Regional Archery Range, Bangkok",
+      "startDate": "2025-07-01T09:00:00Z",
+      "endDate": "2025-07-05T16:00:00Z",
+      "registrationDeadline": "2025-06-15T23:59:59Z",
+      "status": "Upcoming",
+      "isPublic": false,
+      "hostUserId": "user-001",
+      "createdAt": "2024-12-02T14:00:00Z",
+      "updatedAt": "2024-12-02T14:00:00Z"
+    },
+    {
+      "id": "event-004",
+      "name": "Winter Classic 2024",
+      "description": "Completed winter season championship",
+      "location": "Mountain View Arena, Seoul",
+      "startDate": "2024-12-01T09:00:00Z",
+      "endDate": "2024-12-03T18:00:00Z",
+      "registrationDeadline": "2024-11-20T23:59:59Z",
+      "status": "Completed",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2024-10-01T10:00:00Z",
+      "updatedAt": "2024-12-03T20:00:00Z"
+    },
+    {
+      "id": "event-005",
+      "name": "European Grand Prix 2025",
+      "description": "Major international archery event in Europe.",
+      "location": "Berlin Olympic Park, Berlin",
+      "startDate": "2025-08-10T09:00:00Z",
+      "endDate": "2025-08-15T18:00:00Z",
+      "registrationDeadline": "2025-07-20T23:59:59Z",
+      "status": "Upcoming",
+      "isPublic": true,
+      "hostUserId": "user-007",
+      "createdAt": "2024-12-05T10:00:00Z",
+      "updatedAt": "2024-12-05T10:00:00Z"
+    },
+    {
+      "id": "event-006",
+      "name": "Asian Cup Leg 1",
+      "description": "The first leg of the Asian Cup archery series.",
+      "location": "Taipei Arena, Taipei",
+      "startDate": "2025-04-05T08:30:00Z",
+      "endDate": "2025-04-10T17:00:00Z",
+      "registrationDeadline": "2025-03-25T23:59:59Z",
+      "status": "Upcoming",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2024-12-06T09:00:00Z",
+      "updatedAt": "2024-12-06T09:00:00Z"
+    },
+    {
+      "id": "event-007",
+      "name": "Club Friendly Match",
+      "description": "Friendly weekend match for local club members.",
+      "location": "Community Park Range, Sydney",
+      "startDate": "2025-02-15T10:00:00Z",
+      "endDate": "2025-02-15T16:00:00Z",
+      "registrationDeadline": "2025-02-10T23:59:59Z",
+      "status": "Registration Open",
+      "isPublic": false,
+      "hostUserId": "user-007",
+      "createdAt": "2024-12-04T15:00:00Z",
+      "updatedAt": "2024-12-04T15:00:00Z"
+    },
+    {
+      "id": "event-008",
+      "name": "World Archery Championship 2023 (Archive)",
+      "description": "Archived data for historical reference.",
+      "location": "Berlin, Germany",
+      "startDate": "2023-07-31T09:00:00Z",
+      "endDate": "2023-08-06T18:00:00Z",
+      "registrationDeadline": "2023-07-01T23:59:59Z",
+      "status": "Completed",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2023-01-01T10:00:00Z",
+      "updatedAt": "2023-08-07T10:00:00Z"
+    },
+    {
+      "id": "event-009",
+      "name": "Para Archery Open",
+      "description": "Open tournament for Para Archers of all categories.",
+      "location": "Dubai Club for People of Determination, Dubai",
+      "startDate": "2025-11-12T09:00:00Z",
+      "endDate": "2025-11-18T18:00:00Z",
+      "registrationDeadline": "2025-10-30T23:59:59Z",
+      "status": "Upcoming",
+      "isPublic": true,
+      "hostUserId": "user-001",
+      "createdAt": "2024-12-07T08:00:00Z",
+      "updatedAt": "2024-12-07T08:00:00Z"
+    },
+    {
+      "id": "event-010",
+      "name": "Cancelled Event Example",
+      "description": "This event was cancelled due to weather.",
+      "location": "Outdoor Field, London",
+      "startDate": "2024-09-10T09:00:00Z",
+      "endDate": "2024-09-10T17:00:00Z",
+      "registrationDeadline": "2024-09-01T23:59:59Z",
+      "status": "Cancelled",
+      "isPublic": true,
+      "hostUserId": "user-007",
+      "createdAt": "2024-08-01T10:00:00Z",
+      "updatedAt": "2024-09-09T10:00:00Z"
+    }
+  ],
+  "competitions": [
+    {
+      "id": "comp-001",
+      "eventId": "event-001",
+      "name": "Men's Recurve Individual - WA (International) WA 70m",
+      "bowType": "Recurve",
+      "category": "Men's Individual",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Olympic Round",
+      "status": "Active",
+      "maxParticipants": 64,
+      "currentParticipants": 42,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:00:00Z"
+    },
+    {
+      "id": "comp-002",
+      "eventId": "event-001",
+      "name": "Women's Recurve Individual - WA (International) WA 70m",
+      "bowType": "Recurve",
+      "category": "Women's Individual",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Olympic Round",
+      "status": "Active",
+      "maxParticipants": 64,
+      "currentParticipants": 38,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:00:00Z"
+    },
+    {
+      "id": "comp-003",
+      "eventId": "event-001",
+      "name": "Men's Compound Individual - WA (International) WA 50m",
+      "bowType": "Compound",
+      "category": "Men's Individual",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Compound Round",
+      "status": "Active",
+      "maxParticipants": 48,
+      "currentParticipants": 35,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:00:00Z"
+    },
+    {
+      "id": "comp-004",
+      "eventId": "event-001",
+      "name": "Women's Compound Individual - WA (International) WA 50m",
+      "bowType": "Compound",
+      "category": "Women's Individual",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Compound Round",
+      "status": "Active",
+      "maxParticipants": 48,
+      "currentParticipants": 30,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:05:00Z"
+    },
+    {
+      "id": "comp-005",
+      "eventId": "event-001",
+      "name": "Men's Barebow Individual - GNAS (Metric) Metric I",
+      "bowType": "Barebow",
+      "category": "Men's Individual",
+      "round": "GNAS (Metric)",
+      "subround": "Metric I",
+      "distance": "50m",
+      "format": "Barebow Round",
+      "status": "Active",
+      "maxParticipants": 32,
+      "currentParticipants": 18,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:10:00Z"
+    },
+    {
+      "id": "comp-006",
+      "eventId": "event-001",
+      "name": "Women's Barebow Individual - GNAS (Metric) Metric I",
+      "bowType": "Barebow",
+      "category": "Women's Individual",
+      "round": "GNAS (Metric)",
+      "subround": "Metric I",
+      "distance": "50m",
+      "format": "Barebow Round",
+      "status": "Active",
+      "maxParticipants": 32,
+      "currentParticipants": 15,
+      "customDetails": {
+        "roundType": "Qualification"
+      },
+      "createdAt": "2024-12-01T11:15:00Z"
+    },
+    {
+      "id": "comp-011",
+      "eventId": "event-001",
+      "name": "Men's Recurve Individual - WA (International) WA 70m - 1/32",
+      "bowType": "Recurve",
+      "category": "Men's Individual",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Olympic Round",
+      "status": "Scheduled",
+      "maxParticipants": 32,
+      "currentParticipants": 32,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/32"
+      },
+      "createdAt": "2024-12-01T11:20:00Z"
+    },
+    {
+      "id": "comp-012",
+      "eventId": "event-001",
+      "name": "Men's Recurve Individual - WA (International) WA 70m - 1/16",
+      "bowType": "Recurve",
+      "category": "Men's Individual",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Olympic Round",
+      "status": "Scheduled",
+      "maxParticipants": 16,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/16"
+      },
+      "createdAt": "2024-12-01T11:25:00Z"
+    },
+    {
+      "id": "comp-013",
+      "eventId": "event-001",
+      "name": "Men's Recurve Individual - WA (International) WA 70m - Quarter Finals",
+      "bowType": "Recurve",
+      "category": "Men's Individual",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Olympic Round",
+      "status": "Scheduled",
+      "maxParticipants": 8,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Quarter Finals"
+      },
+      "createdAt": "2024-12-01T11:30:00Z"
+    },
+    {
+      "id": "comp-014",
+      "eventId": "event-001",
+      "name": "Women's Compound Individual - WA (International) WA 50m - 1/16",
+      "bowType": "Compound",
+      "category": "Women's Individual",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Compound Round",
+      "status": "Scheduled",
+      "maxParticipants": 16,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/16"
+      },
+      "createdAt": "2024-12-01T11:35:00Z"
+    },
+    {
+      "id": "comp-015",
+      "eventId": "event-001",
+      "name": "Women's Compound Individual - WA (International) WA 50m - Semi Finals",
+      "bowType": "Compound",
+      "category": "Women's Individual",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Compound Round",
+      "status": "Scheduled",
+      "maxParticipants": 4,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Semi Finals"
+      },
+      "createdAt": "2024-12-01T11:40:00Z"
+    },
+    {
+      "id": "comp-021",
+      "eventId": "event-001",
+      "name": "Mixed Double Recurve - WA (International) WA 70m - 1/8",
+      "bowType": "Recurve",
+      "category": "Mixed Double",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 8,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/8"
+      },
+      "createdAt": "2024-12-01T11:45:00Z"
+    },
+    {
+      "id": "comp-022",
+      "eventId": "event-001",
+      "name": "Mixed Double Compound - WA (International) WA 50m - Quarter Finals",
+      "bowType": "Compound",
+      "category": "Mixed Double",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 4,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Quarter Finals"
+      },
+      "createdAt": "2024-12-01T11:50:00Z"
+    },
+    {
+      "id": "comp-031",
+      "eventId": "event-001",
+      "name": "Men's Team Recurve - WA (International) WA 70m - 1/8",
+      "bowType": "Recurve",
+      "category": "Men's Team",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 8,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/8"
+      },
+      "createdAt": "2024-12-01T11:55:00Z"
+    },
+    {
+      "id": "comp-032",
+      "eventId": "event-001",
+      "name": "Men's Team Compound - WA (International) WA 50m - Semi Finals",
+      "bowType": "Compound",
+      "category": "Men's Team",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 4,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Semi Finals"
+      },
+      "createdAt": "2024-12-01T12:00:00Z"
+    },
+    {
+      "id": "comp-033",
+      "eventId": "event-001",
+      "name": "Women's Team Recurve - WA (International) WA 70m - Quarter Finals",
+      "bowType": "Recurve",
+      "category": "Women's Team",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 8,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Quarter Finals"
+      },
+      "createdAt": "2024-12-01T12:05:00Z"
+    },
+    {
+      "id": "comp-034",
+      "eventId": "event-001",
+      "name": "Women's Team Compound - WA (International) WA 50m - Finals",
+      "bowType": "Compound",
+      "category": "Women's Team",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 2,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Finals"
+      },
+      "createdAt": "2024-12-01T12:10:00Z"
+    },
+    {
+      "id": "comp-041",
+      "eventId": "event-001",
+      "name": "Mixed Team Recurve - WA (International) WA 70m - 1/8",
+      "bowType": "Recurve",
+      "category": "Mixed Team",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 8,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "1/8"
+      },
+      "createdAt": "2024-12-01T12:15:00Z"
+    },
+    {
+      "id": "comp-042",
+      "eventId": "event-001",
+      "name": "Mixed Team Compound - WA (International) WA 50m - Quarter Finals",
+      "bowType": "Compound",
+      "category": "Mixed Team",
+      "round": "WA (International)",
+      "subround": "WA 50m",
+      "distance": "50m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 4,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Quarter Finals"
+      },
+      "createdAt": "2024-12-01T12:20:00Z"
+    },
+    {
+      "id": "comp-043",
+      "eventId": "event-001",
+      "name": "Mixed Team Recurve - WA (International) WA 70m - Semi Finals",
+      "bowType": "Recurve",
+      "category": "Mixed Team",
+      "round": "WA (International)",
+      "subround": "WA 70m",
+      "distance": "70m",
+      "format": "Team Round",
+      "status": "Scheduled",
+      "maxParticipants": 4,
+      "currentParticipants": 0,
+      "customDetails": {
+        "roundType": "Elimination",
+        "eliminationRound": "Semi Finals"
+      },
+      "createdAt": "2024-12-01T12:25:00Z"
+    }
+  ],
+  "scores": [
+    {
+      "id": "score-001",
+      "athleteId": "user-002",
+      "competitionId": "comp-001",
+      "endNumber": 1,
+      "arrowScores": [
+        10,
+        10,
+        9,
+        9,
+        8,
+        7
+      ],
+      "endScore": 53,
+      "totalScore": 53,
+      "createdAt": "2025-03-20T09:15:00Z",
+      "updatedAt": "2025-03-20T09:15:00Z"
+    },
+    {
+      "id": "score-002",
+      "athleteId": "user-002",
+      "competitionId": "comp-001",
+      "endNumber": 2,
+      "arrowScores": [
+        10,
+        9,
+        9,
+        8,
+        8,
+        7
+      ],
+      "endScore": 51,
+      "totalScore": 104,
+      "createdAt": "2025-03-20T09:30:00Z",
+      "updatedAt": "2025-03-20T09:30:00Z"
+    },
+    {
+      "id": "score-003",
+      "athleteId": "user-002",
+      "competitionId": "comp-001",
+      "endNumber": 3,
+      "arrowScores": [
+        10,
+        10,
+        10,
+        9,
+        8,
+        8
+      ],
+      "endScore": 55,
+      "totalScore": 159,
+      "createdAt": "2025-03-20T09:45:00Z",
+      "updatedAt": "2025-03-20T09:45:00Z"
+    },
+    {
+      "id": "score-004",
+      "athleteId": "user-004",
+      "competitionId": "comp-001",
+      "endNumber": 1,
+      "arrowScores": [
+        10,
+        10,
+        10,
+        9,
+        9,
+        9
+      ],
+      "endScore": 57,
+      "totalScore": 57,
+      "createdAt": "2025-03-20T09:15:00Z",
+      "updatedAt": "2025-03-20T09:15:00Z"
+    },
+    {
+      "id": "score-005",
+      "athleteId": "user-005",
+      "competitionId": "comp-001",
+      "endNumber": 1,
+      "arrowScores": [
+        10,
+        9,
+        9,
+        9,
+        8,
+        8
+      ],
+      "endScore": 53,
+      "totalScore": 53,
+      "createdAt": "2025-03-20T09:15:00Z",
+      "updatedAt": "2025-03-20T09:15:00Z"
+    }
+  ],
+  "leaderboards": [
+    {
+      "id": "leader-001",
+      "competitionId": "comp-001",
+      "competitionName": "Men's Recurve Individual",
+      "lastUpdated": "2025-03-20T10:00:00Z",
+      "athletes": [
+        {
+          "rank": 1,
+          "athleteId": "user-004",
+          "athleteName": "Kim Min-jun",
+          "country": "KOR",
+          "totalScore": 670,
+          "endScores": [
+            58,
+            56,
+            54,
+            57,
+            55,
+            56,
+            54,
+            58,
+            57,
+            55,
+            55,
+            55
+          ],
+          "previousRank": 1
+        },
+        {
+          "rank": 2,
+          "athleteId": "user-002",
+          "athleteName": "John Archer",
+          "country": "USA",
+          "totalScore": 665,
+          "endScores": [
+            56,
+            57,
+            55,
+            58,
+            56,
+            54,
+            57,
+            56,
+            55,
+            58,
+            55,
+            55
+          ],
+          "previousRank": 2
+        },
+        {
+          "rank": 3,
+          "athleteId": "user-005",
+          "athleteName": "Takeshi Yamamoto",
+          "country": "JPN",
+          "totalScore": 660,
+          "endScores": [
+            55,
+            57,
+            56,
+            55,
+            58,
+            54,
+            56,
+            55,
+            57,
+            56,
+            54,
+            55
+          ],
+          "previousRank": 3
+        }
+      ]
+    },
+    {
+      "id": "leader-002",
+      "competitionId": "comp-004",
+      "competitionName": "Indoor Recurve 18m",
+      "lastUpdated": "2025-03-20T17:00:00Z",
+      "athletes": [
+        {
+          "rank": 1,
+          "athleteId": "user-006",
+          "athleteName": "Sarah Connor",
+          "country": "USA",
+          "totalScore": 580,
+          "endScores": [
+            29,
+            29,
+            29,
+            29,
+            29,
+            29,
+            29,
+            29,
+            29,
+            29
+          ],
+          "previousRank": 1
+        }
+      ]
+    }
+  ],
+  "participants": [
+    {
+      "id": "part-001",
+      "eventId": "event-001",
+      "userId": "user-002",
+      "role": "Athlete",
+      "registeredCompetitions": [
+        "comp-001"
+      ],
+      "status": "Approved",
+      "registeredAt": "2024-12-05T10:00:00Z"
+    },
+    {
+      "id": "part-002",
+      "eventId": "event-001",
+      "userId": "user-003",
+      "role": "Referee",
+      "status": "Pending",
+      "registeredAt": "2024-12-06T14:30:00Z"
+    },
+    {
+      "id": "part-003",
+      "eventId": "event-001",
+      "userId": "user-004",
+      "role": "Athlete",
+      "registeredCompetitions": [
+        "comp-001"
+      ],
+      "status": "Approved",
+      "registeredAt": "2024-12-05T11:00:00Z"
+    },
+    {
+      "id": "part-004",
+      "eventId": "event-001",
+      "userId": "user-005",
+      "role": "Athlete",
+      "registeredCompetitions": [
+        "comp-001"
+      ],
+      "status": "Approved",
+      "registeredAt": "2024-12-05T12:00:00Z"
+    },
+    {
+      "id": "part-005",
+      "eventId": "event-002",
+      "userId": "user-006",
+      "role": "Athlete",
+      "registeredCompetitions": [
+        "comp-004"
+      ],
+      "status": "Approved",
+      "registeredAt": "2024-11-20T10:00:00Z"
+    }
+  ]
+}

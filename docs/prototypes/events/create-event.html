@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Create Event - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/rounds.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f5f5f5; min-height: 100vh; }
+        
+        /* Responsive container */
+        .create-event-container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .create-event-container { width: 100%; }
+            .header-title { font-size: 16px; }
+        }
+       
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .create-event-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .create-event-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Monitor/Desktop (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .create-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+            .create-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header - 8-column grid */
+        .header { display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        
+        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; transition: background 0.2s; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-back i { font-size: 24px; }
+        
+        .header-content { grid-column: 2 / 7; display: flex; align-items: center; gap: 12px; }
+        .header-title { font-size: 20px; font-weight: 700; }
+        
+        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
+        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
+        
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+        
+        /* Language Dropdown */
+        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
+        .language-dropdown.show { display: block; }
+        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
+        .language-item:hover { background: #f5f5f5; }
+        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .language-flag { font-size: 20px; }
+        .language-name { flex: 1; }
+        
+        /* Form Container */
+        .form-section { padding: 24px 16px; }
+        .form-title { font-size: 24px; font-weight: 700; color: #212121; margin-bottom: 8px; }
+        .form-subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+        
+        /* Form Groups */
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-size: 14px; font-weight: 600; color: #424242; margin-bottom: 8px; }
+        .form-label.required::after { content: " *"; color: #d32f2f; }
+        
+        /* Input Fields */
+        .input-wrapper { position: relative; }
+        .input-field { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; font-family: inherit; }
+        .input-field:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .input-field:disabled { background: #f5f5f5; cursor: not-allowed; }
+        
+        textarea.input-field { min-height: 100px; resize: vertical; }
+        
+        /* Date Range Group */
+        .date-range-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        @media (max-width: 599px) {
+            .date-range-group { grid-template-columns: 1fr; }
+        }
+        
+        /* Helper Text */
+        .helper-text { font-size: 12px; color: #666; margin-top: 4px; }
+        .error-text { font-size: 12px; color: #d32f2f; margin-top: 4px; display: none; }
+        
+        /* Form Actions */
+        .form-actions { display: flex; gap: 12px; margin-top: 32px; padding-bottom: 24px; }
+        .form-actions.sticky { position: sticky; bottom: 0; background: white; padding: 16px; margin: 0 -16px; border-top: 1px solid #e0e0e0; }
+        
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
+        .btn-secondary { background: white; color: #424242; border: 2px solid #e0e0e0; }
+        .btn-secondary:hover { background: #f5f5f5; border-color: #bdbdbd; }
+        .btn-icon { width: 40px; height: 44px; background: white; border: 2px solid #e0e0e0; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; color: #666; }
+        .btn-icon:hover { background: #f5f5f5; color: #d32f2f; border-color: #bdbdbd; }
+        
+        /* Add Competition Button */
+        .add-competition-btn { padding: 12px 24px; border: none; border-radius: 8px; background: #1565c0; color: white; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 16px; }
+        .add-competition-btn:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3); }
+        .add-competition-btn i { font-size: 20px; }
+        
+        /* Modal */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
+        .modal-overlay.show { display: flex; }
+        .modal-content { background: white; border-radius: 12px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2); }
+        .modal-header { padding: 20px 24px; border-bottom: 2px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 20px; font-weight: 700; color: #212121; display: flex; align-items: center; gap: 8px; }
+        .modal-title i { color: #1565c0; font-size: 24px; }
+        .modal-close { background: none; border: none; cursor: pointer; color: #666; padding: 8px; border-radius: 50%; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: #f5f5f5; color: #d32f2f; }
+        .modal-close i { font-size: 24px; }
+        .modal-body { padding: 24px; }
+        
+        /* Competition Form in Modal */
+        .competition-form-title { font-size: 16px; font-weight: 600; color: #212121; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+        .competition-form-title i { color: #1565c0; font-size: 20px; }
+        .competition-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .competition-form-label { font-size: 13px; font-weight: 600; color: #424242; margin-bottom: 4px; display: block; }
+        .competition-form-select { width: 100%; padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; outline: none; transition: all 0.2s; background: white; }
+        .competition-form-select:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .competition-form-select:disabled { background: #f5f5f5; cursor: not-allowed; opacity: 0.6; }
+        .competition-form-actions { display: flex; gap: 8px; margin-top: 16px; }
+        .btn-add { padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; background: #1565c0; color: white; }
+        .btn-add:hover { background: #0d47a1; transform: translateY(-1px); box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3); }
+        .btn-add:disabled { background: #bdbdbd; cursor: not-allowed; transform: none; box-shadow: none; }
+        .btn-clear { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; background: white; color: #666; }
+        .btn-clear:hover { background: #f5f5f5; border-color: #bdbdbd; }
+        
+        /* Selected Competitions */
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #666; background: #f5f5f5; padding: 4px 12px; border-radius: 12px; }
+        .selected-competitions { margin-top: 0; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 16px; }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; cursor: pointer; user-select: none; transition: background 0.2s; }
+        .competitions-table th:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table th:last-child { text-align: center; width: 60px; cursor: default; }
+        .competitions-table th:last-child:hover { background: #f5f5f5; }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
+        .competitions-table td:last-child { text-align: center; }
+        .competition-badge { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        .badge-recurve { background: #e3f2fd; color: #1565c0; }
+        .badge-compound { background: #e8f5e9; color: #2e7d32; }
+        .badge-barebow { background: #fff3e0; color: #e65100; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .remove-btn { background: none; border: none; cursor: pointer; color: #d32f2f; padding: 6px; border-radius: 4px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .remove-btn:hover { background: #ffebee; }
+        .remove-btn i { font-size: 20px; }
+        .empty-competitions { text-align: center; padding: 32px 16px; color: #999; font-size: 14px; border: 2px dashed #e0e0e0; border-radius: 8px; background: #fafafa; }
+        .empty-competitions i { font-size: 48px; display: block; margin-bottom: 8px; opacity: 0.3; }
+        
+        @media (max-width: 599px) {
+            .competition-form-row { grid-template-columns: 1fr; }
+            .competitions-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .modal-overlay { padding: 0; align-items: flex-end; }
+            .modal-content { max-width: 100%; border-radius: 12px 12px 0 0; max-height: 80vh; }
+            .modal-header { padding: 16px; }
+            .modal-body { padding: 16px; }
+            .modal-title { font-size: 18px; }
+            .competition-form-actions { flex-direction: column; }
+            .btn-add, .btn-clear { width: 100%; justify-content: center; }
+            .add-competition-btn { width: 100%; }
+            .competitions-table-container { border-radius: 0; margin-left: -16px; margin-right: -16px; box-shadow: none; border-top: 1px solid #e0e0e0; border-bottom: 1px solid #e0e0e0; }
+            .competitions-table th { font-size: 11px; padding: 10px 8px; }
+            .competitions-table td { font-size: 13px; padding: 10px 8px; }
+        }
+        
+        /* Responsive badge */
+        .responsive-badge { position: fixed; bottom: 10px; right: 10px; padding: 6px 12px; background: rgba(0, 0, 0, 0.7); color: white; font-size: 11px; border-radius: 12px; font-weight: 600; z-index: 1000; backdrop-filter: blur(4px); }
+        .responsive-badge::before { content: " Mobile"; }
+        @media (min-width: 600px) and (max-width: 959px) { .responsive-badge::before { content: " Tablet"; } }
+        @media (min-width: 960px) and (max-width: 1279px) { .responsive-badge::before { content: " Desktop"; } }
+        @media (min-width: 1280px) { .responsive-badge::before { content: " Desktop XL"; } }
+    </style>
+</head>
+<body>
+    <div class="responsive-badge"></div>
+    <div class="create-event-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-back" onclick="window.location.href='../dashboard/dashboard.html'">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-content">
+                <span class="header-title">Create Event</span>
+            </div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇺🇸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+            <h1 class="form-title">Create New Event</h1>
+            <p class="form-subtitle">Fill in the details to create a new archery event</p>
+
+            <form id="createEventForm" onsubmit="handleSubmit(event)">
+                <!-- Event Name -->
+                <div class="form-group">
+                    <label class="form-label required" for="eventName">Event Name</label>
+                    <input type="text" id="eventName" name="eventName" class="input-field" placeholder="Enter event name" required>
+                    <span class="helper-text">Give your event a clear, descriptive name</span>
+                </div>
+
+                <!-- Description -->
+                <div class="form-group">
+                    <label class="form-label required" for="description">Description</label>
+                    <textarea id="description" name="description" class="input-field" placeholder="Describe your event..." required></textarea>
+                    <span class="helper-text">Provide details about the event, rules, and requirements</span>
+                </div>
+
+                <!-- Location -->
+                <div class="form-group">
+                    <label class="form-label required" for="location">Location</label>
+                    <input type="text" id="location" name="location" class="input-field" placeholder="Enter location (e.g., Tokyo, Japan)" required>
+                    <span class="helper-text">Where will the event take place?</span>
+                </div>
+
+                <!-- Date Range -->
+                <div class="form-group">
+                    <label class="form-label required">Event Dates</label>
+                    <div class="date-range-group">
+                        <div>
+                            <input type="date" id="startDate" name="startDate" class="input-field" required>
+                            <span class="helper-text">Start date</span>
+                        </div>
+                        <div>
+                            <input type="date" id="endDate" name="endDate" class="input-field" required>
+                            <span class="helper-text">End date</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Deadline -->
+                <div class="form-group">
+                    <label class="form-label required" for="registrationDeadline">Registration Deadline</label>
+                    <input type="date" id="registrationDeadline" name="registrationDeadline" class="input-field" required>
+                    <span class="helper-text">Last date for participants to register</span>
+                </div>
+
+                <!-- Max Participants -->
+                <div class="form-group">
+                    <label class="form-label" for="maxParticipants">Maximum Participants</label>
+                    <input type="number" id="maxParticipants" name="maxParticipants" class="input-field" placeholder="Enter max participants (optional)" min="1">
+                    <span class="helper-text">Leave empty for unlimited participants</span>
+                </div>
+
+                <!-- Equipment Check -->
+                <div class="form-group">
+                    <label class="form-label">Event Options</label>
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 12px; background: #f9f9f9; border-radius: 8px; border: 2px solid #e0e0e0;">
+                        <input type="checkbox" id="equipmentCheck" name="equipmentCheck" style="width: 20px; height: 20px; cursor: pointer; accent-color: #1565c0;">
+                        <label for="equipmentCheck" style="cursor: pointer; font-size: 14px; color: #424242; font-weight: 500; flex: 1; user-select: none;">
+                            <i class="mdi mdi-shield-check" style="color: #1565c0; font-size: 18px; vertical-align: middle; margin-right: 4px;"></i>
+                            Require Equipment Check
+                        </label>
+                    </div>
+                    <span class="helper-text">Athletes must complete equipment inspection before competing</span>
+                </div>
+
+                <!-- Competitions -->
+                <div class="form-group">
+                    <!-- Add Competition Button -->
+                    <button type="button" class="add-competition-btn" onclick="openCompetitionModal()">
+                        <i class="mdi mdi-plus-circle"></i>
+                        <span>Add Competition</span>
+                    </button>
+                    
+                    <!-- Selected Competitions Table -->
+                    <div class="competitions-header" id="competitionsHeader" style="display: none;">
+                        <div class="competitions-count" id="competitionsCount">0 competitions</div>
+                    </div>
+                    <div class="selected-competitions" id="selectedCompetitions">
+                        <div class="empty-competitions">
+                            <i class="mdi mdi-trophy-outline"></i>
+                            No competitions added yet
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions sticky">
+                    <button type="button" class="btn btn-secondary" onclick="window.location.href='../dashboard/dashboard.html'">
+                        <i class="mdi mdi-close"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="mdi mdi-check"></i>
+                        <span>Create Event</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Competition Modal -->
+    <div class="modal-overlay" id="competitionModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="mdi mdi-target"></i>
+                    <span>Add Competition</span>
+                </div>
+                <button type="button" class="modal-close" onclick="closeCompetitionModal()">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="competition-form-row">
+                    <div>
+                        <label class="competition-form-label" for="bowType">Bow Type</label>
+                        <select id="bowType" class="competition-form-select" onchange="updateAddButton()">
+                            <option value="">Select Bow Type...</option>
+                            <option value="Recurve">Recurve</option>
+                            <option value="Compound">Compound</option>
+                            <option value="Barebow">Barebow</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="competition-form-label" for="category">Category</label>
+                        <select id="category" class="competition-form-select" onchange="updateAddButton()">
+                            <option value="">Select Category...</option>
+                            <option value="Men's Individual">Men's Individual</option>
+                            <option value="Women's Individual">Women's Individual</option>
+                            <option value="Men's Team">Men's Team</option>
+                            <option value="Women's Team">Women's Team</option>
+                            <option value="Mixed Team">Mixed Team</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="competition-form-row">
+                    <div>
+                        <label class="competition-form-label" for="round">Round</label>
+                        <select id="round" class="competition-form-select" onchange="updateSubrounds()">
+                            <option value="">Select Round...</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="competition-form-label" for="subround">Subround</label>
+                        <select id="subround" class="competition-form-select" disabled onchange="updateAddButton()">
+                            <option value="">Select Round first...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="competition-form-actions">
+                    <button type="button" class="btn-add" id="addCompetitionBtn" onclick="addCompetition()" disabled>
+                        <i class="mdi mdi-plus-circle"></i>
+                        <span>Add to Event</span>
+                    </button>
+                    <button type="button" class="btn-clear" onclick="clearCompetitionForm()">
+                        <i class="mdi mdi-close"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set minimum date to today for all date inputs
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('startDate').min = today;
+        document.getElementById('endDate').min = today;
+        document.getElementById('registrationDeadline').min = today;
+
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+            
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        // Initialize language selector
+        initLanguageSelector();
+
+        // Update end date minimum when start date changes
+        document.getElementById('startDate').addEventListener('change', function() {
+            document.getElementById('endDate').min = this.value;
+            document.getElementById('registrationDeadline').max = this.value;
+        });
+
+        // Competition management
+        let selectedCompetitions = [];
+        let competitionIdCounter = 1;
+        let currentSortField = null;
+        let currentSortOrder = 'asc';
+
+        // Open competition modal
+        function openCompetitionModal() {
+            document.getElementById('competitionModal').classList.add('show');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        // Close competition modal
+        function closeCompetitionModal() {
+            document.getElementById('competitionModal').classList.remove('show');
+            document.body.style.overflow = ''; // Restore scrolling
+            clearCompetitionForm();
+        }
+
+        // Close modal when clicking overlay
+        function closeModalOnOverlay(event) {
+            if (event.target.id === 'competitionModal') {
+                closeCompetitionModal();
+            }
+        }
+
+        // Initialize rounds dropdown
+        function initializeRounds() {
+            const roundSelect = document.getElementById('round');
+            const rounds = getAllRounds();
+            
+            rounds.forEach(round => {
+                const option = document.createElement('option');
+                option.value = round;
+                option.textContent = round;
+                roundSelect.appendChild(option);
+            });
+        }
+
+        // Update subrounds based on selected round
+        function updateSubrounds() {
+            const roundSelect = document.getElementById('round');
+            const subroundSelect = document.getElementById('subround');
+            const selectedRound = roundSelect.value;
+            
+            // Clear existing subrounds
+            subroundSelect.innerHTML = '<option value="">Select Subround...</option>';
+            
+            if (selectedRound) {
+                const subrounds = getSubrounds(selectedRound);
+                subrounds.forEach(subround => {
+                    const option = document.createElement('option');
+                    option.value = subround;
+                    option.textContent = subround;
+                    subroundSelect.appendChild(option);
+                });
+                subroundSelect.disabled = false;
+            } else {
+                subroundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">Select Round first...</option>';
+            }
+            
+            updateAddButton();
+        }
+
+        // Update add button state
+        function updateAddButton() {
+            const bowType = document.getElementById('bowType').value;
+            const category = document.getElementById('category').value;
+            const round = document.getElementById('round').value;
+            const subround = document.getElementById('subround').value;
+            const addBtn = document.getElementById('addCompetitionBtn');
+            
+            // Enable button only if all fields are filled
+            if (bowType && category && round && subround) {
+                addBtn.disabled = false;
+            } else {
+                addBtn.disabled = true;
+            }
+        }
+
+        // Add competition to list
+        function addCompetition() {
+            const bowType = document.getElementById('bowType').value;
+            const category = document.getElementById('category').value;
+            const round = document.getElementById('round').value;
+            const subround = document.getElementById('subround').value;
+            
+            if (!bowType || !category || !round || !subround) {
+                alert('Please fill in all competition fields');
+                return;
+            }
+            
+            // Check for duplicate
+            const isDuplicate = selectedCompetitions.some(comp => 
+                comp.bowType === bowType && 
+                comp.category === category && 
+                comp.round === round && 
+                comp.subround === subround
+            );
+            
+            if (isDuplicate) {
+                alert('This competition has already been added');
+                return;
+            }
+            
+            // Create competition object
+            const competition = {
+                id: competitionIdCounter++,
+                bowType: bowType,
+                category: category,
+                round: round,
+                subround: subround
+            };
+            
+            selectedCompetitions.push(competition);
+            renderSelectedCompetitions();
+            clearCompetitionForm();
+            
+            // Close the modal
+            closeCompetitionModal();
+            
+            // Scroll to competitions list
+            setTimeout(() => {
+                document.getElementById('selectedCompetitions').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+            
+            console.log('Competition added:', competition);
+        }
+
+        // Remove competition from list
+        function removeCompetition(id) {
+            selectedCompetitions = selectedCompetitions.filter(comp => comp.id !== id);
+            renderSelectedCompetitions();
+        }
+
+        // Sort competitions table
+        function sortCompetitions(field) {
+            // Toggle sort order if clicking the same field
+            if (currentSortField === field) {
+                currentSortOrder = currentSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                currentSortField = field;
+                currentSortOrder = 'asc';
+            }
+            
+            // Update header states
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+            
+            const activeHeader = document.getElementById(`sort${field.charAt(0).toUpperCase() + field.slice(1)}`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (currentSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+            
+            // Sort the array
+            selectedCompetitions.sort((a, b) => {
+                let aVal = a[field].toLowerCase();
+                let bVal = b[field].toLowerCase();
+                
+                if (currentSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderSelectedCompetitions();
+        }
+
+        // Render selected competitions
+        function renderSelectedCompetitions() {
+            const container = document.getElementById('selectedCompetitions');
+            const header = document.getElementById('competitionsHeader');
+            const count = document.getElementById('competitionsCount');
+            
+            if (selectedCompetitions.length === 0) {
+                header.style.display = 'none';
+                container.innerHTML = `
+                    <div class="empty-competitions">
+                        <i class="mdi mdi-trophy-outline"></i>
+                        No competitions added yet
+                    </div>
+                `;
+            } else {
+                header.style.display = 'flex';
+                count.textContent = `${selectedCompetitions.length} competition${selectedCompetitions.length > 1 ? 's' : ''}`;
+                
+                container.innerHTML = `
+                    <div class="competitions-table-container">
+                        <table class="competitions-table">
+                            <thead>
+                                <tr>
+                                    <th id="sortBowType" onclick="sortCompetitions('bowType')">
+                                        Bow Type
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortCategory" onclick="sortCompetitions('category')">
+                                        Category
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortRound" onclick="sortCompetitions('round')">
+                                        Round
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th id="sortSubround" onclick="sortCompetitions('subround')">
+                                        Subround
+                                        <i class="mdi mdi-arrow-up sort-icon"></i>
+                                    </th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${selectedCompetitions.map(comp => {
+                                    // Determine category badge class
+                                    let categoryClass = 'badge-mixed';
+                                    const catLower = comp.category.toLowerCase();
+                                    
+                                    if (catLower === "men's individual") {
+                                        categoryClass = 'badge-men-individual';
+                                    } else if (catLower === "women's individual") {
+                                        categoryClass = 'badge-women-individual';
+                                    } else if (catLower === "men's team") {
+                                        categoryClass = 'badge-men-team';
+                                    } else if (catLower === "women's team") {
+                                        categoryClass = 'badge-women-team';
+                                    } else if (catLower === "mixed team") {
+                                        categoryClass = 'badge-mixed';
+                                    }
+                                    
+                                    return `
+                                    <tr>
+                                        <td>
+                                            <span class="competition-badge badge-${comp.bowType.toLowerCase()}">${comp.bowType}</span>
+                                        </td>
+                                        <td>
+                                            <span class="competition-badge ${categoryClass}">${comp.category}</span>
+                                        </td>
+                                        <td>${comp.round}</td>
+                                        <td>${comp.subround}</td>
+                                        <td>
+                                            <button type="button" class="remove-btn" onclick="removeCompetition(${comp.id})" title="Remove">
+                                                <i class="mdi mdi-close"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+            }
+        }
+
+        // Clear competition form
+        function clearCompetitionForm() {
+            document.getElementById('bowType').value = '';
+            document.getElementById('category').value = '';
+            document.getElementById('round').value = '';
+            document.getElementById('subround').value = '';
+            document.getElementById('subround').disabled = true;
+            document.getElementById('subround').innerHTML = '<option value="">Select Round first...</option>';
+            updateAddButton();
+        }
+
+        // Initialize rounds on page load
+        initializeRounds();
+
+        // Handle form submission
+        function handleSubmit(event) {
+            event.preventDefault();
+            
+            // Validate at least one competition is added
+            if (selectedCompetitions.length === 0) {
+                alert('Please add at least one competition to the event');
+                return;
+            }
+            
+            const formData = {
+                eventName: document.getElementById('eventName').value,
+                description: document.getElementById('description').value,
+                location: document.getElementById('location').value,
+                startDate: document.getElementById('startDate').value,
+                endDate: document.getElementById('endDate').value,
+                registrationDeadline: document.getElementById('registrationDeadline').value,
+                maxParticipants: document.getElementById('maxParticipants').value || null,
+                equipmentCheck: document.getElementById('equipmentCheck').checked,
+                competitions: selectedCompetitions,
+                status: 'upcoming'
+            };
+
+            console.log('Creating event:', formData);
+            console.log('Competitions:', selectedCompetitions);
+            
+            // In production, this would send to API
+            alert(`Event created successfully!\n\nEvent: ${formData.eventName}\nLocation: ${formData.location}\nCompetitions: ${selectedCompetitions.length}`);
+            
+            // Redirect back to dashboard
+            window.location.href = '../dashboard/dashboard.html';
+        }
+    </script>
+</body>
+</html>

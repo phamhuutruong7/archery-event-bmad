@@ -1,0 +1,1548 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Individual Competition Management - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/languages.js"></script>
+    <script src="../mock-data/individual-eliminate.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .manage-container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            margin: 0 auto;
+        }
+/* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .manage-container { width: 100%; }
+        }
+ 
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .manage-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .manage-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Monitor/Desktop (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .manage-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+ 
+            .manage-container {
+                width: 50vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Header */
+        .manage-header {
+            display: grid;
+            grid-template-columns: 40px repeat(5, 1fr) 40px 40px;
+            gap: 4px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-back {
+            grid-column: 1 / 2;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-back i {
+            font-size: 24px;
+        }
+
+        .header-title {
+            grid-column: 2 / 7;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        .header-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .header-language {
+            grid-column: 7 / 8;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+            font-size: 24px;
+            position: relative;
+        }
+
+        .header-language:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile {
+            grid-column: 8 / 9;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+        }
+
+        .header-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile i {
+            font-size: 24px;
+        }
+
+        /* Language Dropdown */
+        .language-dropdown {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            display: none;
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .language-dropdown.show {
+            display: block;
+        }
+
+        .language-item {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: #424242;
+            font-size: 14px;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: white;
+        }
+
+        .language-item:hover {
+            background: #f5f5f5;
+        }
+
+        .language-item.active {
+            background: #e3f2fd;
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .language-flag {
+            font-size: 20px;
+        }
+
+        .language-name {
+            flex: 1;
+        }
+
+        /* Content */
+        .content {
+            padding: 20px;
+            padding-bottom: 100px;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #212121;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* Filter Selects */
+        .filter-selects {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 767px) {
+            .filter-selects {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .filter-select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-label i {
+            font-size: 16px;
+            color: #1565c0;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+            cursor: pointer;
+            transition: all 0.2s;
+            outline: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        .filter-select:hover {
+            border-color: #1565c0;
+        }
+
+        .filter-select:focus {
+            border-color: #1565c0;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        /* Stats Cards */
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 599px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: #f9f9f9;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #757575;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Two Column Layout */
+        .selection-layout {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        @media (min-width: 600px) {
+            .selection-layout {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Section */
+        .section {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            max-height: 600px;
+        }
+
+        @media (max-width: 599px) {
+            .section {
+                max-height: 400px;
+            }
+        }
+
+        .section-header {
+            background: #f5f5f5;
+            padding: 12px 16px;
+            border-bottom: 2px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #212121;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title i {
+            color: #1565c0;
+            font-size: 18px;
+        }
+
+        .section-count {
+            font-size: 12px;
+            color: #757575;
+            font-weight: 600;
+        }
+
+        /* Available Athletes Table */
+        .table-container {
+            overflow-x: auto;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .table-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .athletes-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .athletes-table thead {
+            background: #fafafa;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .athletes-table th {
+            padding: 10px 8px;
+            text-align: left;
+            font-size: 11px;
+            font-weight: 700;
+            color: #424242;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e0e0e0;
+            white-space: nowrap;
+            cursor: pointer;
+            user-select: none;
+            transition: background 0.2s;
+            position: relative;
+        }
+
+        .athletes-table th:hover {
+            background: #f0f0f0;
+        }
+
+        .athletes-table th.sortable::after {
+            content: '';
+            margin-left: 6px;
+            opacity: 0.3;
+            font-family: 'Material Design Icons';
+            font-size: 14px;
+        }
+
+        .athletes-table th.sortable:not(.sorted)::after {
+            content: '\F0360'; /* mdi-unfold-more-horizontal */
+        }
+
+        .athletes-table th.sorted.asc::after {
+            content: '\F0143'; /* mdi-arrow-up */
+            opacity: 1;
+            color: #1565c0;
+        }
+
+        .athletes-table th.sorted.desc::after {
+            content: '\F0140'; /* mdi-arrow-down */
+            opacity: 1;
+            color: #1565c0;
+        }
+
+        .athletes-table tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .athletes-table tbody tr:hover {
+            background: #fafafa;
+        }
+
+        .athletes-table tbody tr.selected {
+            background: #e3f2fd;
+        }
+
+        .athletes-table td {
+            padding: 10px 8px;
+            font-size: 13px;
+            color: #212121;
+        }
+
+        .rank-cell {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1565c0;
+            text-align: center;
+            width: 50px;
+        }
+
+        /* Athlete Name */
+        .athlete-name {
+            font-weight: 600;
+            color: #212121;
+            display: block;
+        }
+
+        .nation-cell {
+            font-weight: 600;
+            color: #424242;
+            font-size: 12px;
+            width: 60px;
+        }
+
+        /* Team Badge */
+        .team-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            white-space: nowrap;
+        }
+
+        .score-cell {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ff6f00;
+            text-align: center;
+            width: 70px;
+        }
+
+        /* Matches Container */
+        .matches-container {
+            padding: 16px;
+            overflow-y: auto;
+            flex: 1;
+            min-height: 0;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+
+        .matches-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .match-card {
+            background: #f9f9f9;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.2s;
+        }
+
+        .match-card:hover {
+            border-color: #1565c0;
+            box-shadow: 0 2px 8px rgba(21, 101, 192, 0.1);
+        }
+
+        .match-card.complete {
+            background: #e3f2fd;
+            border-color: #1565c0;
+        }
+
+        .match-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .match-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1565c0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .match-name i {
+            font-size: 18px;
+        }
+
+        .match-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 8px;
+            border-radius: 10px;
+            background: #fff9c4;
+            color: #f57f17;
+        }
+
+        .match-status.complete {
+            background: #bbdefb;
+            color: #1565c0;
+        }
+
+        .match-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .match-slot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .slot-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .slot-rank {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1565c0;
+            width: 30px;
+        }
+
+        .slot-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: #212121;
+            flex: 1;
+        }
+
+        .slot-score {
+            font-size: 12px;
+            font-weight: 700;
+            color: #ff6f00;
+            margin-right: 8px;
+        }
+
+        .slot-remove {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffebee;
+            color: #c62828;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .slot-remove:hover {
+            background: #c62828;
+            color: white;
+        }
+
+        .slot-remove i {
+            font-size: 14px;
+        }
+
+        .empty-slot {
+            padding: 12px;
+            background: white;
+            border: 2px dashed #bdbdbd;
+            border-radius: 8px;
+            color: #9e9e9e;
+            font-size: 12px;
+            text-align: center;
+            font-style: italic;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .empty-slot:hover {
+            border-color: #1565c0;
+            color: #1565c0;
+            background: #f5f9ff;
+        }
+
+        .empty-slot.selecting {
+            border-color: #1565c0;
+            background: #e3f2fd;
+            color: #1565c0;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            padding: 16px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+            z-index: 100;
+        }
+
+        @media (min-width: 600px) {
+            .action-buttons {
+                left: 25vw;
+                right: 25vw;
+            }
+        }
+
+        .button-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #1565c0;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0d47a1;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            background: #9e9e9e;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #424242;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 48px 16px;
+            color: #9e9e9e;
+        }
+
+        .empty-state i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 16px;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #757575;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            font-size: 14px;
+            color: #9e9e9e;
+        }
+
+        /* Snackbar */
+        .snackbar {
+            position: fixed;
+            bottom: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #323232;
+            color: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 10000;
+            transition: bottom 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 300px;
+            max-width: 90vw;
+        }
+
+        .snackbar.show {
+            bottom: 30px;
+        }
+
+        .snackbar i {
+            font-size: 20px;
+        }
+
+        .snackbar.success {
+            background: #1565c0;
+        }
+
+        .snackbar.error {
+            background: #c62828;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="manage-container">
+        <!-- Header -->
+        <div class="manage-header">
+            <div class="header-back" onclick="window.history.back()">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">
+                <div>Individual Competition</div>
+                <div class="header-subtitle" id="eventName">National Championship 2025</div>
+            </div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag"></span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <div class="page-title">Arrange Elimination Matches</div>
+            <div class="page-subtitle">Select athletes from qualification to create matches</div>
+
+            <!-- Filter Selects -->
+            <div class="filter-selects">
+                <div class="filter-select-group">
+                    <label for="bowTypeSelect" class="filter-label">
+                        <i class="mdi mdi-bow-arrow"></i>
+                        Bow Type
+                    </label>
+                    <select id="bowTypeSelect" class="filter-select" onchange="handleBowTypeChange()">
+                        <option value="">-- Select Bow Type --</option>
+                        <option value="recurve">Recurve</option>
+                        <option value="compound">Compound</option>
+                        <option value="barebow">Barebow</option>
+                    </select>
+                </div>
+                <div class="filter-select-group">
+                    <label for="categorySelect" class="filter-label">
+                        <i class="mdi mdi-human-male-female"></i>
+                        Category
+                    </label>
+                    <select id="categorySelect" class="filter-select" onchange="handleCategoryChange()" disabled>
+                        <option value="">-- Select Bow Type First --</option>
+                    </select>
+                </div>
+                <div class="filter-select-group">
+                    <label for="roundSelect" class="filter-label">
+                        <i class="mdi mdi-trophy"></i>
+                        Round
+                    </label>
+                    <select id="roundSelect" class="filter-select" onchange="handleRoundChange()" disabled>
+                        <option value="">-- Select Category First --</option>
+                    </select>
+                </div>
+                <div class="filter-select-group">
+                    <label for="subroundSelect" class="filter-label">
+                        <i class="mdi mdi-target"></i>
+                        Subround / Custom
+                    </label>
+                    <select id="subroundSelect" class="filter-select" onchange="handleSubroundChange()" disabled>
+                        <option value="">-- Select Round First --</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Two Column Layout -->
+            <div class="selection-layout">
+                <!-- Available Athletes -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="mdi mdi-account-multiple"></i>
+                            <span>Available Athletes</span>
+                        </div>
+                        <div class="section-count" id="availableCount">0 athletes</div>
+                    </div>
+                    <div class="table-container">
+                        <table class="athletes-table">
+                            <thead>
+                                <tr>
+                                    <th class="sortable" style="width: 50px;" onclick="sortAthletes('rank')">Rank</th>
+                                    <th>Name</th>
+                                    <th class="sortable" style="width: 60px;" onclick="sortAthletes('nation')">Nation</th>
+                                    <th class="sortable" onclick="sortAthletes('team')">Team</th>
+                                    <th class="sortable" style="width: 70px; text-align: center;" onclick="sortAthletes('score')">Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="athletesTableBody">
+                                <!-- Athletes will be dynamically loaded -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Matches -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <i class="mdi mdi-tournament"></i>
+                            <span>Matches</span>
+                        </div>
+                        <div class="section-count" id="matchesCountText">0 matches</div>
+                    </div>
+                    <div class="matches-container" id="matchesContainer">
+                        <div class="empty-state">
+                            <i class="mdi mdi-tournament"></i>
+                            <div class="empty-state-title">No Matches Yet</div>
+                            <div class="empty-state-text">Click on athletes to create matches</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+            <div class="button-row">
+                <button class="btn btn-secondary" onclick="window.history.back()">
+                    Cancel
+                </button>
+                <button class="btn btn-primary" id="saveBtn" onclick="saveMatches()" disabled>
+                    <i class="mdi mdi-content-save"></i>
+                    Save & Continue
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let currentBowType = '';
+        let currentCategory = '';
+        let currentRound = '';
+        let currentSubround = '';
+        let availableAthletes = [];
+        let matches = [];
+        let selectingForMatch = null; // {matchId, slotIndex}
+        let sortColumn = 'rank'; // Current sort column
+        let sortDirection = 'asc'; // Current sort direction
+
+        // Competition configuration data
+        const competitionConfig = {
+            recurve: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['WA (International)', 'National Round', 'FITA 900', 'Custom Round'],
+                    'Women': ['WA (International)', 'National Round', 'FITA 900', 'Custom Round']
+                },
+                subrounds: {
+                    'WA (International)': ['WA 70m Qualification', 'WA 70m Elimination', 'WA 50m Mixed'],
+                    'National Round': ['60m Qualification', '50m Elimination'],
+                    'FITA 900': ['90m-70m-50m-30m Combined'],
+                    'Custom Round': ['90m', '70m', '60m', '50m', '40m', '30m', '20m', '18m', '10m']
+                }
+            },
+            compound: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['WA (International)', 'National Round', 'Custom Round'],
+                    'Women': ['WA (International)', 'National Round', 'Custom Round']
+                },
+                subrounds: {
+                    'WA (International)': ['WA 50m Qualification', 'WA 50m Elimination'],
+                    'National Round': ['50m Qualification', '40m Elimination'],
+                    'Custom Round': ['60m', '50m', '40m', '30m', '20m', '18m', '10m']
+                }
+            },
+            barebow: {
+                categories: ['Men', 'Women'],
+                rounds: {
+                    'Men': ['Traditional Round', 'Field Round', 'Custom Round'],
+                    'Women': ['Traditional Round', 'Field Round', 'Custom Round']
+                },
+                subrounds: {
+                    'Traditional Round': ['50m-30m Combined', '40m-20m Combined'],
+                    'Field Round': ['Multi-distance Field'],
+                    'Custom Round': ['50m', '40m', '30m', '20m', '18m', '15m', '10m']
+                }
+            }
+        };
+
+        // Handle Bow Type change
+        function handleBowTypeChange() {
+            const bowTypeSelect = document.getElementById('bowTypeSelect');
+            const categorySelect = document.getElementById('categorySelect');
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentBowType = bowTypeSelect.value;
+            
+            // Reset dependent dropdowns
+            currentCategory = '';
+            currentRound = '';
+            currentSubround = '';
+            
+            if (currentBowType) {
+                // Populate categories
+                const categories = competitionConfig[currentBowType].categories;
+                categorySelect.innerHTML = '<option value="">-- Select Category --</option>' +
+                    categories.map(cat => `<option value="${cat}">${cat}</option>`).join('');
+                categorySelect.disabled = false;
+                
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            } else {
+                categorySelect.innerHTML = '<option value="">-- Select Bow Type First --</option>';
+                categorySelect.disabled = true;
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Category change
+        function handleCategoryChange() {
+            const categorySelect = document.getElementById('categorySelect');
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentCategory = categorySelect.value;
+            currentRound = '';
+            currentSubround = '';
+            
+            if (currentCategory) {
+                // Populate rounds
+                const rounds = competitionConfig[currentBowType].rounds[currentCategory];
+                roundSelect.innerHTML = '<option value="">-- Select Round --</option>' +
+                    rounds.map(round => `<option value="${round}">${round}</option>`).join('');
+                roundSelect.disabled = false;
+                
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            } else {
+                roundSelect.innerHTML = '<option value="">-- Select Category First --</option>';
+                roundSelect.disabled = true;
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Round change
+        function handleRoundChange() {
+            const roundSelect = document.getElementById('roundSelect');
+            const subroundSelect = document.getElementById('subroundSelect');
+            
+            currentRound = roundSelect.value;
+            currentSubround = '';
+            
+            if (currentRound) {
+                // Populate subrounds
+                const subrounds = competitionConfig[currentBowType].subrounds[currentRound];
+                if (currentRound === 'Custom Round') {
+                    subroundSelect.innerHTML = '<option value="">-- Select Distance --</option>' +
+                        subrounds.map(subround => `<option value="${subround}">${subround}</option>`).join('');
+                } else {
+                    subroundSelect.innerHTML = '<option value="">-- Select Subround --</option>' +
+                        subrounds.map(subround => `<option value="${subround}">${subround}</option>`).join('');
+                }
+                subroundSelect.disabled = false;
+            } else {
+                subroundSelect.innerHTML = '<option value="">-- Select Round First --</option>';
+                subroundSelect.disabled = true;
+            }
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Handle Subround change
+        function handleSubroundChange() {
+            const subroundSelect = document.getElementById('subroundSelect');
+            currentSubround = subroundSelect.value;
+            
+            updateCompetitionDisplay();
+            loadAthletes();
+        }
+
+        // Update competition display
+        function updateCompetitionDisplay() {
+            const subtitle = document.querySelector('.page-subtitle');
+            if (currentBowType && currentCategory && currentRound && currentSubround) {
+                subtitle.textContent = `${currentBowType} - ${currentCategory} - ${currentRound} - ${currentSubround}`;
+            } else if (currentBowType && currentCategory) {
+                subtitle.textContent = `${currentBowType} - ${currentCategory} (Select round to continue)`;
+            } else if (currentBowType) {
+                subtitle.textContent = `${currentBowType} (Select category to continue)`;
+            } else {
+                subtitle.textContent = 'Select bow type, category, round, and subround to arrange matches';
+            }
+        }
+
+        const MATCH_SIZE = 2;
+
+        // Language selector
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+
+            dropdown.innerHTML = languages.map(lang => `<button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')"><span class="language-flag">${lang.flag}</span><span class="language-name">${lang.nativeName}</span></button>`).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            document.getElementById('languageDropdown').classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+
+        document.addEventListener('click', function (event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+
+            const selectDropdown = document.getElementById('selectDropdown');
+            const selectBtn = document.querySelector('.select-btn');
+            if (!selectBtn.contains(event.target) && !selectDropdown.contains(event.target)) {
+                selectDropdown.classList.remove('show');
+            }
+        });
+
+        // Generate team color
+        function getTeamColor(teamName) {
+            let hash = 0;
+            for (let i = 0; i < teamName.length; i++) {
+                hash = teamName.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            const hue = Math.abs(hash % 360);
+            return `hsl(${hue}, 70%, 50%)`
+        }
+
+        // Filter by bow category
+        function filterByBowCategory() {
+            const select = document.getElementById('bowCategorySelect');
+            currentBowCategory = select.value;
+            resetMatches();
+            loadAthletes();
+            showSnackbar(`Switched to ${select.options[select.selectedIndex].text}`, 'mdi-bow-arrow', 'success');
+        }
+
+        // Filter by gender
+        function filterByGender() {
+            const select = document.getElementById('genderSelect');
+            currentGender = select.value;
+            resetMatches();
+            loadAthletes();
+            showSnackbar(`Switched to ${select.options[select.selectedIndex].text}`, 'mdi-human-male-female', 'success');
+        }
+
+        // Reset matches
+        function resetMatches() {
+            matches = [];
+            selectingForMatch = null;
+            renderMatches();
+            updateStats();
+        }
+
+        // Sort athletes by column
+        function sortAthletes(column) {
+            // Toggle direction if clicking same column, otherwise default to ascending
+            if (sortColumn === column) {
+                sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortDirection = 'asc';
+            }
+
+            // Sort the athletes array
+            availableAthletes.sort((a, b) => {
+                let aVal, bVal;
+
+                switch(column) {
+                    case 'rank':
+                        aVal = a.rank;
+                        bVal = b.rank;
+                        break;
+                    case 'nation':
+                        aVal = (a.nation || '').toLowerCase();
+                        bVal = (b.nation || '').toLowerCase();
+                        break;
+                    case 'team':
+                        aVal = a.team.toLowerCase();
+                        bVal = b.team.toLowerCase();
+                        break;
+                    case 'score':
+                        aVal = a.score;
+                        bVal = b.score;
+                        break;
+                    default:
+                        return 0;
+                }
+
+                if (aVal < bVal) return sortDirection === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortDirection === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderAthletes();
+        }
+
+        // Load athletes from mock data
+        function loadAthletes() {
+            // Only load athletes if all required selections are made
+            if (!currentBowType || !currentCategory || !currentRound || !currentSubround) {
+                availableAthletes = [];
+                renderAthletes();
+                updateStats();
+                return;
+            }
+            
+            // Build the key based on selections (in real app, would query database)
+            const categoryKey = `${currentBowType}_${currentCategory.toLowerCase().replace(' ', '_')}`;
+            const allAthletes = individualEliminationData[categoryKey] || 
+                               individualEliminationData[currentBowType] || [];
+            
+            // Filter out athletes already in matches
+            const selectedIds = matches.flatMap(match => 
+                match.athletes.filter(a => a !== null).map(a => a.id)
+            );
+            availableAthletes = allAthletes.filter(a => !selectedIds.includes(a.id));
+            
+            renderAthletes();
+            updateStats();
+        }
+
+        // Render available athletes table
+        function renderAthletes() {
+            const tbody = document.getElementById('athletesTableBody');
+            const availableCount = document.getElementById('availableCount');
+
+            availableCount.textContent = `${availableAthletes.length} athletes`;
+
+            // Update sort indicators in headers
+            document.querySelectorAll('.athletes-table th.sortable').forEach(th => {
+                th.classList.remove('sorted', 'asc', 'desc');
+            });
+            const sortedHeader = document.querySelector(`.athletes-table th[onclick="sortAthletes('${sortColumn}')"]`);
+            if (sortedHeader) {
+                sortedHeader.classList.add('sorted', sortDirection);
+            }
+
+            if (availableAthletes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5">
+                            <div class="empty-state">
+                                <i class="mdi mdi-account-off-outline"></i>
+                                <div class="empty-state-title">No Athletes Available</div>
+                                <div class="empty-state-text">All athletes have been assigned to matches</div>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tbody.innerHTML = availableAthletes.map(athlete => {
+                const teamColor = getTeamColor(athlete.team);
+                const isHighlighted = selectingForMatch !== null;
+                return `
+                    <tr onclick="selectAthlete(${athlete.id})" class="${isHighlighted ? 'selecting' : ''}">
+                        <td class="rank-cell">${athlete.rank}</td>
+                        <td><span class="athlete-name">${athlete.name}</span></td>
+                        <td class="nation-cell">${athlete.nation || '-'}</td>
+                        <td>
+                            <span class="team-badge" style="background-color: ${teamColor};">${athlete.team}</span>
+                        </td>
+                        <td class="score-cell">${athlete.score}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Select athlete and add to match
+        function selectAthlete(athleteId) {
+            const athlete = availableAthletes.find(a => a.id === athleteId);
+            if (!athlete) return;
+
+            if (selectingForMatch) {
+                // Adding to specific slot
+                const match = matches.find(m => m.id === selectingForMatch.matchId);
+                if (match) {
+                    match.athletes[selectingForMatch.slotIndex] = athlete;
+                    selectingForMatch = null;
+                }
+            } else {
+                // Find or create incomplete match
+                let currentMatch = matches.find(m => m.athletes.filter(a => a !== null).length < MATCH_SIZE);
+                
+                if (!currentMatch) {
+                    currentMatch = {
+                        id: matches.length + 1,
+                        athletes: [null, null]
+                    };
+                    matches.push(currentMatch);
+                }
+
+                // Add to first empty slot
+                const emptyIndex = currentMatch.athletes.findIndex(a => a === null);
+                if (emptyIndex !== -1) {
+                    currentMatch.athletes[emptyIndex] = athlete;
+                }
+            }
+
+            // Remove from available
+            availableAthletes = availableAthletes.filter(a => a.id !== athleteId);
+
+            renderAthletes();
+            renderMatches();
+            updateStats();
+
+            showSnackbar(`${athlete.name} added to Match ${matches[matches.length - 1].id}`, 'mdi-account-plus', 'success');
+        }
+
+        // Remove athlete from match
+        function removeAthlete(matchId, slotIndex) {
+            const match = matches.find(m => m.id === matchId);
+            if (!match) return;
+
+            const athlete = match.athletes[slotIndex];
+            if (!athlete) return;
+
+            // Remove from match
+            match.athletes[slotIndex] = null;
+
+            // If match is now empty, remove it and reindex
+            if (match.athletes.every(a => a === null)) {
+                matches = matches.filter(m => m.id !== matchId);
+                // Reindex matches
+                matches.forEach((m, index) => {
+                    m.id = index + 1;
+                });
+            }
+
+            // Add back to available athletes (maintain rank order)
+            availableAthletes.push(athlete);
+            availableAthletes.sort((a, b) => a.rank - b.rank);
+
+            renderAthletes();
+            renderMatches();
+            updateStats();
+
+            showSnackbar(`${athlete.name} removed from match`, 'mdi-account-minus', 'success');
+        }
+
+        // Start selecting for specific slot
+        function startSelectingForSlot(matchId, slotIndex) {
+            selectingForMatch = { matchId, slotIndex };
+            renderAthletes();
+            renderMatches();
+            showSnackbar('Select an athlete from the left table', 'mdi-cursor-pointer', 'success');
+        }
+
+        // Render matches
+        function renderMatches() {
+            const container = document.getElementById('matchesContainer');
+            const matchesCountText = document.getElementById('matchesCountText');
+
+            matchesCountText.textContent = `${matches.length} matches`;
+
+            if (matches.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="mdi mdi-tournament"></i>
+                        <div class="empty-state-title">No Matches Yet</div>
+                        <div class="empty-state-text">Click on athletes to create matches</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = matches.map(match => {
+                const filledSlots = match.athletes.filter(a => a !== null).length;
+                const isComplete = filledSlots === MATCH_SIZE;
+                const slotsHtml = [];
+                
+                // Add existing athletes
+                match.athletes.forEach((athlete, index) => {
+                    if (athlete) {
+                        slotsHtml.push(`
+                            <div class="match-slot">
+                                <div class="slot-info">
+                                    <span class="slot-rank">#${athlete.rank}</span>
+                                    <span class="slot-name">${athlete.name}</span>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <span class="slot-score">${athlete.score}</span>
+                                    <button class="slot-remove" onclick="removeAthlete(${match.id}, ${index})">
+                                        <i class="mdi mdi-close"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        const isSelecting = selectingForMatch?.matchId === match.id && selectingForMatch?.slotIndex === index;
+                        slotsHtml.push(`
+                            <div class="empty-slot ${isSelecting ? 'selecting' : ''}" 
+                                 onclick="startSelectingForSlot(${match.id}, ${index})">
+                                ${isSelecting ? '← Select athlete from left' : `Empty slot ${index + 1} (click to select)`}
+                            </div>
+                        `);
+                    }
+                });
+
+                return `
+                    <div class="match-card ${isComplete ? 'complete' : ''}">
+                        <div class="match-header">
+                            <div class="match-name">
+                                <i class="mdi mdi-tournament"></i>
+                                Match ${match.id}
+                            </div>
+                            <div class="match-status ${isComplete ? 'complete' : ''}">
+                                ${isComplete ? 'Complete' : `${filledSlots}/${MATCH_SIZE}`}
+                            </div>
+                        </div>
+                        <div class="match-slots">
+                            ${slotsHtml.join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Update stats
+        function updateStats() {
+            const totalAvailable = availableAthletes.length;
+            const totalSelected = matches.reduce((sum, match) => 
+                sum + match.athletes.filter(a => a !== null).length, 0
+            );
+            const totalMatches = matches.length;
+            const completeMatchesCount = matches.filter(m => 
+                m.athletes.filter(a => a !== null).length === MATCH_SIZE
+            ).length;
+
+            document.getElementById('totalAthletes').textContent = totalAvailable;
+            document.getElementById('selectedCount').textContent = totalSelected;
+            document.getElementById('matchesCount').textContent = totalMatches;
+            document.getElementById('completeMatches').textContent = completeMatchesCount;
+
+            // Enable save button if we have at least one complete match
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.disabled = completeMatchesCount === 0;
+
+            if (completeMatchesCount > 0) {
+                const incompleteCount = totalMatches - completeMatchesCount;
+                if (incompleteCount > 0) {
+                    saveBtn.innerHTML = `<i class="mdi mdi-alert-circle-outline"></i> Save (${incompleteCount} incomplete)`;
+                } else {
+                    saveBtn.innerHTML = `<i class="mdi mdi-content-save"></i> Save & Continue`;
+                }
+            }
+        }
+
+        // Save matches
+        function saveMatches() {
+            const completeMatchesCount = matches.filter(m => 
+                m.athletes.filter(a => a !== null).length === MATCH_SIZE
+            ).length;
+            
+            if (completeMatchesCount === 0) {
+                showSnackbar('Please complete at least one match', 'mdi-alert', 'error');
+                return;
+            }
+
+            const incompleteCount = matches.filter(m => 
+                m.athletes.filter(a => a !== null).length < MATCH_SIZE
+            ).length;
+            
+            if (incompleteCount > 0) {
+                if (!confirm(`You have ${incompleteCount} incomplete match(es). Only complete matches will be saved. Continue?`)) {
+                    return;
+                }
+            }
+
+            const completeMatches = matches.filter(m => 
+                m.athletes.filter(a => a !== null).length === MATCH_SIZE
+            );
+
+            console.log('Complete matches to save:', completeMatches);
+
+            showSnackbar(`Successfully saved ${completeMatchesCount} complete match(es)`, 'mdi-check-circle', 'success');
+
+            setTimeout(() => {
+                alert(`Matches saved!\n\nComplete matches: ${completeMatchesCount}\n\n` + 
+                    completeMatches.map(m => 
+                        `Match ${m.id}:\n${m.athletes.map(a => `  - ${a.name} (#${a.rank}, ${a.score})`).join('\n')}`
+                    ).join('\n\n')
+                );
+            }, 500);
+        }
+
+        // Snackbar
+        function showSnackbar(message, icon = 'mdi-information', type = 'success') {
+            const existingSnackbar = document.querySelector('.snackbar');
+            if (existingSnackbar) existingSnackbar.remove();
+
+            const snackbar = document.createElement('div');
+            snackbar.className = `snackbar ${type}`;
+            snackbar.innerHTML = `<i class="mdi ${icon}"></i><span>${message}</span>`;
+
+            document.body.appendChild(snackbar);
+            setTimeout(() => snackbar.classList.add('show'), 10);
+            setTimeout(() => {
+                snackbar.classList.remove('show');
+                setTimeout(() => snackbar.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize
+        initLanguageSelector();
+        loadAthletes();
+    </script>
+</body>
+
+</html>

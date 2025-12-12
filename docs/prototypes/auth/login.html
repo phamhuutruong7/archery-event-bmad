@@ -1,0 +1,263 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Authentication Prototype - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: linear-gradient(135deg, #1565c0 0%, #1976d2 50%, #42a5f5 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .auth-container { width: 100%; max-width: 500px; }
+         /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            body { padding: 16px; }
+            .auth-container { max-width: 100%; }
+            .auth-card { padding: 32px 24px; border-radius: 12px; }
+        }
+       
+        /* Mobile Landscape (600px - 767px) & Tablet Portrait (768px - 959px) */
+        @media (min-width: 600px) and (max-width: 959px) {
+            .auth-container { max-width: 550px; }
+        }
+       
+        /* Tablet Landscape & Small Desktop (960px - 1279px) */
+        @media (min-width: 960px) and (max-width: 1279px) {
+            body { padding: 32px; }
+            .auth-container { max-width: 75vw; }
+        }
+       
+        
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { padding: 50vw; }
+            .auth-container { max-width: 50vw; }
+        }
+        @media (max-width: 599px) { body { padding: 16px; } .auth-container { max-width: 100%; } }
+        @media (min-width: 600px) and (max-width: 959px) { .auth-container { max-width: 550px; } }
+        @media (min-width: 960px) { body { padding: 32px; } .auth-container { max-width: 650px; } }
+        @media (min-width: 1280px) { .auth-container { max-width: 700px; } }
+        .auth-card { background: rgba(255, 255, 255, 0.98); border-radius: 16px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); backdrop-filter: blur(10px); padding: 48px; }
+        @media (max-width: 599px) { .auth-card { padding: 32px 24px; border-radius: 12px; } }
+        .auth-header { text-align: center; margin-bottom: 32px; }
+        .auth-icon { font-size: 64px; color: #1565c0; margin-bottom: 16px; }
+        .auth-title { font-size: 28px; font-weight: 700; color: #1565c0; margin-bottom: 8px; }
+        .auth-subtitle { font-size: 16px; color: #666; }
+        .form-section { display: none; }
+        .form-section.active { display: block; }
+        .form-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 8px; color: #212121; }
+        .form-description { text-align: center; color: #666; margin-bottom: 24px; font-size: 14px; }
+        .input-group { margin-bottom: 16px; position: relative; }
+        .input-wrapper { display: grid; grid-template-columns: 48px 1fr; align-items: center; position: relative; }
+        .input-field { grid-column: 1 / 3; grid-row: 1; padding: 14px 16px 14px 48px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; line-height: 1.5; outline: none; transition: all 0.2s; background: white; }
+        .input-field:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .input-field.error { border-color: #f44336; }
+        .input-icon { grid-column: 1; grid-row: 1; justify-self: center; align-self: center; color: #666; font-size: 20px; line-height: 1; pointer-events: none; z-index: 1; }
+        .input-field:focus + .input-icon { color: #1565c0; }
+        .toggle-password { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: #666; font-size: 20px; cursor: pointer; background: none; border: none; padding: 4px; }
+        .toggle-password:hover { color: #1565c0; }
+        .input-label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 600; color: #424242; }
+        .error-message { color: #f44336; font-size: 12px; margin-top: 4px; display: none; }
+        .error-message.show { display: block; }
+        .password-strength { margin-top: 8px; display: none; }
+        .password-strength.show { display: block; }
+        .strength-bar { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 4px; }
+        .strength-fill { height: 100%; width: 0%; transition: all 0.3s; border-radius: 3px; }
+        .strength-fill.weak { width: 33%; background: #f44336; }
+        .strength-fill.medium { width: 66%; background: #ff9800; }
+        .strength-fill.strong { width: 100%; background: #4caf50; }
+        .strength-text { font-size: 12px; font-weight: 600; }
+        .strength-text.weak { color: #f44336; }
+        .strength-text.medium { color: #ff9800; }
+        .strength-text.strong { color: #4caf50; }
+        .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; display: flex; align-items: center; gap: 12px; display: none; }
+        .alert.show { display: flex; }
+        .alert-error { background: #ffebee; border-left: 4px solid #f44336; color: #c62828; }
+        .alert-success { background: #e8f5e9; border-left: 4px solid #4caf50; color: #2e7d32; }
+        .alert-icon { font-size: 20px; }
+        .alert-close { margin-left: auto; background: none; border: none; color: inherit; cursor: pointer; font-size: 18px; padding: 0; opacity: 0.7; }
+        .alert-close:hover { opacity: 1; }
+        .btn { width: 100%; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background: #1565c0; color: white; box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3); }
+        .btn-primary:hover { background: #0d47a1; box-shadow: 0 4px 12px rgba(21, 101, 192, 0.4); transform: translateY(-1px); }
+        .btn-primary:active { transform: translateY(0); }
+        .btn-primary:disabled { background: #bdbdbd; cursor: not-allowed; box-shadow: none; transform: none; }
+        .btn-secondary { background: #f5f5f5; color: #616161; margin-top: 12px; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-icon { font-size: 20px; }
+        .spinner { width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .form-link { text-align: center; margin-top: 16px; font-size: 14px; color: #666; }
+        .form-link a { color: #1565c0; text-decoration: none; font-weight: 600; }
+        .form-link a:hover { text-decoration: underline; }
+        .forgot-password { text-align: right; margin-bottom: 16px; }
+        .forgot-password a { color: #1565c0; text-decoration: none; font-size: 14px; }
+        .forgot-password a:hover { text-decoration: underline; }
+        .divider { display: flex; align-items: center; margin: 24px 0; color: #9e9e9e; font-size: 14px; }
+        .divider::before, .divider::after { content: ""; flex: 1; border-bottom: 1px solid #e0e0e0; }
+        .divider span { padding: 0 16px; }
+        .responsive-badge { position: fixed; bottom: 10px; right: 10px; padding: 6px 12px; background: rgba(0, 0, 0, 0.7); color: white; font-size: 11px; border-radius: 12px; font-weight: 600; z-index: 1000; backdrop-filter: blur(4px); }
+        .responsive-badge::before { content: " Mobile"; }
+        @media (min-width: 600px) and (max-width: 959px) { .responsive-badge::before { content: " Tablet"; } }
+        @media (min-width: 960px) and (max-width: 1279px) { .responsive-badge::before { content: " Desktop"; } }
+        @media (min-width: 1280px) { .responsive-badge::before { content: " Desktop XL"; } }
+        .name-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        @media (max-width: 599px) { .name-row { grid-template-columns: 1fr; gap: 16px; } }
+        .phone-wrapper { display: grid; grid-template-columns: 30% 70%; gap: 8px; }
+        .country-select { padding: 14px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; background: white; cursor: pointer; color: #424242; font-weight: 500; }
+        .country-select:focus { border-color: #1565c0; box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1); }
+        .country-select.error { border-color: #f44336; }
+        .phone-input-wrapper { grid-column: 2; }
+    </style>
+</head>
+<body>
+    <div class="responsive-badge"></div>
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-header">
+                <div class="auth-icon"><i class="mdi mdi-bow-arrow"></i></div>
+                <h1 class="auth-title">Archery Events</h1>
+                <p class="auth-subtitle">Professional Archery Event Management</p>
+            </div>
+            <div id="loginForm" class="form-section active">
+                <h2 class="form-title">Sign In</h2>
+                <p class="form-description">Welcome back! Please sign in to continue.</p>
+                <div id="loginError" class="alert alert-error">
+                    <i class="mdi mdi-alert-circle alert-icon"></i>
+                    <span id="loginErrorText">Invalid email or password</span>
+                    <button class="alert-close" onclick="closeAlert('loginError')"><i class="mdi mdi-close"></i></button>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-email input-icon"></i>
+                        <input type="email" id="loginEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
+                    </div>
+                    <div class="error-message" id="loginEmailError">Please enter a valid email</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock input-icon"></i>
+                        <input type="password" id="loginPassword" class="input-field" placeholder="Enter your password" autocomplete="current-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')"><i class="mdi mdi-eye" id="loginPasswordIcon"></i></button>
+                    </div>
+                    <div class="error-message" id="loginPasswordError">Password is required</div>
+                </div>
+                <div class="forgot-password"><a href="#" onclick="return false;">Forgot Password?</a></div>
+                <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">
+                    <span id="loginBtnText">Sign In</span>
+                    <div class="spinner" id="loginSpinner" style="display: none;"></div>
+                </button>
+                <div class="divider"><span>OR</span></div>
+                <button class="btn btn-secondary" disabled><i class="mdi mdi-google btn-icon"></i>Sign in with Google (Coming Soon)</button>
+                <div class="form-link">Don't have an account? <a href="#" onclick="showRegister(); return false;">Register</a></div>
+            </div>
+            <div id="registerForm" class="form-section">
+                <h2 class="form-title">Create Account</h2>
+                <p class="form-description">Join the archery community today</p>
+                <div id="registerSuccess" class="alert alert-success">
+                    <i class="mdi mdi-check-circle alert-icon"></i>
+                    <span>Account created successfully! Redirecting to dashboard...</span>
+                </div>
+                <div id="registerError" class="alert alert-error">
+                    <i class="mdi mdi-alert-circle alert-icon"></i>
+                    <span id="registerErrorText">Email already exists</span>
+                    <button class="alert-close" onclick="closeAlert('registerError')"><i class="mdi mdi-close"></i></button>
+                </div>
+                <div class="name-row">
+                    <div class="input-group">
+                        <label class="input-label">First Name</label>
+                        <div class="input-wrapper">
+                            <i class="mdi mdi-account input-icon"></i>
+                            <input type="text" id="registerFirstName" class="input-field" placeholder="John" autocomplete="given-name">
+                        </div>
+                        <div class="error-message" id="registerFirstNameError">First name is required (min 2 characters)</div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Last Name</label>
+                        <div class="input-wrapper">
+                            <i class="mdi mdi-account input-icon"></i>
+                            <input type="text" id="registerLastName" class="input-field" placeholder="Doe" autocomplete="family-name">
+                        </div>
+                        <div class="error-message" id="registerLastNameError">Last name is required (min 2 characters)</div>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Email Address</label>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-email input-icon"></i>
+                        <input type="email" id="registerEmail" class="input-field" placeholder="you@example.com" autocomplete="email">
+                    </div>
+                    <div class="error-message" id="registerEmailError">Please enter a valid email</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Phone Number</label>
+                    <div class="phone-wrapper">
+                        <select id="registerCountryCode" class="country-select">
+                            <option value="+1" data-country="USA">USA +1</option>
+                            <option value="+44" data-country="UK">UK +44</option>
+                            <option value="+61" data-country="Australia">Australia +61</option>
+                            <option value="+81" data-country="Japan">Japan +81</option>
+                            <option value="+82" data-country="South Korea">South Korea +82</option>
+                            <option value="+84" data-country="Vietnam" selected>Vietnam +84</option>
+                            <option value="+86" data-country="China">China +86</option>
+                            <option value="+91" data-country="India">India +91</option>
+                            <option value="+33" data-country="France">France +33</option>
+                            <option value="+49" data-country="Germany">Germany +49</option>
+                        </select>
+                        <div class="input-wrapper phone-input-wrapper">
+                            <i class="mdi mdi-phone input-icon"></i>
+                            <input type="tel" id="registerPhone" class="input-field" placeholder="123456789" autocomplete="tel">
+                        </div>
+                    </div>
+                    <div class="error-message" id="registerPhoneError">Please enter a valid phone number (digits only)</div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Password</label>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock input-icon"></i>
+                        <input type="password" id="registerPassword" class="input-field" placeholder="Create a strong password" autocomplete="new-password" oninput="updatePasswordStrength()">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerPassword')"><i class="mdi mdi-eye" id="registerPasswordIcon"></i></button>
+                    </div>
+                    <div class="error-message" id="registerPasswordError">Password must be at least 8 characters with uppercase, lowercase, number, and special character (!@#$%^&*)</div>
+                    <div class="password-strength" id="passwordStrength">
+                        <div class="strength-bar"><div class="strength-fill" id="strengthFill"></div></div>
+                        <p class="strength-text" id="strengthText">Password strength: Weak</p>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label class="input-label">Confirm Password</label>
+                    <div class="input-wrapper">
+                        <i class="mdi mdi-lock-check input-icon"></i>
+                        <input type="password" id="registerConfirmPassword" class="input-field" placeholder="Re-enter your password" autocomplete="new-password">
+                        <button type="button" class="toggle-password" onclick="togglePassword('registerConfirmPassword')"><i class="mdi mdi-eye" id="registerConfirmPasswordIcon"></i></button>
+                    </div>
+                    <div class="error-message" id="registerConfirmPasswordError">Passwords do not match</div>
+                </div>
+                <button class="btn btn-primary" id="registerBtn" onclick="handleRegister()">
+                    <span id="registerBtnText">Create Account</span>
+                    <div class="spinner" id="registerSpinner" style="display: none;"></div>
+                </button>
+                <div class="form-link">Already have an account? <a href="#" onclick="showLogin(); return false;">Login</a></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showLogin() { document.getElementById("loginForm").classList.add("active"); document.getElementById("registerForm").classList.remove("active"); clearForm("login"); }
+        function showRegister() { document.getElementById("registerForm").classList.add("active"); document.getElementById("loginForm").classList.remove("active"); clearForm("register"); }
+        function togglePassword(fieldId) { const field = document.getElementById(fieldId); const icon = document.getElementById(fieldId + "Icon"); if (field.type === "password") { field.type = "text"; icon.classList.remove("mdi-eye"); icon.classList.add("mdi-eye-off"); } else { field.type = "password"; icon.classList.remove("mdi-eye-off"); icon.classList.add("mdi-eye"); } }
+        function updatePasswordStrength() { const password = document.getElementById("registerPassword").value; const strengthDiv = document.getElementById("passwordStrength"); const fill = document.getElementById("strengthFill"); const text = document.getElementById("strengthText"); if (!password) { strengthDiv.classList.remove("show"); return; } strengthDiv.classList.add("show"); let strength = 0; if (password.length >= 8) strength += 20; if (password.length >= 12) strength += 20; if (/[A-Z]/.test(password)) strength += 20; if (/[a-z]/.test(password)) strength += 20; if (/\d/.test(password)) strength += 10; if (/[!@#$%^&*]/.test(password)) strength += 10; fill.className = "strength-fill"; text.className = "strength-text"; if (strength < 40) { fill.classList.add("weak"); text.classList.add("weak"); text.textContent = "Password strength: Weak"; } else if (strength < 70) { fill.classList.add("medium"); text.classList.add("medium"); text.textContent = "Password strength: Medium"; } else { fill.classList.add("strong"); text.classList.add("strong"); text.textContent = "Password strength: Strong"; } }
+        function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email); }
+        function validatePassword(password) { if (password.length < 8) return { valid: false, message: "Password must be at least 8 characters" }; if (!/[A-Z]/.test(password)) return { valid: false, message: "Password must contain uppercase letter" }; if (!/[a-z]/.test(password)) return { valid: false, message: "Password must contain lowercase letter" }; if (!/\d/.test(password)) return { valid: false, message: "Password must contain a number" }; if (!/[!@#$%^&*]/.test(password)) return { valid: false, message: "Password must contain special character (!@#$%^&*)" }; return { valid: true }; }
+        function validatePhone(phone) { return /^\d{7,15}$/.test(phone); }
+        function showFieldError(fieldId, show) { const field = document.getElementById(fieldId); const error = document.getElementById(fieldId + "Error"); if (show) { field.classList.add("error"); error.classList.add("show"); } else { field.classList.remove("error"); error.classList.remove("show"); } }
+        function closeAlert(alertId) { document.getElementById(alertId).classList.remove("show"); }
+        function clearForm(type) { if (type === "login") { document.getElementById("loginEmail").value = ""; document.getElementById("loginPassword").value = ""; showFieldError("loginEmail", false); showFieldError("loginPassword", false); closeAlert("loginError"); } else { document.getElementById("registerFirstName").value = ""; document.getElementById("registerLastName").value = ""; document.getElementById("registerEmail").value = ""; document.getElementById("registerCountryCode").value = "+84"; document.getElementById("registerPhone").value = ""; document.getElementById("registerPassword").value = ""; document.getElementById("registerConfirmPassword").value = ""; showFieldError("registerFirstName", false); showFieldError("registerLastName", false); showFieldError("registerEmail", false); showFieldError("registerPhone", false); showFieldError("registerPassword", false); showFieldError("registerConfirmPassword", false); closeAlert("registerError"); closeAlert("registerSuccess"); document.getElementById("passwordStrength").classList.remove("show"); } }
+        async function handleLogin() { const email = document.getElementById("loginEmail").value.trim(); const password = document.getElementById("loginPassword").value; let hasError = false; if (!email || !validateEmail(email)) { showFieldError("loginEmail", true); hasError = true; } else { showFieldError("loginEmail", false); } if (!password) { showFieldError("loginPassword", true); hasError = true; } else { showFieldError("loginPassword", false); } if (hasError) return; const btn = document.getElementById("loginBtn"); const btnText = document.getElementById("loginBtnText"); const spinner = document.getElementById("loginSpinner"); btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block"; setTimeout(() => { const success = Math.random() > 0.1; btn.disabled = false; btnText.style.display = "inline"; spinner.style.display = "none"; if (success) { const successDiv = document.createElement("div"); successDiv.className = "alert alert-success show"; successDiv.innerHTML = `<i class="mdi mdi-check-circle alert-icon"></i><span>Login successful! Redirecting to dashboard...</span>`; document.getElementById("loginForm").insertBefore(successDiv, document.getElementById("loginEmail").parentElement); setTimeout(() => { alert(` Login Successful!\n\nUser: ${email}\n\nIn production, you would be redirected to the events dashboard.`); successDiv.remove(); clearForm("login"); }, 1500); } else { document.getElementById("loginErrorText").textContent = "Invalid email or password"; document.getElementById("loginError").classList.add("show"); } }, 800); }
+        async function handleRegister() { const firstName = document.getElementById("registerFirstName").value.trim(); const lastName = document.getElementById("registerLastName").value.trim(); const email = document.getElementById("registerEmail").value.trim(); const countryCode = document.getElementById("registerCountryCode").value; const phone = document.getElementById("registerPhone").value.trim(); const password = document.getElementById("registerPassword").value; const confirmPassword = document.getElementById("registerConfirmPassword").value; let hasError = false; if (!firstName || firstName.length < 2) { showFieldError("registerFirstName", true); hasError = true; } else { showFieldError("registerFirstName", false); } if (!lastName || lastName.length < 2) { showFieldError("registerLastName", true); hasError = true; } else { showFieldError("registerLastName", false); } if (!email || !validateEmail(email)) { showFieldError("registerEmail", true); hasError = true; } else { showFieldError("registerEmail", false); } if (!phone || !validatePhone(phone)) { showFieldError("registerPhone", true); hasError = true; } else { showFieldError("registerPhone", false); } const passwordValidation = validatePassword(password); if (!passwordValidation.valid) { document.getElementById("registerPasswordError").textContent = passwordValidation.message; showFieldError("registerPassword", true); hasError = true; } else { showFieldError("registerPassword", false); } if (password !== confirmPassword) { showFieldError("registerConfirmPassword", true); hasError = true; } else { showFieldError("registerConfirmPassword", false); } if (hasError) return; const btn = document.getElementById("registerBtn"); const btnText = document.getElementById("registerBtnText"); const spinner = document.getElementById("registerSpinner"); btn.disabled = true; btnText.style.display = "none"; spinner.style.display = "block"; setTimeout(() => { const success = Math.random() > 0.2; btn.disabled = false; btnText.style.display = "inline"; spinner.style.display = "none"; if (success) { document.getElementById("registerSuccess").classList.add("show"); setTimeout(() => { alert(` Registration Successful!\n\nName: ${firstName} ${lastName}\nEmail: ${email}\nPhone: ${countryCode} ${phone}\n\nIn production, you would be auto-logged in and redirected to the events dashboard.`); clearForm("register"); }, 1500); } else { document.getElementById("registerErrorText").textContent = "Email address is already registered"; document.getElementById("registerError").classList.add("show"); } }, 800); }
+        document.addEventListener("keypress", (e) => { if (e.key === "Enter") { const loginActive = document.getElementById("loginForm").classList.contains("active"); if (loginActive) { handleLogin(); } else { handleRegister(); } } });
+    </script>
+</body>
+</html>

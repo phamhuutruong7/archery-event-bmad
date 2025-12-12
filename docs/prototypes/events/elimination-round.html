@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Elimination Round - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        /* Responsive container */
+        .elimination-container {
+            width: 100%;
+            min-height: 100vh;
+            background: white;
+            margin: 0 auto;
+        }
+
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .elimination-container { width: 100%; }
+        }
+ 
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .elimination-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .elimination-container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Landscape (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .elimination-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+ 
+            .elimination-container {
+                width: 50vw;
+                box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            }
+        }
+
+        /* Header */
+        .elimination-header {
+            display: grid;
+            grid-template-columns: 40px 1fr 40px;
+            gap: 4px;
+            padding: 12px;
+            background: #1565c0;
+            color: white;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-back {
+            grid-column: 1 / 2;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .header-back:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .header-back i {
+            font-size: 24px;
+        }
+
+        .header-title {
+            grid-column: 2 / 3;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .header-profile {
+            grid-column: 3 / 4;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s;
+        }
+
+        .header-profile:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .header-profile i {
+            font-size: 24px;
+        }
+
+        /* Info Section */
+        .info-section {
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #757575;
+            text-transform: uppercase;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #212121;
+        }
+
+        .competition-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-recurve {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
+        .badge-compound {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .badge-barebow {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        /* Bracket Container */
+        .bracket-container {
+            position: relative;
+            padding: 20px;
+            overflow: hidden;
+            background: white;
+            touch-action: pan-y;
+        }
+
+        .bracket-wrapper {
+            display: flex;
+            gap: 60px;
+            min-width: max-content;
+            padding: 20px 0;
+            transition: transform 0.3s ease-out;
+            will-change: transform;
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #e0e0e0;
+            position: sticky;
+            top: 69px;
+            z-index: 99;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-button {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 2px solid #1565c0;
+            background: white;
+            color: #1565c0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-button:hover:not(:disabled) {
+            background: #1565c0;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .nav-button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #9e9e9e;
+            color: #9e9e9e;
+        }
+
+        .nav-button i {
+            font-size: 24px;
+        }
+
+        .nav-indicator {
+            font-size: 14px;
+            font-weight: 600;
+            color: #424242;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        /* Desktop: Show all rounds */
+        @media (min-width: 600px) {
+            .bracket-container {
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+
+            .nav-controls {
+                display: none;
+            }
+        }
+
+        /* Round Column */
+        .bracket-round {
+            display: flex;
+            flex-direction: column;
+            min-width: 220px;
+            position: relative;
+        }
+
+        .round-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1565c0;
+            text-align: center;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .matches-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        /* Spacing for vertical alignment between rounds */
+        /* Each match in next round should be centered between the 2 matches that feed into it */
+        
+        /* Round of 32 (32 matches) - Base spacing */
+        .bracket-round:nth-child(1) .match {
+            margin-bottom: 20px;
+        }
+
+        /* Round of 16 (16 matches) - Centered between every 2 R32 matches */
+        .bracket-round:nth-child(2) .match {
+            margin-bottom: 110px; /* 2x match height + gap */
+        }
+
+        .bracket-round:nth-child(2) .match:first-child {
+            margin-top: 60px; /* Half of R32 match + gap */
+        }
+
+        /* Quarter Finals (8 matches) - Centered between every 2 R16 matches */
+        .bracket-round:nth-child(3) .match {
+            margin-bottom: 250px; /* 2x previous spacing */
+        }
+
+        .bracket-round:nth-child(3) .match:first-child {
+            margin-top: 125px; /* Center of first 2 R16 matches */
+        }
+
+        /* Semi Finals (4 matches) - Centered between every 2 QF matches */
+        .bracket-round:nth-child(4) .match {
+            margin-bottom: 530px; /* 2x previous spacing */
+        }
+
+        .bracket-round:nth-child(4) .match:first-child {
+            margin-top: 265px; /* Center of first 2 QF matches */
+        }
+
+        /* Finals (2 matches) - Centered between every 2 SF matches */
+        .bracket-round:nth-child(5) .match {
+            margin-bottom: 1090px; /* 2x previous spacing */
+        }
+
+        .bracket-round:nth-child(5) .match:first-child {
+            margin-top: 545px; /* Center of first 2 SF matches */
+        }
+
+        /* Medal Matches - Centered after Finals */
+        .bracket-round:nth-child(6) {
+            padding-top: 1090px; /* Align with center of Finals */
+        }
+
+        /* Match */
+        .match {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .match:hover {
+            border-color: #1565c0;
+            box-shadow: 0 4px 12px rgba(21, 101, 192, 0.2);
+            transform: translateX(-2px);
+        }
+
+        /* Connector lines */
+        .match::after {
+            content: '';
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            width: 60px;
+            height: 2px;
+            background: #e0e0e0;
+        }
+
+        .bracket-round:last-child .match::after {
+            display: none;
+        }
+
+        .match-player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #e0e0e0;
+            transition: background 0.2s;
+        }
+
+        .match-player:last-child {
+            border-bottom: none;
+        }
+
+        .match-player.winner {
+            background: #e8f5e9;
+            font-weight: 600;
+        }
+
+        .match-player:hover {
+            background: #f5f5f5;
+        }
+
+        .match-player.winner:hover {
+            background: #c8e6c9;
+        }
+
+        .player-name {
+            font-size: 14px;
+            color: #212121;
+            flex: 1;
+        }
+
+        .player-score {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-left: 12px;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        .match-player.winner .player-score {
+            color: #2e7d32;
+        }
+
+        /* Finals Section */
+        .finals-section {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .finals-column {
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .finals-title {
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .bronze-title {
+            color: #ef6c00;
+        }
+
+        .gold-title {
+            color: #ffc107;
+        }
+
+        .medal-icon {
+            font-size: 18px;
+            margin-right: 6px;
+        }
+
+        /* Final Match Highlight */
+        .final-match {
+            border: 3px solid #ffc107;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+        }
+
+        .bronze-match {
+            border: 3px solid #ef6c00;
+            box-shadow: 0 4px 12px rgba(239, 108, 0, 0.3);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 599px) {
+            .bracket-container {
+                padding: 10px;
+            }
+
+            .bracket-wrapper {
+                gap: 20px;
+            }
+
+            .bracket-round {
+                min-width: 160px;
+            }
+
+            .match-player {
+                padding: 10px 12px;
+            }
+
+            .player-name {
+                font-size: 13px;
+            }
+
+            .player-score {
+                font-size: 14px;
+            }
+        }
+
+        /* Empty State */
+        .empty-bracket {
+            text-align: center;
+            padding: 48px 16px;
+            color: #9e9e9e;
+        }
+
+        .empty-bracket i {
+            font-size: 64px;
+            color: #e0e0e0;
+            margin-bottom: 16px;
+        }
+
+        .empty-bracket-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #757575;
+            margin-bottom: 8px;
+        }
+
+        .empty-bracket-text {
+            font-size: 14px;
+            color: #9e9e9e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="elimination-container">
+        <!-- Header -->
+        <div class="elimination-header">
+            <div class="header-back" onclick="goBack()">
+                <i class="mdi mdi-arrow-left"></i>
+            </div>
+            <div class="header-title">Elimination Bracket</div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <!-- Competition Info -->
+        <div class="info-section">
+            <div class="info-row">
+                <span class="info-label">Category</span>
+                <span class="info-value" id="categoryInfo">Men's Individual</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Bow Type</span>
+                <span class="info-value">
+                    <span class="competition-badge badge-recurve" id="bowTypeInfo">Recurve</span>
+                </span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Round</span>
+                <span class="info-value" id="roundInfo">WA (International)</span>
+            </div>
+        </div>
+
+        <!-- Navigation Controls (Mobile) -->
+        <div class="nav-controls">
+            <button class="nav-button" id="prevButton" onclick="navigatePrev()">
+                <i class="mdi mdi-chevron-left"></i>
+            </button>
+            <div class="nav-indicator" id="navIndicator">R32 & R16</div>
+            <button class="nav-button" id="nextButton" onclick="navigateNext()">
+                <i class="mdi mdi-chevron-right"></i>
+            </button>
+        </div>
+
+        <!-- Bracket -->
+        <div class="bracket-container" id="bracketContainer">
+            <div class="bracket-wrapper" id="bracketContent">
+                <!-- Round of 32 (64 athletes, 32 matches) -->
+                <div class="bracket-round">
+                    <div class="round-title">Round of 32</div>
+                    <div class="matches-container">
+                        <div class="match"><div class="match-player winner"><span class="player-name">An San</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Zhang Min</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Kim Woojin</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Chen Yiwen</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Lee Seung-yun</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Park Min-hee</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Oh Jin-hyek</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Liu Yi</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Kim Je-deok</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Yang Tae-hun</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Brady Ellison</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Jack Williams</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Marcus D'Almeida</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Felipe Silva</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mete Gazoz</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Yigit Çakir</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mauro Nespoli</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Marco Morello</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Miguel Alvariño</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Pablo Acha</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Jean-Charles Valladont</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Thomas Chirault</span><span class="player-score">1</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Tom Hall</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Patrick Huston</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Takaharu Furukawa</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Hiroki Muto</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Wei Chun-heng</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Lin Chia-en</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Taylor Worth</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Ryan Tyack</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Florian Unruh</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Maximilian Weckmueller</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Sjef van den Berg</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Rick van der Ven</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Andreas Gstöttner</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Armin Hirmer</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Demir Elmaağaçlı</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Berkim Tumer</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Steve Wijler</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Gijs Broeksma</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Wang Yan</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Li Jialiang</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Kim Min-jong</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Lee Woo-seok</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Galsan Bazarzhapov</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Denis Gankin</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Kang Chae-young</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Jang Min-hee</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mohammed Al-Azri</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Saeed Al-Maktoum</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Atanu Das</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Pravin Jadhav</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Jake Kaminski</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Casey Kaufhold</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Eric Peters</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Ben Meeks</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Marcus Vinicius</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Ane Marcelle</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Aleksandr Yeremenko</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Anton Prilepov</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Khairul Anuar</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Muhammad Zulkarnain</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Luis Alvarez</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Mario Cardoso</span><span class="player-score">5</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Round of 16 (32 athletes, 16 matches) -->
+                <div class="bracket-round">
+                    <div class="round-title">Round of 16</div>
+                    <div class="matches-container">
+                        <div class="match"><div class="match-player winner"><span class="player-name">An San</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Kim Woojin</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Lee Seung-yun</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Oh Jin-hyek</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player"><span class="player-name">Kim Je-deok</span><span class="player-score">5</span></div><div class="match-player winner"><span class="player-name">Brady Ellison</span><span class="player-score">6</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Marcus D'Almeida</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Mete Gazoz</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mauro Nespoli</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Miguel Alvariño</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Jean-Charles Valladont</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Tom Hall</span><span class="player-score">1</span></div></div>
+                        <div class="match"><div class="match-player"><span class="player-name">Takaharu Furukawa</span><span class="player-score">4</span></div><div class="match-player winner"><span class="player-name">Wei Chun-heng</span><span class="player-score">6</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Taylor Worth</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Florian Unruh</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Sjef van den Berg</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Andreas Gstöttner</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Demir Elmaağaçlı</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Steve Wijler</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Wang Yan</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Kim Min-jong</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Galsan Bazarzhapov</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Kang Chae-young</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mohammed Al-Azri</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Atanu Das</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Jake Kaminski</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Eric Peters</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Marcus Vinicius</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Aleksandr Yeremenko</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Khairul Anuar</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Luis Alvarez</span><span class="player-score">2</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Quarter Finals (16 athletes, 8 matches) -->
+                <div class="bracket-round">
+                    <div class="round-title">Quarter Finals</div>
+                    <div class="matches-container">
+                        <div class="match"><div class="match-player winner"><span class="player-name">An San</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Lee Seung-yun</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Brady Ellison</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Marcus D'Almeida</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mauro Nespoli</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Jean-Charles Valladont</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Wei Chun-heng</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Taylor Worth</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Sjef van den Berg</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Demir Elmaağaçlı</span><span class="player-score">3</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Wang Yan</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Galsan Bazarzhapov</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mohammed Al-Azri</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Jake Kaminski</span><span class="player-score">2</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Marcus Vinicius</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Khairul Anuar</span><span class="player-score">5</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Semi Finals (8 athletes, 4 matches) -->
+                <div class="bracket-round">
+                    <div class="round-title">Semi Finals</div>
+                    <div class="matches-container">
+                        <div class="match"><div class="match-player winner"><span class="player-name">An San</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Brady Ellison</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Mauro Nespoli</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Wei Chun-heng</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Sjef van den Berg</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Wang Yan</span><span class="player-score">4</span></div></div>
+                        <div class="match"><div class="match-player"><span class="player-name">Mohammed Al-Azri</span><span class="player-score">5</span></div><div class="match-player winner"><span class="player-name">Marcus Vinicius</span><span class="player-score">6</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Finals (4 athletes, 2 matches) -->
+                <div class="bracket-round">
+                    <div class="round-title">Finals</div>
+                    <div class="matches-container">
+                        <div class="match"><div class="match-player winner"><span class="player-name">An San</span><span class="player-score">7</span></div><div class="match-player"><span class="player-name">Mauro Nespoli</span><span class="player-score">5</span></div></div>
+                        <div class="match"><div class="match-player winner"><span class="player-name">Sjef van den Berg</span><span class="player-score">6</span></div><div class="match-player"><span class="player-name">Marcus Vinicius</span><span class="player-score">4</span></div></div>
+                    </div>
+                </div>
+
+                <!-- Medal Matches -->
+                <div class="bracket-round">
+                    <div class="round-title">Medal Matches</div>
+                    <div class="finals-section">
+                        <!-- Bronze Final -->
+                        <div class="finals-column">
+                            <div class="finals-title bronze-title">
+                                <span class="medal-icon">🥉</span>
+                                Bronze Final
+                            </div>
+                            <div class="match bronze-match">
+                                <div class="match-player winner"><span class="player-name">Mauro Nespoli</span><span class="player-score">6</span></div>
+                                <div class="match-player"><span class="player-name">Marcus Vinicius</span><span class="player-score">4</span></div>
+                            </div>
+                        </div>
+
+                        <!-- Gold Final -->
+                        <div class="finals-column">
+                            <div class="finals-title gold-title">
+                                <span class="medal-icon">🥇</span>
+                                Gold Final
+                            </div>
+                            <div class="match final-match">
+                                <div class="match-player winner"><span class="player-name">An San</span><span class="player-score">7</span></div>
+                                <div class="match-player"><span class="player-name">Sjef van den Berg</span><span class="player-score">5</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId');
+        const competitionId = urlParams.get('competitionId');
+        const category = urlParams.get('category');
+        const bowType = urlParams.get('bowType');
+
+        // Display competition info
+        if (category) {
+            document.getElementById('categoryInfo').textContent = category;
+        }
+
+        if (bowType) {
+            const bowTypeElement = document.getElementById('bowTypeInfo');
+            bowTypeElement.textContent = bowType;
+            
+            // Update badge class
+            bowTypeElement.className = 'competition-badge';
+            if (bowType.toLowerCase() === 'recurve') {
+                bowTypeElement.classList.add('badge-recurve');
+            } else if (bowType.toLowerCase() === 'compound') {
+                bowTypeElement.classList.add('badge-compound');
+            } else if (bowType.toLowerCase() === 'barebow') {
+                bowTypeElement.classList.add('badge-barebow');
+            }
+        }
+
+        function goBack() {
+            if (eventId) {
+                window.location.href = `event-detail.html?id=${eventId}`;
+            } else {
+                window.history.back();
+            }
+        }
+
+        // Open match details
+        function openMatchDetails(matchId, roundName) {
+            const params = new URLSearchParams({
+                eventId: eventId || 'default',
+                matchId: matchId,
+                round: roundName,
+                category: category || "Men's Individual",
+                bowType: bowType || 'Recurve'
+            });
+            window.location.href = `elimination-match.html?${params.toString()}`;
+        }
+
+        // Add click handlers to all matches
+        function initializeMatchClicks() {
+            const matches = document.querySelectorAll('.match');
+            const rounds = document.querySelectorAll('.bracket-round');
+            
+            matches.forEach((match, index) => {
+                // Determine which round this match belongs to
+                let roundName = 'Round of 32';
+                let matchId = 'match1';
+                
+                // Find the round title
+                const roundElement = match.closest('.bracket-round');
+                if (roundElement) {
+                    const titleElement = roundElement.querySelector('.round-title');
+                    if (titleElement) {
+                        roundName = titleElement.textContent;
+                    }
+                }
+                
+                // Assign match IDs based on prominent matches
+                const playerNames = match.textContent.toLowerCase();
+                if (playerNames.includes('an san') && playerNames.includes('kim woojin')) {
+                    matchId = 'match1';
+                } else if (playerNames.includes('brady ellison') && playerNames.includes('marcus')) {
+                    matchId = 'match2';
+                } else if (playerNames.includes('an san') && playerNames.includes('mauro nespoli')) {
+                    matchId = 'match3';
+                } else if (playerNames.includes('an san') && playerNames.includes('sjef')) {
+                    matchId = 'match4';
+                } else {
+                    // Default match ID based on index
+                    matchId = `match${(index % 4) + 1}`;
+                }
+                
+                match.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openMatchDetails(matchId, roundName);
+                });
+                
+                // Add title attribute for better UX
+                match.setAttribute('title', 'Click to view match details');
+            });
+        }
+
+        // Mobile Navigation System
+        let currentView = 0;
+        const totalViews = 5; // 0: R32+R16, 1: R16+QF, 2: QF+SF, 3: SF+Finals, 4: Finals+Medals
+
+        function updateNavigation() {
+            const bracketWrapper = document.getElementById('bracketContent');
+            const prevButton = document.getElementById('prevButton');
+            const nextButton = document.getElementById('nextButton');
+            const navIndicator = document.getElementById('navIndicator');
+            
+            if (window.innerWidth < 600) {
+                const roundWidth = 280; // round width + gap
+                let transformValue = 0;
+                let indicatorText = '';
+                
+                switch(currentView) {
+                    case 0:
+                        transformValue = 0;
+                        indicatorText = 'R32 & R16';
+                        break;
+                    case 1:
+                        transformValue = -(roundWidth * 1);
+                        indicatorText = 'R16 & QF';
+                        break;
+                    case 2:
+                        transformValue = -(roundWidth * 2);
+                        indicatorText = 'QF & SF';
+                        break;
+                    case 3:
+                        transformValue = -(roundWidth * 3);
+                        indicatorText = 'SF & Finals';
+                        break;
+                    case 4:
+                        transformValue = -(roundWidth * 4);
+                        indicatorText = 'Finals & Medals';
+                        break;
+                }
+                
+                bracketWrapper.style.transform = `translateX(${transformValue}px)`;
+                navIndicator.textContent = indicatorText;
+                
+                prevButton.disabled = currentView === 0;
+                nextButton.disabled = currentView >= (totalViews - 1);
+            } else {
+                bracketWrapper.style.transform = 'translateX(0)';
+            }
+        }
+
+        function navigatePrev() {
+            if (currentView > 0) {
+                currentView--;
+                updateNavigation();
+            }
+        }
+
+        function navigateNext() {
+            if (currentView < (totalViews - 1)) {
+                currentView++;
+                updateNavigation();
+            }
+        }
+
+        // Touch Swipe Support
+        let touchStartX = 0;
+        let touchEndX = 0;
+        let lastTapTime = 0;
+        const bracketContainer = document.getElementById('bracketContainer');
+
+        function handleTouchStart(e) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+
+        function handleTouchEnd(e) {
+            touchEndX = e.changedTouches[0].screenX;
+            
+            // Double tap detection
+            const currentTime = new Date().getTime();
+            const tapLength = currentTime - lastTapTime;
+            
+            if (tapLength < 300 && tapLength > 0) {
+                // Double tap detected
+                const tapX = e.changedTouches[0].screenX;
+                const screenWidth = window.innerWidth;
+                
+                if (tapX > screenWidth / 2) {
+                    // Tap on right side - next
+                    navigateNext();
+                } else {
+                    // Tap on left side - previous
+                    navigatePrev();
+                }
+                lastTapTime = 0; // Reset to prevent triple tap
+            } else {
+                lastTapTime = currentTime;
+                handleSwipe();
+            }
+        }
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchStartX - touchEndX;
+            
+            if (Math.abs(diff) > swipeThreshold) {
+                if (diff > 0) {
+                    navigateNext();
+                } else {
+                    navigatePrev();
+                }
+            }
+        }
+
+        bracketContainer.addEventListener('touchstart', handleTouchStart);
+        bracketContainer.addEventListener('touchend', handleTouchEnd);
+
+        updateNavigation();
+        window.addEventListener('resize', updateNavigation);
+        
+        // Initialize match click handlers
+        initializeMatchClicks();
+    </script>
+</body>
+
+</html>

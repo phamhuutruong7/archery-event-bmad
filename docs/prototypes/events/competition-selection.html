@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Competitions - Archery Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+    <script src="../mock-data/languages.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+        
+        .container { width: 100%; min-height: 100vh; background: white; margin: 0 auto; }
+        
+        /* Mobile Portrait (320px - 599px) */
+        @media (max-width: 599px) {
+            .container { width: 100%; }
+            .header-title { font-size: 16px; }
+        }
+       
+        /* Mobile Landscape (600px - 767px) */
+        @media (min-width: 600px) and (max-width: 767px) {
+            body { background: #e0e0e0; }
+            .container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Portrait (768px - 1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            body { background: #e0e0e0; }
+            .container { width: 100%; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Tablet Landscape (1024px - 1279px) */
+        @media (min-width: 1024px) and (max-width: 1279px) {
+            body { background: #e0e0e0; }
+            .selection-container { width: 75vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+       
+        /* Wide Screen - Centered Layout (1280px+) */
+        @media (min-width: 1280px) {
+            body { background: #e0e0e0; }
+            .selection-container { width: 50vw; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1); }
+        }
+        
+        /* Header */
+        .header { display: grid; grid-template-columns: 40px repeat(5, 1fr) 40px 40px; gap: 4px; padding: 12px; background: #1565c0; color: white; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .header-back { grid-column: 1 / 2; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 8px; }
+        .header-back:hover { background: rgba(255, 255, 255, 0.1); }
+        .header-title { grid-column: 2 / 7; font-size: 18px; font-weight: 700; }
+        
+        .header-language { grid-column: 7 / 8; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; font-size: 24px; position: relative; }
+        .header-language:hover { background: rgba(255, 255, 255, 0.3); }
+        
+        .header-profile { grid-column: 8 / 9; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%; background: rgba(255, 255, 255, 0.2); transition: background 0.2s; }
+        .header-profile:hover { background: rgba(255, 255, 255, 0.3); }
+        .header-profile i { font-size: 24px; }
+        
+        /* Language Dropdown */
+        .language-dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); min-width: 200px; display: none; z-index: 1000; overflow: hidden; }
+        .language-dropdown.show { display: block; }
+        .language-item { padding: 12px 16px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: background 0.2s; color: #424242; font-size: 14px; border: none; width: 100%; text-align: left; background: white; }
+        .language-item:hover { background: #f5f5f5; }
+        .language-item.active { background: #e3f2fd; color: #1565c0; font-weight: 600; }
+        .language-flag { font-size: 20px; }
+        .language-name { flex: 1; }
+        
+        /* Content */
+        .content { padding: 20px; padding-bottom: 100px; }
+        .page-title { font-size: 24px; font-weight: 700; color: #212121; margin-bottom: 8px; }
+        .page-subtitle { font-size: 14px; color: #666; margin-bottom: 24px; }
+        
+        /* Event Info */
+        .event-info { background: #f9f9f9; border-radius: 12px; padding: 16px; margin-bottom: 24px; }
+        .event-info-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 12px; }
+        .event-info-row { font-size: 14px; color: #666; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+        .event-info-row i { color: #1565c0; }
+        
+        /* Competitions Section */
+        .section-title { font-size: 18px; font-weight: 700; color: #212121; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .section-title i { color: #1565c0; }
+        
+        /* Competitions Table */
+        .competitions-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .competitions-count { font-size: 14px; font-weight: 600; color: #666; background: #f5f5f5; padding: 4px 12px; border-radius: 12px; }
+        .competitions-table-container { overflow-x: auto; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); margin-bottom: 20px; }
+        .competitions-table { width: 100%; border-collapse: collapse; }
+        .competitions-table thead { background: #f5f5f5; }
+        .competitions-table th { padding: 12px; text-align: left; font-size: 12px; font-weight: 700; color: #424242; text-transform: uppercase; border-bottom: 2px solid #e0e0e0; white-space: nowrap; user-select: none; transition: background 0.2s; }
+        .competitions-table th.sortable { cursor: pointer; }
+        .competitions-table th.sortable:hover { background: #eeeeee; }
+        .competitions-table th.active { color: #1565c0; }
+        .competitions-table th .sort-icon { font-size: 16px; margin-left: 4px; vertical-align: middle; transition: transform 0.2s; display: inline-block; }
+        .competitions-table th.desc .sort-icon { transform: rotate(180deg); }
+        .competitions-table tbody tr { transition: background 0.2s; }
+        .competitions-table tbody tr:hover { background: #f5f5f5; }
+        .competitions-table tbody tr.selected { background: #e3f2fd; }
+        .competitions-table td { padding: 12px; font-size: 14px; color: #424242; border-bottom: 1px solid #e0e0e0; }
+        .competition-badge { padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; display: inline-block; }
+        .badge-recurve { background: #e3f2fd; color: #1565c0; }
+        .badge-compound { background: #e8f5e9; color: #2e7d32; }
+        .badge-barebow { background: #fff3e0; color: #e65100; }
+        .badge-men-individual { background: #b3e5fc; color: #01579b; }
+        .badge-women-individual { background: #ffccbc; color: #bf360c; }
+        .badge-men-team { background: #c5cae9; color: #283593; }
+        .badge-women-team { background: #f8bbd0; color: #880e4f; }
+        .badge-mixed { background: #c8e6c9; color: #1b5e20; }
+        .competitions-empty { text-align: center; padding: 48px 16px; color: #9e9e9e; }
+        .competitions-empty i { font-size: 48px; color: #e0e0e0; margin-bottom: 12px; }
+        
+        /* Selection Checkbox */
+        .selection-cell { text-align: center; width: 60px; }
+        .selection-checkbox { width: 20px; height: 20px; cursor: pointer; accent-color: #2e7d32; }
+        
+        /* Action Buttons */
+        .action-buttons { position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 16px 20px; box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1); display: flex; gap: 12px; z-index: 100; }
+        
+        @media (min-width: 600px) {
+            .action-buttons { left: 50%; transform: translateX(-50%); width: 50vw; }
+        }
+        
+        .btn { flex: 1; padding: 14px 24px; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-secondary { background: #f5f5f5; color: #424242; }
+        .btn-secondary:hover { background: #e0e0e0; }
+        .btn-primary { background: #1565c0; color: white; }
+        .btn-primary:hover { background: #0d47a1; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        
+        /* Empty State */
+        .empty-state { text-align: center; padding: 48px 20px; color: #999; }
+        .empty-state i { font-size: 64px; margin-bottom: 16px; display: block; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-back" onclick="goBack()">
+                <i class="mdi mdi-arrow-left" style="font-size: 24px;"></i>
+            </div>
+            <div class="header-title">Select Competitions</div>
+            <div class="header-language" id="languageSelector" onclick="toggleLanguageDropdown()">
+                <span id="currentLanguageFlag">🇺🇸</span>
+                <div class="language-dropdown" id="languageDropdown"></div>
+            </div>
+            <div class="header-profile" onclick="alert('Profile clicked')">
+                <i class="mdi mdi-account"></i>
+            </div>
+        </div>
+
+        <div class="content">
+            <h1 class="page-title">Competition Registration</h1>
+            <p class="page-subtitle">Enter your team information and select competitions</p>
+
+            <div id="eventInfo" class="event-info"></div>
+
+            <!-- Team Name Section -->
+            <div class="event-info">
+                <div class="event-info-title">
+                    <i class="mdi mdi-account-group"></i>
+                    Team Information
+                </div>
+                <div style="margin-top: 12px;">
+                    <label for="teamNameInput" style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px;">
+                        Team Name <span style="color: #c62828;">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="teamNameInput" 
+                        placeholder="Enter your team name (or create new)" 
+                        style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; outline: none; transition: border 0.2s;"
+                        oninput="validateTeamName()"
+                        onfocus="this.style.borderColor='#1565c0'"
+                        onblur="this.style.borderColor='#e0e0e0'"
+                    />
+                    <div id="teamNameHelp" style="font-size: 12px; color: #666; margin-top: 6px;">
+                        <i class="mdi mdi-information-outline"></i>
+                        If your team doesn't exist, it will be created automatically
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <i class="mdi mdi-trophy-variant"></i>
+                Available Competitions
+            </div>
+
+            <div id="competitionList"></div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="btn btn-secondary" onclick="goBack()">
+                <i class="mdi mdi-close"></i>
+                Cancel
+            </button>
+            <button id="confirmBtn" class="btn btn-primary" onclick="confirmRegistration()" disabled>
+                <i class="mdi mdi-check"></i>
+                Submit Registration
+            </button>
+        </div>
+    </div>
+
+    <script src="../mock-data/event-details.js"></script>
+    <script>
+        // Language selector functionality
+        function initLanguageSelector() {
+            const currentLang = getCurrentLanguage();
+            document.getElementById('currentLanguageFlag').textContent = currentLang.flag;
+            renderLanguageDropdown();
+        }
+
+        function renderLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            const languages = getSupportedLanguages();
+            const currentLang = getCurrentLanguage();
+            
+            dropdown.innerHTML = languages.map(lang => `
+                <button class="language-item ${lang.code === currentLang.code ? 'active' : ''}" onclick="selectLanguage('${lang.code}')">
+                    <span class="language-flag">${lang.flag}</span>
+                    <span class="language-name">${lang.nativeName}</span>
+                </button>
+            `).join('');
+        }
+
+        function toggleLanguageDropdown() {
+            const dropdown = document.getElementById('languageDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        function selectLanguage(languageCode) {
+            const language = setCurrentLanguage(languageCode);
+            document.getElementById('currentLanguageFlag').textContent = language.flag;
+            renderLanguageDropdown();
+            toggleLanguageDropdown();
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const languageSelector = document.getElementById('languageSelector');
+            const dropdown = document.getElementById('languageDropdown');
+            if (!languageSelector.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = Number.parseInt(urlParams.get('eventId'));
+        let selectedCompetitions = [];
+        let currentEvent = null;
+        
+        // Competitions sorting state
+        let competitionsSortField = null;
+        let competitionsSortOrder = 'asc';
+        let competitionsData = [];
+
+        function init() {
+            // Load event data
+            currentEvent = getEventDetail(eventId);
+            if (!currentEvent) {
+                document.querySelector('.content').innerHTML = '<div class="empty-state"><i class="mdi mdi-alert-circle"></i><div>Event not found</div></div>';
+                return;
+            }
+
+            loadExistingSelections();
+            renderEventInfo();
+            renderCompetitions();
+            updateSelectedCount();
+        }
+
+        function loadExistingSelections() {
+            const saved = localStorage.getItem(`event_${eventId}_athlete_competitions`);
+            if (saved) {
+                selectedCompetitions = JSON.parse(saved);
+            }
+        }
+
+        function renderEventInfo() {
+            document.getElementById('eventInfo').innerHTML = `
+                <div class="event-info-title">${currentEvent.title}</div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-calendar"></i>
+                    ${currentEvent.dateDisplay}
+                </div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-map-marker"></i>
+                    ${currentEvent.location}
+                </div>
+                <div class="event-info-row">
+                    <i class="mdi mdi-run"></i>
+                    Registering as: <strong>Athlete</strong>
+                </div>
+            `;
+        }
+
+        function sortCompetitionsTable(field) {
+            if (competitionsSortField === field) {
+                competitionsSortOrder = competitionsSortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                competitionsSortField = field;
+                competitionsSortOrder = 'asc';
+            }
+            
+            document.querySelectorAll('.competitions-table th').forEach(th => {
+                th.classList.remove('active', 'desc');
+            });
+            
+            const activeHeader = document.querySelector(`[onclick*="sortCompetitionsTable('${field}')"]`);
+            if (activeHeader) {
+                activeHeader.classList.add('active');
+                if (competitionsSortOrder === 'desc') {
+                    activeHeader.classList.add('desc');
+                }
+            }
+            
+            competitionsData.sort((a, b) => {
+                let aVal = a[field] ? a[field].toString().toLowerCase() : '';
+                let bVal = b[field] ? b[field].toString().toLowerCase() : '';
+                if (competitionsSortOrder === 'asc') {
+                    return aVal.localeCompare(bVal);
+                } else {
+                    return bVal.localeCompare(aVal);
+                }
+            });
+            
+            renderCompetitionsTable();
+        }
+        
+        function renderCompetitionsTable() {
+            const tbody = document.getElementById('competitionsTableBody');
+            if (!tbody || !competitionsData || competitionsData.length === 0) return;
+            
+            tbody.innerHTML = competitionsData.map(comp => {
+                let categoryClass = 'badge-mixed';
+                const catLower = comp.category ? comp.category.toLowerCase() : '';
+                
+                if (catLower === "men's individual") {
+                    categoryClass = 'badge-men-individual';
+                } else if (catLower === "women's individual") {
+                    categoryClass = 'badge-women-individual';
+                } else if (catLower === "men's team") {
+                    categoryClass = 'badge-men-team';
+                } else if (catLower === "women's team") {
+                    categoryClass = 'badge-women-team';
+                } else if (catLower === "mixed team") {
+                    categoryClass = 'badge-mixed';
+                }
+                
+                const bowTypeClass = comp.bowType ? 'badge-' + comp.bowType.toLowerCase() : 'badge-recurve';
+                const isSelected = selectedCompetitions.includes(comp.id);
+                const rowClass = isSelected ? 'selected' : '';
+                
+                return `
+                <tr class="${rowClass}">
+                    <td class="selection-cell">
+                        <input type="checkbox" class="selection-checkbox" 
+                               ${isSelected ? 'checked' : ''} 
+                               onchange="toggleCompetitionSelection(${comp.id}, this)">
+                    </td>
+                    <td>
+                        <span class="competition-badge ${bowTypeClass}">${comp.bowType || 'N/A'}</span>
+                    </td>
+                    <td>
+                        <span class="competition-badge ${categoryClass}">${comp.category || 'N/A'}</span>
+                    </td>
+                    <td>${comp.round || 'N/A'}</td>
+                    <td>${comp.subround || 'N/A'}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderCompetitions() {
+            const container = document.getElementById('competitionList');
+            
+            if (!currentEvent.competitions || currentEvent.competitions.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="mdi mdi-trophy-outline"></i><div>No competitions available</div></div>';
+                return;
+            }
+
+            competitionsData = [...currentEvent.competitions];
+            
+            container.innerHTML = `
+                <div class="competitions-table-container">
+                    <table class="competitions-table">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th class="sortable" onclick="sortCompetitionsTable('bowType')">
+                                    Bow Type
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('category')">
+                                    Category
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('round')">
+                                    Round
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                                <th class="sortable" onclick="sortCompetitionsTable('subround')">
+                                    Subround
+                                    <i class="mdi mdi-arrow-up sort-icon"></i>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="competitionsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            renderCompetitionsTable();
+        }
+
+        function toggleCompetitionSelection(compId, checkbox) {
+            const index = selectedCompetitions.indexOf(compId);
+            const row = checkbox.closest('tr');
+            
+            if (checkbox.checked) {
+                if (index === -1) {
+                    selectedCompetitions.push(compId);
+                }
+                row.classList.add('selected');
+            } else {
+                if (index > -1) {
+                    selectedCompetitions.splice(index, 1);
+                }
+                row.classList.remove('selected');
+            }
+            updateSelectedCount();
+        }
+
+        function validateTeamName() {
+            const teamName = document.getElementById('teamNameInput').value.trim();
+            const confirmBtn = document.getElementById('confirmBtn');
+            
+            // Enable button only if team name is provided AND competitions are selected
+            confirmBtn.disabled = !teamName || selectedCompetitions.length === 0;
+        }
+
+        function updateSelectedCount() {
+            validateTeamName(); // Re-validate whenever selection changes
+        }
+
+        function confirmRegistration() {
+            const teamName = document.getElementById('teamNameInput').value.trim();
+            
+            if (!teamName) {
+                alert('Please enter your team name');
+                document.getElementById('teamNameInput').focus();
+                return;
+            }
+            
+            if (selectedCompetitions.length === 0) {
+                alert('Please select at least one competition');
+                return;
+            }
+
+            // Save to localStorage
+            localStorage.setItem(`event_${eventId}_athlete_competitions`, JSON.stringify(selectedCompetitions));
+            localStorage.setItem(`event_${eventId}_athlete_team`, teamName);
+            localStorage.setItem(`event_${eventId}_registration`, 'athlete');
+
+            alert(`Successfully registered as athlete for team "${teamName}" in ${selectedCompetitions.length} competition(s)!`);
+            window.location.href = `event-detail.html?id=${eventId}`;
+        }
+
+        function goBack() {
+            window.location.href = `event-detail.html?id=${eventId}`;
+        }
+
+        // Initialize language selector
+        initLanguageSelector();
+
+        // Initialize when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', init);
+        } else {
+            init();
+        }
+    </script>
+</body>
+</html>
